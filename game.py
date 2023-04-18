@@ -26,22 +26,39 @@ class Game:
         self.score_text2_rect = self.score_text2_surface.get_rect()
         self.score_text2_rect.topright = self.score_text1_rect.bottomright
 
-        self.clock = pygame.time.Clock()
+        self.player = Player(self.window) # on creer une instance du joueur
+
+        self.clock = pygame.time.Clock() # module pygame pour gérer le temps dans le jeu (notamment les fps)
 
     def draw(self):
-        self.window.fill("black")
-        pygame.draw.rect(self.window, "white", self.center_square, 5)
-        self.window.blit(self.score_text1_surface, self.score_text1_rect)
-        self.window.blit(self.score_text2_surface, self.score_text2_rect)
+        self.window.fill("black") # on remplit la fenetre de noir à chaque tour de boucle pour effacer les éléments précédents
+        pygame.draw.rect(self.window, "white", self.center_square, 5) # on affiche le rectangle central
+        self.window.blit(self.score_text1_surface, self.score_text1_rect) # on affiche le texte "score"
+        self.window.blit(self.score_text2_surface, self.score_text2_rect) # on affiche la valeur du score
+        self.player.draw(self.player.rotated_img, self.player.vaisseau_rect) # affichage du joueur
 
     def run(self):
         continuer = True
+
         while continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     continuer = False
                     pygame.quit()
 
+            # on récupère à chaque tour de boucle les touches enfoncées par le joueur
+            keys = pygame.key.get_pressed()
+
+            # rotation du vaisseau (juste graphique pour l'instant
+            if keys[pygame.K_RIGHT]:
+                self.player.rotate("R")
+            if keys[pygame.K_LEFT]:
+                self.player.rotate("L")
+
+            # affichage des éléments graphiques
             self.draw()
+            # on update l'affichage
             pygame.display.flip()
+
+            # on fait en sorte d'avoir 60 fps
             self.clock.tick(60)
