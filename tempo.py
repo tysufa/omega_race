@@ -55,8 +55,8 @@ while not done:
     pos = (screen.get_width() / 2, screen.get_height() / 2)
 
     screen.fill(0)
-    blitRotate(screen, image, pos, (w / 2, h / 2), angle)
-    #blitRotate2(screen, image, pos, angle)
+    #blitRotate(screen, image, pos, (w / 2, h / 2), angle)
+    blitRotate2(screen, image, pos, angle)
     angle += 1
 
     pygame.draw.line(screen, (0, 255, 0), (pos[0] - 20, pos[1]), (pos[0] + 20, pos[1]), 3)

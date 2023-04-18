@@ -35,7 +35,7 @@ class Game:
         pygame.draw.rect(self.window, "white", self.center_square, 5) # on affiche le rectangle central
         self.window.blit(self.score_text1_surface, self.score_text1_rect) # on affiche le texte "score"
         self.window.blit(self.score_text2_surface, self.score_text2_rect) # on affiche la valeur du score
-        self.player.draw(self.player.rotated_img, self.player.vaisseau_rect) # affichage du joueur
+        self.player.draw() # affichage du joueur
 
     def run(self):
         continuer = True
@@ -54,6 +54,11 @@ class Game:
                 self.player.rotate("R")
             if keys[pygame.K_LEFT]:
                 self.player.rotate("L")
+            if keys[pygame.K_UP]:
+                self.player.move()
+
+            # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
+            self.player.collision_bord()
 
             # affichage des éléments graphiques
             self.draw()
