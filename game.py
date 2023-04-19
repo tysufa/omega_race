@@ -80,9 +80,6 @@ class Game:
             self.player.collision_bord()
             self.player.central_square_collision(self.center_square)
 
-            tu=pygame.display.get_window_size()
-            self.ennemy_list.append(bull(tu[0]//2,tu[1]//2,self.player.x,self.player.y,self.window))
-
             # affichage des éléments graphiques
             self.update_ennemy()
             self.draw()

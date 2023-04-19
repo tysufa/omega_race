@@ -57,7 +57,11 @@ class Player:
 
     def collision_bord(self):
         if self.vaisseau_rect.top <= 0 or self.vaisseau_rect.bottom > self.size[1]:
+            self.y = 25
             self.velocity.y = -self.velocity.y
+            self.move(True)
+            self.velocity /= 2
+
         if self.vaisseau_rect.left < 0 or self.vaisseau_rect.right > self.size[0]:
             self.velocity.x = -self.velocity.x
 
