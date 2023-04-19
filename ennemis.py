@@ -51,10 +51,10 @@ class asteroid(ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
             self.rotation = -self.rotation#car sin est paire. fonctione.
 
 class bull(ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
-    def __init__ (self,x,y,WINDOW):
+    def __init__ (self,x,y,xb,yb,WINDOW):
         super().__init__(x,y,WINDOW)
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
-        self.rotation=rotate(x,y,320,240)
+        self.rotation=rotate(x,y,xb,yb)
     def draw (self):
         pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
     def moove(self):
