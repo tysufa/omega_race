@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from random import randint
 from math import radians,sin,cos,acos,asin,degrees
-
+#size : 720, 480
 def rotate (xa,ya,xb,yb):
     """
     renvoie en degrés la rotation nescaissaire a l'objet (xa,ya) pour être tourné vers (xb,yb)
@@ -18,6 +18,13 @@ class ennemi:
         self.y=y
         self.alive=True
         self.window=WINDOW#mettre la fenettre en imput pour pouvoir s'afficher
+        tu=pygame.display.get_window_size()
+        self.height=tu[1]
+        self.widht=tu[0]
+    def colver (self):
+        return self.y+10 >= self.height or self.y-10 <= 0#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
+    def colhor (self):
+        return self.x+10 >= self.widht or self.x-10 <= 0
 
 class mine(ennemi):#La mine est un cercle blanc immobile.
     def __init__ (self,x,y,WINDOW):
@@ -37,10 +44,10 @@ class asteroid(ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
     def moove(self):
         self.x+=5*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=5*(sin(radians(self.rotation)))
-        if self.x+10 >= 640 or self.x-10 <= 0:
+        if super().colhor():
             self.senscos=-self.senscos
             #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
-        if self.y+10 >= 480 or self.y-10 <= 0:
+        if super().colhor():
             self.rotation = -self.rotation#car sin est paire. fonctione.
 
 class bull(ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
@@ -57,5 +64,5 @@ class bull(ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
             self.senscos=-self.senscos#self.rotation = self.rotation-90#la rotation ne marche pas
         if self.y+10 >= 480 or self.y-10 <= 0:
             self.rotation = -self.rotation"""
-        if self.x+10 > 640 or self.x-10 < 0 or self.y+10 >= 480 or self.y-10 <= 0:
+        if super().colhor() or super().colver() :
             self.alive=False
