@@ -4,7 +4,10 @@ from ennemis import *
 
 pygame.init()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> aec4203ac0d03fc3ee8d91b1a83d4020e70ce157
 class Game:
     def __init__(self, size, title):
         self.size = size
@@ -29,17 +32,30 @@ class Game:
         self.score_text2_rect = self.score_text2_surface.get_rect()
         self.score_text2_rect.topright = self.score_text1_rect.bottomright
 
-        self.player = Player(self.window, self.size)  # on creer une instance du joueur
-
-        self.clock = pygame.time.Clock()  # module pygame pour gérer le temps dans le jeu (notamment les fps)
+        self.player = Player(self.window) # on creer une instance du joueur
+        self.ennemy_list=[]
+        self.clock = pygame.time.Clock() # module pygame pour gérer le temps dans le jeu (notamment les fps)
 
     def draw(self):
-        self.window.fill(
-            "black")  # on remplit la fenetre de noir à chaque tour de boucle pour effacer les éléments précédents
-        pygame.draw.rect(self.window, "white", self.center_square, 5)  # on affiche le rectangle central
-        self.window.blit(self.score_text1_surface, self.score_text1_rect)  # on affiche le texte "score"
-        self.window.blit(self.score_text2_surface, self.score_text2_rect)  # on affiche la valeur du score
-        self.player.draw()  # affichage du joueur
+        self.window.fill("black") # on remplit la fenetre de noir à chaque tour de boucle pour effacer les éléments précédents
+        pygame.draw.rect(self.window, "white", self.center_square, 5) # on affiche le rectangle central
+        self.window.blit(self.score_text1_surface, self.score_text1_rect) # on affiche le texte "score"
+        self.window.blit(self.score_text2_surface, self.score_text2_rect) # on affiche la valeur du score
+        self.player.draw() # affichage du joueur
+        for i in range(len(self.ennemy_list)):
+            if self.ennemy_list[i].alive:
+                self.ennemy_list[i].draw()
+
+    def update_ennemy(self):
+        tmp=self.ennemy_list.copy()#on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
+        a=0#a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
+        for i in range(len(self.ennemy_list)):
+            if self.ennemy_list[i].alive:
+                self.ennemy_list[i].moove()
+            else :
+                tmp.pop(i-a)#comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+                a+=1
+        self.ennemy_list=tmp.copy()
 
     def run(self):
         continuer = True
@@ -65,9 +81,12 @@ class Game:
 
             # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
             self.player.collision_bord()
-            # self.player.central_square_collision(self.center_square)
+            
+            tu=pygame.display.get_window_size()
+            self.ennemy_list.append(bull(tu[0]//2,tu[1]//2,self.player.x,self.player.y,self.window))
 
             # affichage des éléments graphiques
+            self.update_ennemy()
             self.draw()
             # on update l'affichage
             pygame.display.flip()
