@@ -21,6 +21,9 @@ class ennemi:
         tu=pygame.display.get_window_size()
         self.height=tu[1]
         self.widht=tu[0]
+        while self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
+            self.x=randint(0,tu[0])
+            self.y=randint(0,tu[1])
     def colver (self):
         return self.y+10 >= self.height or self.y-10 <= 0#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
     def colhor (self):
@@ -47,7 +50,7 @@ class asteroid(ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
         if super().colhor():
             self.senscos=-self.senscos
             #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
-        if super().colhor():
+        if super().colver():
             self.rotation = -self.rotation#car sin est paire. fonctione.
 
 class bull(ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
