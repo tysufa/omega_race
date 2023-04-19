@@ -1,5 +1,5 @@
 from game import Game
 
-jeu = Game((720, 480), "jeu")
+jeu = Game((1080, 600), "jeu")
 jeu.run()
 
