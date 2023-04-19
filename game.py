@@ -1,9 +1,10 @@
 import pygame
 from player import Player
+from ennemis import *
 
 pygame.init()
 
-
+print ("haha le test")
 class Game:
     def __init__(self, size, title):
         self.size = size
