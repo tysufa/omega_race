@@ -64,6 +64,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     continuer = False
                     pygame.quit()
+                    exit()
 
             # on récupère à chaque tour de boucle les touches enfoncées par le joueur
             keys = pygame.key.get_pressed()
@@ -80,6 +81,7 @@ class Game:
 
             # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
             self.player.collision_bord()
+            self.player.central_square_collision(self.center_square)
 
 
             # affichage des éléments graphiques
