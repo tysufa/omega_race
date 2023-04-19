@@ -4,10 +4,6 @@ from ennemis import *
 
 pygame.init()
 
-<<<<<<< HEAD
-
-=======
->>>>>>> aec4203ac0d03fc3ee8d91b1a83d4020e70ce157
 class Game:
     def __init__(self, size, title):
         self.size = size
@@ -32,7 +28,7 @@ class Game:
         self.score_text2_rect = self.score_text2_surface.get_rect()
         self.score_text2_rect.topright = self.score_text1_rect.bottomright
 
-        self.player = Player(self.window) # on creer une instance du joueur
+        self.player = Player(self.window, self.size) # on creer une instance du joueur
         self.ennemy_list=[]
         self.clock = pygame.time.Clock() # module pygame pour gérer le temps dans le jeu (notamment les fps)
 
@@ -81,7 +77,7 @@ class Game:
 
             # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
             self.player.collision_bord()
-            
+
             tu=pygame.display.get_window_size()
             self.ennemy_list.append(bull(tu[0]//2,tu[1]//2,self.player.x,self.player.y,self.window))
 
