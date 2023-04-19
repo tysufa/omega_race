@@ -4,7 +4,7 @@ from ennemis import *
 
 pygame.init()
 
-print ("haha le test")
+
 class Game:
     def __init__(self, size, title):
         self.size = size
@@ -66,8 +66,6 @@ class Game:
             # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
             self.player.collision_bord()
             # self.player.central_square_collision(self.center_square)
-
-            print("test")
 
             # affichage des éléments graphiques
             self.draw()
