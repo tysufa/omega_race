@@ -1,6 +1,7 @@
 import pygame
 from player import Player
 from ennemis import *
+from random import randint
 
 pygame.init()
 
@@ -55,7 +56,9 @@ class Game:
 
     def run(self):
         continuer = True
-
+        tu=pygame.display.get_window_size()
+        for i in range(10):
+            self.ennemy_list.append(mine(randint(0,tu[0]),randint(0,tu[1]),self.window))
         while continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
