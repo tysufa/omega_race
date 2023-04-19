@@ -14,7 +14,7 @@ class Game:
             (0, 0, size[0] // 3, size[1] // 3))  # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square.center = (size[0] // 2, size[1] // 2)  # on place le carré au centre de l'écran
 
-        self.score = 100
+        self.score = 1000
         self.high_score = 0
         self.ariel = pygame.font.SysFont("Comic Sans MS", 30)  # on créer la police de caractère ariel
 
