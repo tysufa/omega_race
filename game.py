@@ -3,6 +3,7 @@ from player import Player
 from ennemis import *
 from random import randint
 from projectiles import Projectiles
+from math import radians,sin,cos,acos,asin,degrees
 
 pygame.init()
 
@@ -53,6 +54,8 @@ class Game:
         tmp=self.ennemy_list.copy()#on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a=0#a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.ennemy_list)):
+            if self.ennemy_list[i].colide(self.player.x,self.player.y,20):
+                self.ennemy_list[i].alive=False
             if self.ennemy_list[i].alive:
                 self.ennemy_list[i].moove()
             else :
@@ -86,10 +89,16 @@ class Game:
                 self.player.rotate("R")
             if keys[pygame.K_LEFT]:
                 self.player.rotate("L")
+            if keys[pygame.K_SPACE]:
+                self.ennemy_list.append(bull(self.player.x,self.player.y,self.player.x+cos(radians(self.player.angle)),self.player.y+sin(radians(-self.player.angle)),self.window))
             if keys[pygame.K_UP]:
                 self.player.move(True)
             else:
-                self.player.move(False)
+                if keys[pygame.K_SPACE]:
+                    self.ennemy_list.append(bull(self.player.x,self.player.y,self.player.x+cos(radians(self.player.angle)),self.player.y+sin(radians(-self.player.angle)),self.window))
+                    self.player.move(False)
+                else:
+                    self.player.move(False)
 
             # collision (TODO -> faire une fonction update ou on mettra les collisions et les trucs similaire)
             self.player.collision_bord()

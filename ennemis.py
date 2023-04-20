@@ -25,9 +25,11 @@ class ennemi:
             self.x=randint(0,tu[0])
             self.y=randint(0,tu[1])
     def colver (self):
-        return self.y+10 >= self.height or self.y-10 <= 0#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
+        return self.y+10 >= self.height or self.y-10 <= 0 or(self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6))#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
     def colhor (self):
-        return self.x+10 >= self.widht or self.x-10 <= 0
+        return self.x+10 >= self.widht or self.x-10 <= 0 or (self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6))
+    def colide (self, x,y,size):
+        return self.x-size<x and self.x+size>x and self.y-size<y and self.y+size>y
 
 class mine(ennemi):#La mine est un cercle blanc immobile.
     def __init__ (self,x,y,WINDOW):
@@ -61,11 +63,7 @@ class bull(ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
     def draw (self):
         pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
     def moove(self):
-        self.x+=5*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=5*(sin(radians(self.rotation)))
-        """if self.x+10 > 620 or self.x-10 < 0:
-            self.senscos=-self.senscos#self.rotation = self.rotation-90#la rotation ne marche pas
-        if self.y+10 >= 480 or self.y-10 <= 0:
-            self.rotation = -self.rotation"""
+        self.x+=20*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=20*(sin(radians(self.rotation)))
         if super().colhor() or super().colver() :
             self.alive=False
