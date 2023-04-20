@@ -1,11 +1,13 @@
 import pygame
+
 from player import Player
 from ennemis import *
 from random import randint
 from projectiles import Projectiles
-from math import radians,sin,cos,acos,asin,degrees
+from math import radians, sin, cos, acos, asin, degrees
 
 pygame.init()
+
 
 class Game:
     def __init__(self, size, title):
@@ -22,7 +24,7 @@ class Game:
         self.score_text1_surface = self.ariel.render("score", False, "white")  # le texte à afficher
         self.score_text1_rect = self.score_text1_surface.get_rect()  # le rectangle pour avoir la position du text
         self.score_text1_rect.topright = self.center_square.topright  # on place le text dans l'angle en haut à droite du rectangle
-        self.score_text1_rect.x -= 10;
+        self.score_text1_rect.x -= 10
         self.score_text1_rect.y += 10  # légère correction sur la position
 
         # on refait la même chose pour l'affichage de la valeur du score
@@ -30,11 +32,15 @@ class Game:
         self.score_text2_rect = self.score_text2_surface.get_rect()
         self.score_text2_rect.topright = self.score_text1_rect.bottomright
 
-        self.player = Player(self.window, self.size) # on creer une instance du joueur
+
+        self.sussy_walls = [pygame.rect.Rect(20, 20, self.size[0], 1)]
+
+        self.projectile_list = []
+
+        self.player = Player(self.window, self.size, self.sussy_walls) # on creer une instance du joueur
         self.ennemy_list=[]
         self.clock = pygame.time.Clock() # module pygame pour gérer le temps dans le jeu (notamment les fps)
 
-        self.projectile_list = []
 
     def draw(self):
         self.window.fill("black") # on remplit la fenetre de noir à chaque tour de boucle pour effacer les éléments précédents
@@ -51,24 +57,24 @@ class Game:
             proj.draw()
 
     def update_ennemy(self):
-        tmp=self.ennemy_list.copy()#on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
-        a=0#a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
+        tmp = self.ennemy_list.copy() # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
+        a = 0 # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.ennemy_list)):
             if self.ennemy_list[i].colide(self.player.x,self.player.y,20):
                 self.ennemy_list[i].alive=False
             if self.ennemy_list[i].alive:
                 self.ennemy_list[i].moove()
             else :
-                tmp.pop(i-a)#comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-                a+=1
-        self.ennemy_list=tmp.copy()
+                tmp.pop(i-a) # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+                a += 1
+        self.ennemy_list = tmp.copy()
 
     def run(self):
         continuer = True
         tu=pygame.display.get_window_size()
 
         for i in range(10):
-            self.ennemy_list.append(mine(randint(0,tu[0]),randint(0,tu[1]),self.window))
+            self.ennemy_list.append(mine(randint(0, tu[0]), randint(0, tu[1]), self.window))
 
         while continuer:
             # on récupère à chaque tour de boucle les touches enfoncées par le joueur
@@ -90,7 +96,7 @@ class Game:
             if keys[pygame.K_LEFT]:
                 self.player.rotate("L")
             if keys[pygame.K_SPACE]:
-                self.ennemy_list.append(bull(self.player.x,self.player.y,self.player.x+cos(radians(self.player.angle)),self.player.y+sin(radians(-self.player.angle)),self.window))
+                self.ennemy_list.append(bull(self.player.x, self.player.y, self.player.x+cos(radians(self.player.angle)), self.player.y+sin(radians(-self.player.angle)), self.window))
             if keys[pygame.K_UP]:
                 self.player.move(True)
             else:
