@@ -2,6 +2,7 @@ import pygame
 from player import Player
 from ennemis import *
 from random import randint
+from projectiles import Projectiles
 
 pygame.init()
 
@@ -13,7 +14,6 @@ class Game:
         self.center_square = pygame.rect.Rect(
             (0, 0, size[0] // 3, size[1] // 3))  # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square.center = (size[0] // 2, size[1] // 2)  # on place le carré au centre de l'écran
-
         self.score = 1000
         self.high_score = 0
         self.ariel = pygame.font.SysFont("Comic Sans MS", 30)  # on créer la police de caractère ariel
@@ -33,15 +33,21 @@ class Game:
         self.ennemy_list=[]
         self.clock = pygame.time.Clock() # module pygame pour gérer le temps dans le jeu (notamment les fps)
 
+        self.projectile_list = []
+
     def draw(self):
         self.window.fill("black") # on remplit la fenetre de noir à chaque tour de boucle pour effacer les éléments précédents
         pygame.draw.rect(self.window, "white", self.center_square, 5) # on affiche le rectangle central
         self.window.blit(self.score_text1_surface, self.score_text1_rect) # on affiche le texte "score"
         self.window.blit(self.score_text2_surface, self.score_text2_rect) # on affiche la valeur du score
         self.player.draw() # affichage du joueur
+
         for i in range(len(self.ennemy_list)):
             if self.ennemy_list[i].alive:
                 self.ennemy_list[i].draw()
+
+        for proj in self.projectile_list:
+            proj.draw()
 
     def update_ennemy(self):
         tmp=self.ennemy_list.copy()#on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -57,17 +63,23 @@ class Game:
     def run(self):
         continuer = True
         tu=pygame.display.get_window_size()
+
         for i in range(10):
             self.ennemy_list.append(mine(randint(0,tu[0]),randint(0,tu[1]),self.window))
+
         while continuer:
+            # on récupère à chaque tour de boucle les touches enfoncées par le joueur
+            keys = pygame.key.get_pressed()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     continuer = False
                     pygame.quit()
                     exit()
+                if event.type == pygame.KEYDOWN:
+                    if pygame.key.get_pressed()[pygame.K_z]:
+                        self.projectile_list.append(Projectiles(self.player.x, self.player.y, -90, self.size, self.window))
 
-            # on récupère à chaque tour de boucle les touches enfoncées par le joueur
-            keys = pygame.key.get_pressed()
 
             # rotation du vaisseau (juste graphique pour l'instant
             if keys[pygame.K_RIGHT]:

@@ -36,7 +36,7 @@ def blitRotate2(surf, image, topleft, angle):
 
 
 try:
-    image = pygame.image.load('AirPlaneFront.png')
+    image = pygame.image.load('image/vaisseau-spatial.png')
 except:
     text = pygame.font.SysFont('Times New Roman', 60).render('Image', False, (255, 255, 0))
     image = pygame.Surface((text.get_width() + 1, text.get_height() + 1))
@@ -55,7 +55,7 @@ while not done:
     pos = (screen.get_width() / 2, screen.get_height() / 2)
 
     screen.fill(0)
-    #blitRotate(screen, image, pos, (w / 2, h / 2), angle)
+    blitRotate(screen, image, pos, (w / 2, h / 2), angle)
     blitRotate2(screen, image, pos, angle)
     angle += 1
 

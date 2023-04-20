@@ -9,7 +9,7 @@ class Player:
         self.window = window
         self.size = size
         self.img_flamme  = pygame.image.load("image/feu.png")
-        self.img_vaisseau = pygame.image.load("image/vaisseau-spatial.png")
+        self.img_vaisseau = pygame.image.load("image/vaisseau_avec_flamme.png")
         self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))  # on redimmensionne l'image du vaisseau à une taille plus adaptée
         self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
         self.img_flamme = pygame.transform.rotate(self.img_flamme, 90)
@@ -22,19 +22,34 @@ class Player:
         self.speed = 0.2
         self.velocity_lost = 0.6
 
-        self.max_velocity = 30
+        self.max_velocity = 3
         self.angle = 0
+
+        self.tempo = pygame.rect.Rect(0, 0, 32, 32)
+        self.tempo_flamme = False
 
     def draw(self):
         self.window.blit(self.rotated_img, self.vaisseau_rect)
         # self.window.blit(self.img_flamme, self.vaisseau_rect)
-        # pygame.draw.rect(self.window, "red", self.vaisseau_rect, 2)
+        #pygame.draw.rect(self.window, "red", self.vaisseau_rect, 2)
+
+        #pygame.draw.rect(self.window, "red", self.tempo, 2)
 
     def rotate(self, direction):
         for i in range(5):
+            if self.tempo_flamme:
+                self.img_vaisseau = pygame.image.load("image/vaisseau_avec_flamme.png")
+                self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
+                self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
+            else:
+                self.img_vaisseau = pygame.image.load("image/vaisseau2.png")
+                self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
+                self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
+
             self.rotated_img = pygame.transform.rotate(self.img_vaisseau, self.angle)  # on tourne graphiquement l'image du vaisseau
             self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))  # on change la position de la hitbox car elle c'est décalé en tournant
-            self.vaisseau_rect.center=(self.x,self.y)
+            self.tempo = pygame.rect.Rect(0, 0, 32, 32)
+            self.tempo.center = (self.x, self.y)
 
             if direction == "R":  # si on tourne vers la droite :
                 self.angle -= 1
@@ -42,18 +57,26 @@ class Player:
                 self.angle += 1
 
     def move(self, acceleration):
+        self.tempo_flamme = False
         if acceleration:
             # update de la vélocité, -sin car si y est positif on va vers le haut
-            if abs(self.velocity.x + cos(radians(self.angle))) < self.max_velocity:
+            if abs((self.velocity.x + cos(radians(self.angle))) * self.speed) < self.max_velocity:
                 self.velocity.x += cos(radians(self.angle))
 
-            if abs(self.velocity.y - sin(radians(self.angle))) < self.max_velocity:
+            if abs((self.velocity.y - sin(radians(self.angle))) * self.speed) < self.max_velocity:
                 self.velocity.y -= sin(radians(self.angle))
 
-        self.x += self.velocity.x * self.speed  # multiplication par 3 pour la vitesse (TODO -> changer 3 par une variable vitesse)
+            self.tempo_flamme = True
+
+        self.x += self.velocity.x * self.speed  # speed est là pour gérer l'accélération du joueur
         self.y += self.velocity.y * self.speed
 
-        self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))  # on ne peut pas directement modifier par rapport au centre du rect donc on récupère le rectangle à partir de l'image en modifiant la position centrale
+        self.tempo = pygame.rect.Rect(0, 0, 32, 32)
+        self.tempo.center = (self.x, self.y)
+        self.vaisseau_rect = self.rotated_img.get_rect(
+            center=(self.x, self.y))  # on change la position de la hitbox car elle c'est décalé en tournant
+
+        # self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))  # on ne peut pas directement modifier par rapport au centre du rect donc on récupère le rectangle à partir de l'image en modifiant la position centrale
 
 
     def collision_bord(self):
