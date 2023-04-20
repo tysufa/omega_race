@@ -20,6 +20,7 @@ class Player:
         self.y = 100  # x et y gardent la position du centre de l'image du vaisseau (nécessaire pour la rotation)
         self.velocity = pygame.math.Vector2(0, 0)
         self.speed = 0.2
+        self.velocity_lost = 0.6
 
         self.max_velocity = 30
         self.angle = 0
@@ -58,33 +59,47 @@ class Player:
     def collision_bord(self):
         if self.vaisseau_rect.top <= 0:
             self.y = 25
-            self.velocity.y = -(self.velocity.y / 3)
+            self.velocity.y *= -self.velocity_lost
+            self.velocity.x *= self.velocity_lost
             self.move(True)
 
         if self.vaisseau_rect.bottom > self.size[1]:
             self.y = self.size[1]-25
-            self.velocity.y = -(self.velocity.y / 3)
+            self.velocity.y *= -self.velocity_lost
+            self.velocity.x *= self.velocity_lost
             self.move(True)
 
         if self.vaisseau_rect.left < 0:
             self.x = 25
-            self.velocity.x = -(self.velocity.x/3)
+            self.velocity.x *= -self.velocity_lost
+            self.velocity.y *= self.velocity_lost
             self.move(True)
 
         if self.vaisseau_rect.right > self.size[0]:
             self.x = self.size[0]-25
-            self.velocity.x = -(self.velocity.x / 3)
+            self.velocity.x *= -self.velocity_lost
+            self.velocity.y *= self.velocity_lost
             self.move(True)
 
 
     def central_square_collision(self, central_square):
         if self.vaisseau_rect.colliderect(central_square):
             if abs(self.vaisseau_rect.bottom - central_square.top) <= 10:
-                self.velocity.y = -self.velocity.y
+                self.y = central_square.top - 25
+                self.velocity.y *= -self.velocity_lost
+                self.velocity.x *= self.velocity_lost
+
             elif abs(self.vaisseau_rect.top - central_square.bottom) <= 10:
-                self.velocity.y = -self.velocity.y
+                self.y = central_square.bottom + 25
+                self.velocity.y *= -self.velocity_lost
+                self.velocity.x *= self.velocity_lost
 
             if abs(self.vaisseau_rect.right - central_square.left) <= 10:
-                self.velocity.x = -self.velocity.x
+                self.x = central_square.left - 25
+                self.velocity.y *= self.velocity_lost
+                self.velocity.x *= -self.velocity_lost
+
             elif abs(self.vaisseau_rect.left - central_square.right) <= 10:
-                self.velocity.x = -self.velocity.x
+                self.x = central_square.right + 25
+                self.velocity.y *= self.velocity_lost
+                self.velocity.x *= -self.velocity_lost
