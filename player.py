@@ -56,14 +56,26 @@ class Player:
 
 
     def collision_bord(self):
-        if self.vaisseau_rect.top <= 0 or self.vaisseau_rect.bottom > self.size[1]:
+        if self.vaisseau_rect.top <= 0:
             self.y = 25
-            self.velocity.y = -self.velocity.y
+            self.velocity.y = -(self.velocity.y / 3)
             self.move(True)
-            self.velocity /= 2
 
-        if self.vaisseau_rect.left < 0 or self.vaisseau_rect.right > self.size[0]:
-            self.velocity.x = -self.velocity.x
+        if self.vaisseau_rect.bottom > self.size[1]:
+            self.y = self.size[1]-25
+            self.velocity.y = -(self.velocity.y / 3)
+            self.move(True)
+
+        if self.vaisseau_rect.left < 0:
+            self.x = 25
+            self.velocity.x = -(self.velocity.x/3)
+            self.move(True)
+
+        if self.vaisseau_rect.right > self.size[0]:
+            self.x = self.size[0]-25
+            self.velocity.x = -(self.velocity.x / 3)
+            self.move(True)
+
 
     def central_square_collision(self, central_square):
         if self.vaisseau_rect.colliderect(central_square):
