@@ -31,7 +31,7 @@ while continuer:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 pos=pygame.mouse.get_pos()
-                entity.append(asteroid(pos[0],pos[1],WINDOW))
+                entity.append(bull(pos[0],pos[1],320,240,WINDOW))
                 print(len(entity))
 
 
