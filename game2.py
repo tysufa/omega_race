@@ -3,6 +3,7 @@ import pygame.time
 from player2 import Player, PlayerAnim
 from ennemis import *
 from text import Text
+from wall import Wall
 
 
 class Game:
@@ -24,32 +25,51 @@ class Game:
         text1 = Text("Comic Sans MS", "score", 24, self.center_square.right - 5, self.center_square.top, "white")
         text2 = Text("Comic Sans MS", str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
         text3 = Text("Comic Sans MS", "high score", 24, self.center_square.right - 5, text2.rect.bottom, "white")
-        text4 = Text("Comic Sans MS", str(self.high_score), 24, self.center_square.right-5, text3.rect.bottom, "white")
+        text4 = Text("Comic Sans MS", str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
+                     "white")
 
-        self.text_group = pygame.sprite.Group()  # on créer un groupe qui contiendra les sprites de text
+        # on créer un groupe qui contient les sprites de text
+        self.text_group = pygame.sprite.Group(text1, text2, text3, text4)
 
-        # on ajoute chaque sprite text à ce groupe
-        self.text_group.add(text1)
-        self.text_group.add(text2)
-        self.text_group.add(text3)
-        self.text_group.add(text4)
+        ##### walls ######
+        top_wall = Wall(20, 20, self.size[0] - 40, 1, 1, "white")
+        right_wall = Wall(self.size[0] - 20, 20, 1, self.size[1] - 40, 1, "white")
+        down_wall = Wall(20, self.size[1] - 20, self.size[0] - 40, 1, 1, "white")
+        left_wall = Wall(20, 20, 1, self.size[1] - 40, 1, "white")
 
-        self.player = Player(100, 100, self.size, self.center_square)
+        self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
+
+        ####
+
+        self.player = Player(200, 200, self.size, self.center_square, self.walls)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
-        # self.player_group.add(self.PlayerAnim)
 
         self.clock = pygame.time.Clock()
+
+    def wall_collisions(self):
+        for wall in self.walls:
+            if self.player.hitbox.colliderect(wall.rect):
+                wall.show()
+
+    def sprites_update(self):
+        self.player_group.update()
+        self.walls.update()
 
     def draw(self):
         self.window.blit(self.background, (0, 0))
 
+        for wall in self.walls.sprites():
+            if wall.displayed:
+                wall.draw(self.window)
+
         self.player.player_anim.draw(self.window)
-        self.player_group.draw(self.window)
+        if self.player.alive:
+            self.player_group.draw(self.window)
         self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
-        pygame.draw.rect(self.window, "white", self.center_square, 2) # rectangle du milieu
+        pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
 
         pygame.display.flip()
 
@@ -61,7 +81,8 @@ class Game:
                 if event.type == pygame.QUIT:
                     continuer = False
 
-            self.player_group.update()
+            self.sprites_update()
+            self.wall_collisions() # sert uniquement pour l'affichage des murs
             self.draw()
 
             self.clock.tick(60)

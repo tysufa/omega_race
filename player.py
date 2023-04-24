@@ -8,11 +8,9 @@ class Player:
     def __init__(self, window, size, sussy_walls=[]):
         self.window = window
         self.size = size
-        self.img_flamme = pygame.image.load("image/feu.png")
         self.img_vaisseau = pygame.image.load("image/Kla'ed - Fighter - Base.png")
         self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (80, 80))  # on redimmensionne l'image du vaisseau à une taille plus adaptée
         self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
-        self.img_flamme = pygame.transform.rotate(self.img_flamme, 90)
 
         self.rotated_img = self.img_vaisseau  # cette image est celle qui sera affichée
         self.vaisseau_rect = self.img_vaisseau.get_rect(center=(100, 100))
