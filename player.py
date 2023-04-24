@@ -5,13 +5,12 @@ pygame.init()
 
 
 class Player:
-    def __init__(self, window, size, sussy_walls):
+    def __init__(self, window, size, sussy_walls=[]):
         self.window = window
         self.size = size
         self.img_flamme = pygame.image.load("image/feu.png")
-        self.img_vaisseau = pygame.image.load("image/vaisseau2.png")
-        self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (
-        32, 32))  # on redimmensionne l'image du vaisseau à une taille plus adaptée
+        self.img_vaisseau = pygame.image.load("image/Kla'ed - Fighter - Base.png")
+        self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (80, 80))  # on redimmensionne l'image du vaisseau à une taille plus adaptée
         self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
         self.img_flamme = pygame.transform.rotate(self.img_flamme, 90)
 
@@ -32,20 +31,19 @@ class Player:
         self.affichage_sussy_walls = -1
         self.sussy_walls = sussy_walls
 
-
         self.t = pygame.time.get_ticks()
         self.a = 0
 
     def draw(self):
 
-        if self.tempo_flamme:
-            self.img_vaisseau = pygame.image.load("image/vaisseau_avec_flamme.png")
-            self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
-            self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
-        else:
-            self.img_vaisseau = pygame.image.load("image/vaisseau_sans_couille.png")
-            self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
-            self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
+        #if self.tempo_flamme:
+        #    self.img_vaisseau = pygame.image.load("image/vaisseau_avec_flamme.png")
+        #    self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
+        #    self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
+        #else:
+        #    self.img_vaisseau = pygame.image.load("image/vaisseau_sans_couille.png")
+        #    self.img_vaisseau = pygame.transform.scale(self.img_vaisseau, (32, 32))
+        #    self.img_vaisseau = pygame.transform.rotate(self.img_vaisseau, -90)
 
         self.rotate(None)  # on appel rotate simplement pour update rotated img (donc afficher ou pas le feu)
 
@@ -68,14 +66,15 @@ class Player:
             elif direction == "L":
                 self.angle += 1
 
-            self.rotated_img = pygame.transform.rotate(self.img_vaisseau, self.angle)  # on tourne graphiquement l'image du vaisseau
+            self.rotated_img = pygame.transform.rotate(self.img_vaisseau,
+                                                       self.angle)  # on tourne graphiquement l'image du vaisseau
             # on change la position de la hitbox car elle c'est décalé en tournant
             self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))
             self.tempo = pygame.rect.Rect(0, 0, 32, 32)
             self.tempo.center = (self.x, self.y)
 
     def move(self, acceleration):
-        self.tempo_flamme = False # on considère qu'on accélère pas
+        self.tempo_flamme = False  # on considère qu'on accélère pas
         if acceleration:
             # on augmente la velicité que si elle ne dépasse pas la vélocité max
             if abs((self.velocity.x + cos(radians(self.angle))) * self.speed) < self.max_velocity:
@@ -84,7 +83,7 @@ class Player:
             if abs((self.velocity.y - sin(radians(self.angle))) * self.speed) < self.max_velocity:
                 self.velocity.y -= sin(radians(self.angle))
 
-            self.tempo_flamme = True # si on accélère on affichera la flamme
+            self.tempo_flamme = True  # si on accélère on affichera la flamme
 
         # on change les coordonnées en fonction de la velocité et de la vitesse qu'on veut pour notre joueur
         self.x += self.velocity.x * self.speed  # speed est là pour gérer l'accélération du joueur
@@ -93,7 +92,8 @@ class Player:
         self.tempo = pygame.rect.Rect(0, 0, 32, 32)
         self.tempo.center = (self.x, self.y)
 
-        self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))  # on ne peut pas directement modifier par rapport au centre du rect donc on récupère le rectangle à partir de l'image en modifiant la position centrale
+        # on ne peut pas directement modifier par rapport au centre du rect donc on récupère le rectangle à partir de l'image en modifiant la position centrale
+        self.vaisseau_rect = self.rotated_img.get_rect(center=(self.x, self.y))
 
     def collision_bord(self):
         if self.tempo.top < 20:
@@ -101,10 +101,6 @@ class Player:
             self.y = self.tempo.center[1]
             self.velocity.y *= -self.velocity_lost
             # self.velocity.x *= self.velocity_lost
-
-            self.affichage_sussy_walls = 0
-            self.a = 4
-
 
         elif self.tempo.bottom > self.size[1] - 20:
             self.tempo.bottom = self.size[1] - 20
@@ -134,7 +130,8 @@ class Player:
 
             if abs(self.tempo.top - central_square.bottom) <= self.max_velocity:
                 self.tempo.top = central_square.bottom
-                self.y = self.tempo.center[1] + 1 # droite et bas ne se comportent pas pareil que haut et gauche donc + 1
+                self.y = self.tempo.center[
+                             1] + 1  # droite et bas ne se comportent pas pareil que haut et gauche donc + 1
                 self.velocity.y *= -self.velocity_lost
                 # self.velocity.x *= self.velocity_lost
 
