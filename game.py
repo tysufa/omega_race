@@ -48,8 +48,8 @@ class Game:
         tmp=self.ennemy_list.copy()#on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a=0#a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.ennemy_list)):
-            if self.ennemy_list[i].colide(self.player.x,self.player.y,20):
-                self.ennemy_list[i].alive=False
+            if self.ennemy_list[i].colide(self.player.x,self.player.y,20):#si l'objet est en colision avec le joueur a 20 px près
+                self.ennemy_list[i].alive=False#alors on tue l'objet
             if self.ennemy_list[i].alive:
                 self.ennemy_list[i].moove()
             else :
@@ -61,7 +61,7 @@ class Game:
         continuer = True
         tu=pygame.display.get_window_size()
         for i in range(10):
-            self.ennemy_list.append(mine(randint(0,tu[0]),randint(0,tu[1]),self.window))
+            self.ennemy_list.append(mine(randint(0,tu[0]-10),randint(0,tu[1]-10),self.window))
         while continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
