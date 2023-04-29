@@ -4,10 +4,12 @@ from player2 import Player, PlayerAnim
 from ennemis import *
 from text import Text
 from wall import Wall
+from menu import Menu
 
 
 class Game:
     def __init__(self, size, title):
+        self.playing_music = False
         self.size = size
         self.window = pygame.display.set_mode(size)
         pygame.display.set_caption(title)
@@ -32,10 +34,10 @@ class Game:
         self.text_group = pygame.sprite.Group(text1, text2, text3, text4)
 
         ##### walls ######
-        top_wall = Wall(20, 20, self.size[0] - 40, 1, 1, "white")
-        right_wall = Wall(self.size[0] - 20, 20, 1, self.size[1] - 40, 1, "white")
-        down_wall = Wall(20, self.size[1] - 20, self.size[0] - 40, 1, 1, "white")
-        left_wall = Wall(20, 20, 1, self.size[1] - 40, 1, "white")
+        top_wall = Wall(10, 10, self.size[0] - 20, 1, 1, "white")
+        right_wall = Wall(self.size[0] - 10, 10, 1, self.size[1] - 20, 1, "white")
+        down_wall = Wall(10, self.size[1] - 10, self.size[0] - 20, 1, 1, "white")
+        left_wall = Wall(10, 10, 1, self.size[1] - 20, 1, "white")
 
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
@@ -45,6 +47,11 @@ class Game:
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
+
+        self.in_menu = True
+        self.menu = Menu(self.window)
+
+        pygame.mixer.music.load("music/bgm_1.mp3")
 
         self.clock = pygame.time.Clock()
 
@@ -60,18 +67,39 @@ class Game:
     def draw(self):
         self.window.blit(self.background, (0, 0))
 
-        for wall in self.walls.sprites():
-            if wall.displayed:
-                wall.draw(self.window)
+        if not self.in_menu:
+            for wall in self.walls.sprites():
+                if wall.displayed:
+                    wall.draw(self.window)
 
-        self.player.player_anim.draw(self.window)
-        if self.player.alive:
-            self.player_group.draw(self.window)
-        self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
+            self.player.player_anim.draw(self.window)
+            if self.player.alive:
+                self.player_group.draw(self.window)
+            self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
-        pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+            pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+
+        else:
+            self.menu.draw()
 
         pygame.display.flip()
+
+    def menu_loop(self):
+        if self.menu.menu_actions():
+            self.in_menu = False
+
+    def game_loop(self):
+        keys = pygame.key.get_pressed()
+
+        self.sprites_update()
+        self.wall_collisions()  # sert uniquement pour l'affichage des murs
+
+        if keys[pygame.K_ESCAPE]:
+            self.in_menu = True
+            
+        if not self.playing_music:
+            pygame.mixer.music.play(10)
+            self.playing_music = True
 
     def run(self):
         continuer = True
@@ -81,8 +109,11 @@ class Game:
                 if event.type == pygame.QUIT:
                     continuer = False
 
-            self.sprites_update()
-            self.wall_collisions() # sert uniquement pour l'affichage des murs
+            if self.in_menu:
+                self.menu_loop()
+            else:
+                self.game_loop()
+
             self.draw()
 
             self.clock.tick(60)
