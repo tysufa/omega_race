@@ -70,7 +70,7 @@ class Game:
         # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
-        self.ennemis.update(self.player.x,self.player.y)
+        self.ennemis.update(self.player.hitbox)
 
     def draw(self):
         self.window.blit(self.background, (0, 0))

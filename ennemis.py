@@ -16,11 +16,11 @@ class Ennemy_list :
     def __init__ (self):
         self.tab=[]
 
-    def update(self,playerx,playery):
+    def update(self,playerect):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.tab)):
-            if self.tab[i].colide(playerx,playery,26):#si l'objet est en colision avec le joueur a 20 px près
+            if self.tab[i].colide(playerect):#si l'objet est en colision avec le joueur
                 self.tab[i].alive=False#alors on tue l'objet
             if self.tab[i].alive:
                 self.tab[i].move()
@@ -49,7 +49,8 @@ class Ennemi:
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
-        while self.x+10>(self.widht // 2 - self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
+        self.hitbox = pygame.rect.Rect((x,y),(35,35))
+        while self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
             self.x=randint(10,tu[0]-10)
             self.y=randint(10,tu[1]-10)
 
@@ -65,8 +66,8 @@ class Ennemi:
     def colhor (self):
         return self.x+10 >= self.widht or self.x-10 <= 0 or self.colmurhor()
 
-    def colide (self, x,y,size):
-        return self.x-size<x and self.x+size>x and self.y-size<y and self.y+size>y
+    def colide (self,rect):
+        return self.hitbox.colliderect(rect)
 
 class mine(Ennemi):#La mine est un cercle blanc immobile.
     def __init__ (self,x,y,WINDOW):
@@ -89,6 +90,7 @@ class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
         self.window.blit(self.image,self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
 
     def move(self):
         self.x+=1*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
@@ -129,6 +131,6 @@ class shooter(Ennemi):
     def move(self):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
-
+        self.liste.ajouter
         if super().colhor() or super().colver() :
             self.alive=False
