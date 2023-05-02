@@ -41,6 +41,8 @@ class Game:
 
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
+        self.ennemis = Ennemy_list()
+
         ####
 
         self.player = Player(200, 200, self.size, self.center_square)
@@ -59,11 +61,14 @@ class Game:
         for wall in self.walls:
             if self.player.hitbox.colliderect(wall.rect):
                 wall.show()
-
+    def spawn(self):
+        for i in range(10):
+            self.ennemis.tab.append(asteroid(360,240,self.window))
     def sprites_update(self):
         # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
+        self.ennemis.update(self.player.x,self.player.y)
 
     def draw(self):
         self.window.blit(self.background, (0, 0))
@@ -74,6 +79,7 @@ class Game:
                     wall.draw(self.window)
 
             self.player.player_anim.draw(self.window)
+            self.ennemis.draw()
             if self.player.alive:
                 self.player_group.draw(self.window)
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
@@ -98,18 +104,20 @@ class Game:
 
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
-            
+
         if not self.playing_music:
             pygame.mixer.music.play(10, fade_ms=1500)
             self.playing_music = True
 
     def run(self):
         continuer = True
-
+        self.spawn()
         while continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     continuer = False
+                    pygame.quit()
+                    exit()
 
             if self.in_menu:
                 self.menu_loop()
