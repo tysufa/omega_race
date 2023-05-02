@@ -36,7 +36,7 @@ class mine(ennemi):#La mine est un cercle blanc immobile.
         super().__init__(x,y,WINDOW)
     def draw(self):
         pygame.draw.circle(self.window, (255,255,255), (self.x, self.y), 10)
-    def moove(self):
+    def move(self):
         pass
 
 class asteroid(ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
@@ -46,7 +46,7 @@ class asteroid(ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
         self.rotation=randint(0,360)#rotation de l'ennemi, en degrés, 0 étant a droite
     def draw (self):
         pygame.draw.circle(self.window, (255,255,0), (self.x, self.y), 10)
-    def moove(self):
+    def move(self):
         self.x+=5*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=5*(sin(radians(self.rotation)))
         if super().colhor():
