@@ -47,6 +47,7 @@ class Ennemi:
         self.height=tu[1]
         self.widht=tu[0]
         self.image = pygame.image.load(imagepath).convert_alpha()
+        self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
         while self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
             self.x=randint(10,tu[0]-10)
@@ -81,17 +82,18 @@ class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
     def __init__ (self,x,y,WINDOW):
         super().__init__(x,y,WINDOW,"image/Asteroid 01 - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
-        self.rotation=randint(0,360)#rotation de l'ennemi, en degrés, 0 étant a droite
-        self.angle=0
+        self.rotation=randint(1,360)#rotation de l'ennemi, en degrés, 0 étant a droite
+        self.angle=randint(0,360)
 
     def draw (self):
         self.window.blit(self.image,self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
-        self.rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
 
     def move(self):
         self.x+=1*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=1*(sin(radians(self.rotation)))
+        self.angle+=self.rotation/abs(self.rotation)
         if super().colhor():
             self.senscos=-self.senscos
             #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
