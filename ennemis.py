@@ -16,12 +16,19 @@ class Ennemy_list :
     def __init__ (self):
         self.tab=[]
 
-    def update(self,playerect):
+    def update(self, player, projectiles_list):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.tab)):
-            if self.tab[i].colide(playerect):#si l'objet est en colision avec le joueur
-                self.tab[i].alive=False#alors on tue l'objet
+
+            if self.tab[i].colide(player.hitbox):
+                player.die()
+
+            for proj in projectiles_list.sprites():
+                if self.tab[i].colide(proj.rect): # si l'objet est en colision avec le joueur
+                    self.tab[i].alive = False # alors on tue l'objet
+                    proj.remove(projectiles_list) # on supprime le projectile du groupe
+
             if self.tab[i].alive:
                 self.tab[i].move()
             else:

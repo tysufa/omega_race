@@ -1,3 +1,5 @@
 FONT = "Comic Sans MS"
 WINDOW_H = 480
 WINDOW_W = 720
+
+MAX_AMO = 5

@@ -12,7 +12,7 @@ class Projectiles(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x, self.y))
 
 
-        self.velocity = cos(radians(self.direction)) * 20, sin(radians(self.direction)) * 20
+        self.velocity = cos(radians(self.direction)) * 12, sin(radians(self.direction)) * 12
 
 
     def update(self):
