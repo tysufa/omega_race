@@ -49,7 +49,7 @@ class Ennemi:
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
-        while self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
+        while self.x+10>(self.widht // 2 - self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
             self.x=randint(10,tu[0]-10)
             self.y=randint(10,tu[1]-10)
 
@@ -111,7 +111,7 @@ class bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
     def draw (self):
         pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
 
-    def moove(self):
+    def move(self):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
         if super().colhor() or super().colver() :
@@ -126,7 +126,7 @@ class shooter(Ennemi):
 
     def draw(self):
         pygame.draw.rect(self.window, (255,255,0), (self.x-self.width/2, self.y-self.height/2), self.height,self.widht)
-    def moove(self):
+    def move(self):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
 

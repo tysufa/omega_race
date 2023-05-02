@@ -61,9 +61,11 @@ class Game:
         for wall in self.walls:
             if self.player.hitbox.colliderect(wall.rect):
                 wall.show()
+
     def spawn(self):
-        for i in range(1000):
+        for i in range(4):
             self.ennemis.tab.append(asteroid(360,240,self.window))
+
     def sprites_update(self):
         # self.player.projectiles.update()
         self.player_group.update()
