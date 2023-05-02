@@ -1,14 +1,15 @@
 import pygame
 from math import cos, sin, radians
+from projectiles import Projectiles
 
 pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, rect_centre, walls):
+    def __init__(self, x, y, size, rect_centre):
         super().__init__()
         self.base_image = pygame.image.load(
-            "image/Kla'ed/Base/Kla'ed - Frigate - Base.png")
+            "image/Kla'ed/Base/Kla'ed - Frigate - Base.png").convert_alpha()
         # on tourne l'image vers la droite
         self.base_image = pygame.transform.rotozoom(self.base_image, -90, 1)
         self.image = self.base_image
@@ -46,6 +47,10 @@ class Player(pygame.sprite.Sprite):
         self.player_anim.add(self.anim1)
         self.player_anim.add(self.anim2)
         self.player_anim.add(self.anim3)
+
+
+
+        self.projectiles = pygame.sprite.Group()
 
     def rotate(self, direction):
         if direction == "R":  # si on veut tourner vers la droite
@@ -86,7 +91,7 @@ class Player(pygame.sprite.Sprite):
             self.anim1.show = True  # on veut afficher l'animation des réacteurs
 
         if keys[pygame.K_z]:
-            self.anim2.show = True  # on affiche l'animation du bouclier
+            self.projectiles.add(Projectiles(self.x, self.y, self.angle))
 
         if keys[pygame.K_SPACE]:
             self.alive = False
@@ -101,6 +106,8 @@ class Player(pygame.sprite.Sprite):
             self.rotate("L")
             for sprite in self.player_anim.sprites():
                 sprite.rotate("L")
+
+        self.projectiles.update()
 
         # on update les coordonnées
         self.x += self.velocity.x * self.speed
@@ -149,17 +156,17 @@ class Player(pygame.sprite.Sprite):
                 self.y = self.hitbox.center[1]
                 self.velocity.y *= -self.velocity_lost
 
-            if abs(self.hitbox.bottom - self.rect_centre.top) <= self.max_velocity * self.speed + 1:
+            elif abs(self.hitbox.bottom - self.rect_centre.top) <= self.max_velocity * self.speed + 1:
                 self.hitbox.bottom = self.rect_centre.top - 1
                 self.y = self.hitbox.center[1]
                 self.velocity.y *= -self.velocity_lost
 
-            if abs(self.hitbox.right - self.rect_centre.left) <= self.max_velocity * self.speed + 1:
+            elif abs(self.hitbox.right - self.rect_centre.left) <= self.max_velocity * self.speed + 1:
                 self.hitbox.right = self.rect_centre.left - 1
                 self.x = self.hitbox.center[0]
                 self.velocity.x *= -self.velocity_lost
 
-            if abs(self.hitbox.left - self.rect_centre.right) <= self.max_velocity * self.speed + 1:
+            elif abs(self.hitbox.left - self.rect_centre.right) <= self.max_velocity * self.speed + 1:
                 self.hitbox.left = self.rect_centre.right + 1
                 self.x = self.hitbox.center[0]
                 self.velocity.x *= -self.velocity_lost

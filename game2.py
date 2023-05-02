@@ -1,6 +1,6 @@
 import pygame.time
 
-from player2 import Player, PlayerAnim
+from player2 import Player
 from ennemis import *
 from text import Text
 from wall import Wall
@@ -43,12 +43,12 @@ class Game:
 
         ####
 
-        self.player = Player(200, 200, self.size, self.center_square, self.walls)
+        self.player = Player(200, 200, self.size, self.center_square)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
 
-        self.in_menu = True
+        self.in_menu = False
         self.menu = Menu(self.window)
 
         pygame.mixer.music.load("music/bgm_1.mp3")
@@ -61,6 +61,7 @@ class Game:
                 wall.show()
 
     def sprites_update(self):
+        # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
 
@@ -78,6 +79,7 @@ class Game:
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+            self.player.projectiles.draw(self.window)
 
         else:
             self.menu.draw()
