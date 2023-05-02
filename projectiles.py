@@ -1,14 +1,20 @@
 import pygame
+from math import sin, cos, radians
 
 
-class Projectiles:
-    def __init__(self, x, y, direction, size, window):
+class Projectiles(pygame.sprite.Sprite):
+    def __init__(self, x, y, direction):
+        super().__init__()
         self.x, self.y = x, y
         self.direction = direction
-        self.projectile_rect = pygame.rect.Rect(self.x, self.y, 10, 5)
+        self.image = pygame.surface.Surface((10, 5))
+        self.image.fill("red")
+        self.rect = self.image.get_rect(center=(self.x, self.y))
 
-        self.size = size
-        self.window = window
 
-    def draw(self):
-        pygame.draw.rect(self.window, "red", self.projectile_rect)
+        self.velocity = cos(radians(self.direction)) * 20, sin(radians(self.direction)) * 20
+
+
+    def update(self):
+        self.rect.x += self.velocity[0]
+        self.rect.y -= self.velocity[1]
