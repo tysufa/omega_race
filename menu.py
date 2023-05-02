@@ -25,6 +25,8 @@ class Menu:
 
         self.over = ["white", "white", "white"]
 
+        self.select_sound = pygame.mixer.Sound("sound/select.wav")
+
     def draw(self):
         pygame.draw.rect(self.window, self.over[0], self.jouer.rect)
         pygame.draw.rect(self.window, self.over[1], self.boutique.rect)
@@ -38,6 +40,8 @@ class Menu:
         if self.jouer.rect.collidepoint(pygame.mouse.get_pos()):
             self.over[0] = "red"
             if mouse_events[0]:
+                self.select_sound.set_volume(0.15)
+                self.select_sound.play()
                 return True
 
         elif self.boutique.rect.collidepoint(pygame.mouse.get_pos()):

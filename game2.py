@@ -98,7 +98,7 @@ class Game:
             self.in_menu = True
             
         if not self.playing_music:
-            pygame.mixer.music.play(10)
+            pygame.mixer.music.play(10, fade_ms=1500)
             self.playing_music = True
 
     def run(self):
