@@ -26,7 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.max_velocity = 15
         self.angle = 0
 
-        self.wall_distance = 20
+        self.wall_distance = 10
 
         self.rect = self.image.get_rect(center=(self.x, self.y))  # pour l'affichage et la position de l'img
 
@@ -57,6 +57,10 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
         self.rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.rect.center  # on replace la hitbox
+
+    def die(self):
+        self.alive = False
+        self.anim3.show = True
 
     def move(self):
         # la prochaine velocité
@@ -115,7 +119,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
         self.hitbox.center = (self.x, self.y)
 
-
     def collision_bord(self):
         # si le haut du vaisseau dépasse le haut de l'écran
         if self.hitbox.top < self.wall_distance:
@@ -123,7 +126,7 @@ class Player(pygame.sprite.Sprite):
             self.y = self.hitbox.center[1]  # on update aussi la coordonnée y car on a seulement modifié hitbox
             self.velocity.y *= -self.velocity_lost  # on inverse la direction pour rebondir et on perd de la vitesse
 
-        if self.hitbox.bottom > self.size[1]-self.wall_distance:
+        if self.hitbox.bottom > self.size[1] - self.wall_distance:
             self.hitbox.bottom = self.size[1] - self.wall_distance - 1
             self.y = self.hitbox.center[1]
             self.velocity.y *= -self.velocity_lost
@@ -133,7 +136,7 @@ class Player(pygame.sprite.Sprite):
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
 
-        if self.hitbox.right > self.size[0]-self.wall_distance:
+        if self.hitbox.right > self.size[0] - self.wall_distance:
             self.hitbox.right = self.size[0] - self.wall_distance - 1
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
@@ -220,7 +223,8 @@ class PlayerAnim(pygame.sprite.Sprite):
 
         self.base_image.fill("black")  # on efface l'image précédente
         # on affiche la nouvelle image
-        self.base_image.blit(self.image_to_blit, (0, 0), (self.frame * self.frame_size, 0, self.frame_size, self.frame_size))
+        self.base_image.blit(self.image_to_blit, (0, 0),
+                             (self.frame * self.frame_size, 0, self.frame_size, self.frame_size))
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
