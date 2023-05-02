@@ -112,8 +112,8 @@ class bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
         pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
 
     def moove(self):
-        self.x+=vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=vitesse*(sin(radians(self.rotation)))
+        self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=self.vitesse*(sin(radians(self.rotation)))
         if super().colhor() or super().colver() :
             self.alive=False
 
@@ -127,8 +127,8 @@ class shooter(Ennemi):
     def draw(self):
         pygame.draw.rect(self.window, (255,255,0), (self.x-self.width/2, self.y-self.height/2), self.height,self.widht)
     def moove(self):
-        self.x+=vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=vitesse*(sin(radians(self.rotation)))
+        self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=self.vitesse*(sin(radians(self.rotation)))
 
         if super().colhor() or super().colver() :
             self.alive=False
