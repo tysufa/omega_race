@@ -30,7 +30,10 @@ class Ennemy_list :
                     proj.remove(projectiles_list) # on supprime le projectile du groupe
 
             if self.tab[i].alive:
-                self.tab[i].move()
+                if type(self.tab[i])!=Bull :
+                    self.tab[i].move()
+                else:
+                    self.tab[i].move(player.x,player.y)
             else:
                 tmp.pop(i - a)  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
                 a += 1
@@ -92,17 +95,17 @@ class Ennemi:
     def colide (self,rect):
         return self.hitbox.colliderect(rect)
 
-class mine(Ennemi):#La mine est un cercle blanc immobile.
-    def __init__ (self,x,y,WINDOW):
-        super().__init__(x,y,WINDOW)
+class Mine(Ennemi):#La mine est un cercle blanc immobile.
+    def __init__ (self,x,y,WINDOW,rect):
+        super().__init__(x,y,WINDOW,rect,"image/mine2.png")
 
     def draw(self):
-        pygame.draw.circle(self.window, (255,255,255), (self.x, self.y), 10)
+        self.window.blit(self.image,self.image_rect)
 
     def move(self):
         pass
 
-class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
+class Asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
     def __init__ (self,x,y,WINDOW,rect):
         super().__init__(x,y,WINDOW,rect,"image/Asteroid 01 - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
@@ -128,21 +131,25 @@ class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
-class bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
-    def __init__ (self,x,y,xb,yb,WINDOW,vitesse=5):
-        super().__init__(x,y,WINDOW)
+class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
+    def __init__ (self,x,y,WINDOW,rect,vitesse=1):
+        super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship - Frigate - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
-        self.rotation=rotate(x,y,xb,yb)
+        self.rotation=rotate(x,y,0,0)
         self.vitesse=vitesse
 
     def draw (self):
-        pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
+        self.window.blit(self.image,self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, 270-self.rotation, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
 
-    def move(self):
+    def move(self,x,y):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
+        self.rotation=rotate(self.x,self.y,x,y)
         if super().colhor() or super().colver() :
-            self.alive=False
+            pass#self.alive=False
 
 class shooter(Ennemi):
     def _init__ (self,x,y,WINDOW,liste):

@@ -46,7 +46,7 @@ class Game:
 
         ####
 
-        self.player = Player(200, 200, self.size, self.center_square)
+        self.player = Player(130, 160, self.size, self.center_square)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
@@ -64,8 +64,8 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        while len(self.ennemis.tab)<1:
-            self.ennemis.tab.append(asteroid(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
+        while len(self.ennemis.tab)<10:
+            self.ennemis.tab.append(Bull(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x,self.center_square.y),(self.center_square.width+self.ennemis.tab[-1].hitbox.width,self.center_square.height+self.ennemis.tab[-1].hitbox.height))
