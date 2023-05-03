@@ -64,7 +64,7 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        while len(self.ennemis.tab)<10:
+        while len(self.ennemis.tab)<1:
             self.ennemis.tab.append(asteroid(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
@@ -97,8 +97,6 @@ class Game:
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
-            for projectile in self.player.projectiles.sprites():
-                projectile.anim_group.draw(self.window)
 
         else:
             self.menu.draw()

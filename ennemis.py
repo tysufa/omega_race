@@ -42,7 +42,7 @@ class Ennemy_list :
                 self.tab[i].draw()
 
     def ajouter (self,ennemi):
-        tab.append(ennemi)
+        self.tab.append(ennemi)
 
 class Ennemi:
     def __init__ (self,x,y,WINDOW,rect,imagepath):

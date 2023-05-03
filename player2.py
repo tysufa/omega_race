@@ -22,10 +22,10 @@ class Player(pygame.sprite.Sprite):
         self.rect_centre = rect_centre
 
         self.velocity = pygame.math.Vector2(0, 0)
-        self.speed = 0.2
+        self.speed = PLAYER_SPEED
         # la perte de vitesse lorsqu'on rebondit
-        self.velocity_lost = 0.6
-        self.max_velocity = 15
+        self.velocity_lost = VELOCITY_LOST
+        self.max_velocity = MAX_PLAYER_SPEED
         self.angle = 0
 
         self.wall_distance = 10
@@ -82,6 +82,7 @@ class Player(pygame.sprite.Sprite):
         if abs(new_velocity_y) < self.max_velocity:
             self.velocity.y = new_velocity_y
 
+
     def update(self):
         if self.has_shot:
             if pygame.time.get_ticks() - self.test > FIRE_RATE:
@@ -136,6 +137,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (self.x, self.y)
         self.hitbox.center = (self.x, self.y)
 
+
     def collision_bord(self):
         for projectile in self.projectiles.sprites():
             if not projectile.rect.colliderect(self.rect_ecran): # si le projectile n'est pas sur l'écran
@@ -161,6 +163,7 @@ class Player(pygame.sprite.Sprite):
             self.hitbox.right = self.size[0] - self.wall_distance - 1
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
+
 
     def collision_centre(self):
         for projectile in self.projectiles.sprites():
