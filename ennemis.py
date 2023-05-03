@@ -16,12 +16,19 @@ class Ennemy_list :
     def __init__ (self):
         self.tab=[]
 
-    def update(self,playerect):
+    def update(self, player, projectiles_list):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
         for i in range(len(self.tab)):
-            if self.tab[i].colide(playerect):#si l'objet est en colision avec le joueur
-                self.tab[i].alive=False#alors on tue l'objet
+
+            if self.tab[i].colide(player.hitbox):
+                player.die()
+
+            for proj in projectiles_list.sprites():
+                if self.tab[i].colide(proj.rect): # si l'objet est en colision avec le joueur
+                    self.tab[i].alive = False # alors on tue l'objet
+                    proj.remove(projectiles_list) # on supprime le projectile du groupe
+
             if self.tab[i].alive:
                 self.tab[i].move()
             else:
@@ -39,21 +46,26 @@ class Ennemy_list :
 
 class Ennemi:
     def __init__ (self,x,y,WINDOW,rect,imagepath):
+        self.alive=True #Etat
+        #Position et mouvements
         self.x=x
         self.y=y
-        self.alive=True
+
+        #logique de spawn :
+
+
+        #Données globales
         self.window=WINDOW#mettre la fenettre en imput pour pouvoir s'afficher
         tu=pygame.display.get_window_size()
         self.height=tu[1]
         self.widht=tu[0]
         self.centre=rect
+
+        #rectangles
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
         self.hitbox = pygame.rect.Rect((x,y),(35,35))
-        while self.x+10>(self.widht // 2 -self.widht // 6) and self.x-10<(self.widht // 2 +self.widht // 6) and self.y+10>(self.height // 2 -self.height // 6) and self.y-10<(self.height // 2 +self.height // 6) :
-            self.x=randint(10,tu[0]-10)
-            self.y=randint(10,tu[1]-10)
 
     def colmurver (self):
         if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
@@ -72,7 +84,7 @@ class Ennemi:
                 return True
 
     def colver (self):
-        return self.y+10 >= self.height or self.y-10 <= 0 or self.colmurver()#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
+        return self.y+10 >= self.height or self.y-10 <= 0 or self.colmurver()
 
     def colhor (self):
         return self.x+10 >= self.widht or self.x-10 <= 0 or self.colmurhor()
@@ -126,7 +138,7 @@ class bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
     def draw (self):
         pygame.draw.circle(self.window, (0,255,0), (self.x, self.y), 10)
 
-    def moove(self):
+    def move(self):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
         if super().colhor() or super().colver() :
@@ -141,7 +153,7 @@ class shooter(Ennemi):
 
     def draw(self):
         pygame.draw.rect(self.window, (255,255,0), (self.x-self.width/2, self.y-self.height/2), self.height,self.widht)
-    def moove(self):
+    def move(self):
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
         self.liste.ajouter

@@ -49,8 +49,10 @@ class Player(pygame.sprite.Sprite):
         self.player_anim.add(self.anim3)
 
 
-
         self.projectiles = pygame.sprite.Group()
+        self.has_shot = False
+
+        self.rect_ecran = pygame.rect.Rect((0, 0), self.size) # on créer un rectangle qui prend toute la fenetre
 
     def rotate(self, direction):
         if direction == "R":  # si on veut tourner vers la droite
@@ -67,6 +69,7 @@ class Player(pygame.sprite.Sprite):
         self.alive = False
         self.anim3.show = True
 
+
     def move(self):
         # la prochaine velocité
         new_velocity_x = (self.velocity.x + cos(radians(self.angle)))
@@ -79,6 +82,9 @@ class Player(pygame.sprite.Sprite):
             self.velocity.y = new_velocity_y
 
     def update(self):
+        if self.has_shot:
+            if pygame.time.get_ticks() - self.test > 300:
+                self.has_shot = False
 
         keys = pygame.key.get_pressed()  # on récupère la liste des touches appuyées
 
@@ -91,7 +97,10 @@ class Player(pygame.sprite.Sprite):
             self.anim1.show = True  # on veut afficher l'animation des réacteurs
 
         if keys[pygame.K_z]:
-            self.projectiles.add(Projectiles(self.x, self.y, self.angle))
+            if not self.has_shot:
+                self.projectiles.add(Projectiles(self.x, self.y, self.angle))
+                self.has_shot = True
+                self.test = pygame.time.get_ticks()
 
         if keys[pygame.K_SPACE]:
             self.alive = False
@@ -127,6 +136,12 @@ class Player(pygame.sprite.Sprite):
         self.hitbox.center = (self.x, self.y)
 
     def collision_bord(self):
+        for projectile in self.projectiles.sprites():
+            if not projectile.rect.colliderect(self.rect_ecran): # si le projectile n'est pas sur l'écran
+                projectile.remove(self.projectiles)
+
+        #print(self.projectiles)
+
         # si le haut du vaisseau dépasse le haut de l'écran
         if self.hitbox.top < self.wall_distance:
             self.hitbox.top = self.wall_distance + 1  # on se replace 1 pixel en dessous
@@ -149,6 +164,10 @@ class Player(pygame.sprite.Sprite):
             self.velocity.x *= -self.velocity_lost
 
     def collision_centre(self):
+        for projectile in self.projectiles.sprites():
+            if projectile.rect.colliderect(self.rect_centre):
+                projectile.remove(self.projectiles) # on supprime les projectiles qui passent par le centre
+
         if self.hitbox.colliderect(self.rect_centre):  # si on a une collision avec le rectangle du milieu
             # si l'écart entre le haut du vaisseau et le bas du rectangle est suffisament faible
             if abs(self.hitbox.top - self.rect_centre.bottom) <= self.max_velocity * self.speed + 1:

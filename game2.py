@@ -63,14 +63,14 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        for i in range(100):
-            self.ennemis.tab.append(asteroid(360,240,self.window,self.center_square))
+        for i in range(50):
+            self.ennemis.tab.append(asteroid(700,400,self.window,self.center_square))
 
-    def sprites_update(self):
+    def update(self):
         # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
-        self.ennemis.update(self.player.hitbox)
+        self.ennemis.update(self.player, self.player.projectiles)
 
     def draw(self):
         self.window.blit(self.background, (0, 0))
@@ -80,10 +80,13 @@ class Game:
                 if wall.displayed:
                     wall.draw(self.window)
 
-            self.player.player_anim.draw(self.window)
-            self.ennemis.draw()
             if self.player.alive:
+                self.player.player_anim.draw(self.window)
                 self.player_group.draw(self.window)
+
+            self.ennemis.draw()
+
+
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
@@ -101,7 +104,7 @@ class Game:
     def game_loop(self):
         keys = pygame.key.get_pressed()
 
-        self.sprites_update()
+        self.update()
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
 
         if keys[pygame.K_ESCAPE]:
