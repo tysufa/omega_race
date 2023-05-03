@@ -63,11 +63,10 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        for i in range(15):
+        for i in range(1):
             self.ennemis.tab.append(asteroid(360,240,self.window))
 
     def update(self):
-        # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
         self.ennemis.update(self.player, self.player.projectiles)
@@ -91,6 +90,9 @@ class Game:
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
+            for projectile in self.player.projectiles.sprites():
+                print(projectile.anim_group)
+                projectile.anim_group.draw(self.window)
 
         else:
             self.menu.draw()

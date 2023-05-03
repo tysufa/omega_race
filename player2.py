@@ -1,6 +1,7 @@
 import pygame
 from math import cos, sin, radians
 from projectiles import Projectiles
+from constantes import *
 
 pygame.init()
 
@@ -36,17 +37,21 @@ class Player(pygame.sprite.Sprite):
 
         self.alive = True
 
-        self.anim1 = PlayerAnim(self.x, self.y, 11, 64, 50,
+        self.anim1 = PlayerAnim(self.x, self.y, 11, (64, 64), 50,
                                 "image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False)
-        self.anim2 = PlayerAnim(self.x, self.y, 39, 64, 50,
+        self.anim2 = PlayerAnim(self.x, self.y, 39, (64, 64), 50,
                                 "image/Kla'ed/Shield/Kla'ed - Frigate - Shield.png", True)
-        self.anim3 = PlayerAnim(self.x, self.y, 8, 64, 50,
+        self.anim3 = PlayerAnim(self.x, self.y, 8, (64, 64), 50,
                                 "image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png", True)
+
+        self.anim5 = PlayerAnim(100, 50, 5, (8, 16), 2000,
+                          "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png", True)
 
         self.player_anim = pygame.sprite.Group()
         self.player_anim.add(self.anim1)
         self.player_anim.add(self.anim2)
         self.player_anim.add(self.anim3)
+        self.player_anim.add(self.anim5)
 
 
         self.projectiles = pygame.sprite.Group()
@@ -83,7 +88,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         if self.has_shot:
-            if pygame.time.get_ticks() - self.test > 300:
+            if pygame.time.get_ticks() - self.test > FIRE_RATE:
                 self.has_shot = False
 
         keys = pygame.key.get_pressed()  # on récupère la liste des touches appuyées
@@ -95,6 +100,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_UP]:
             self.move()
             self.anim1.show = True  # on veut afficher l'animation des réacteurs
+            self.anim5.show = True  # on veut afficher l'animation des réacteurs
 
         if keys[pygame.K_z]:
             if not self.has_shot:
@@ -139,8 +145,6 @@ class Player(pygame.sprite.Sprite):
         for projectile in self.projectiles.sprites():
             if not projectile.rect.colliderect(self.rect_ecran): # si le projectile n'est pas sur l'écran
                 projectile.remove(self.projectiles)
-
-        print(self.projectiles)
 
         # si le haut du vaisseau dépasse le haut de l'écran
         if self.hitbox.top < self.wall_distance:
@@ -204,7 +208,7 @@ class PlayerAnim(pygame.sprite.Sprite):
         self.stay = stay
 
         # on créer une surface pour contenir notre image
-        self.image = pygame.Surface((self.frame_size, self.frame_size)).convert_alpha()
+        self.image = pygame.Surface(self.frame_size).convert_alpha()
 
         # on charge l'image qu'on affichera sur notre surface
         self.image_to_blit = pygame.image.load(self.image_path)
@@ -213,7 +217,7 @@ class PlayerAnim(pygame.sprite.Sprite):
         self.frame = 0
 
         # on affiche l'image sur la surface
-        self.image.blit(self.image_to_blit, (0, 0), (self.frame * self.frame_size, 0, self.frame_size, self.frame_size))
+        self.image.blit(self.image_to_blit, (0, 0), (self.frame * self.frame_size[0], 0, self.frame_size[0], self.frame_size[1]))
 
         # savoir si on affiche le sprite ou non
         self.show = False
@@ -225,7 +229,7 @@ class PlayerAnim(pygame.sprite.Sprite):
 
         self.base_image = self.image  # l'image que l'on fera tourner pour éviter une perte de qualité de l'image
 
-        self.rect = self.image.get_rect(center=(x, y))
+        self.rect = self.image.get_rect(center=(self.x, self.y))
 
         self.timer = pygame.time.get_ticks()  # le timer pour gérer le timing des animations
 
@@ -250,7 +254,7 @@ class PlayerAnim(pygame.sprite.Sprite):
         self.base_image.fill("black")  # on efface l'image précédente
         # on affiche la nouvelle image
         self.base_image.blit(self.image_to_blit, (0, 0),
-                             (self.frame * self.frame_size, 0, self.frame_size, self.frame_size))
+                             (self.frame * self.frame_size[0], 0, self.frame_size[0], self.frame_size[1]))
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
