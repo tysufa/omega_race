@@ -5,6 +5,7 @@ from ennemis import *
 from text import Text
 from wall import Wall
 from menu import Menu
+from random import randint
 
 
 class Game:
@@ -63,11 +64,15 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        for i in range(50):
-            self.ennemis.tab.append(asteroid(700,400,self.window,self.center_square))
+        while len(self.ennemis.tab)<10:
+            self.ennemis.tab.append(asteroid(randint(0,720),randint(0,480),self.window,self.center_square))
+            spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
+            spawnbox.center=self.player.hitbox.center
+            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(self.center_square) :
+                self.ennemis.tab[-1].alive=False
+                self.ennemis.tab.pop(-1)
 
     def update(self):
-        # self.player.projectiles.update()
         self.player_group.update()
         self.walls.update()
         self.ennemis.update(self.player, self.player.projectiles)
@@ -91,6 +96,9 @@ class Game:
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
+            for projectile in self.player.projectiles.sprites():
+                print(projectile.anim_group)
+                projectile.anim_group.draw(self.window)
 
         else:
             self.menu.draw()
