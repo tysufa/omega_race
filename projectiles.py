@@ -24,7 +24,6 @@ class Projectiles(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y -= self.velocity[1]
-        print(self.velocity)
         # ça marche je sais pas pourquoi, j'ai pas envie de savoir pourquoi et je saurais pas pourquoi
         self.image = self.anim1.image
         self.anim_group.update()

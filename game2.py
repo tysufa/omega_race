@@ -91,7 +91,6 @@ class Game:
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
             for projectile in self.player.projectiles.sprites():
-                print(projectile.anim_group)
                 projectile.anim_group.draw(self.window)
 
         else:
