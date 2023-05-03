@@ -64,7 +64,7 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        while len(self.ennemis.tab)<10:
+        while len(self.ennemis.tab)<40:
             self.ennemis.tab.append(asteroid(randint(0,720),randint(0,480),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
