@@ -64,7 +64,7 @@ class Game:
 
     def spawn(self):
         for i in range(100):
-            self.ennemis.tab.append(asteroid(360,240,self.window))
+            self.ennemis.tab.append(asteroid(360,240,self.window,self.center_square))
 
     def sprites_update(self):
         # self.player.projectiles.update()

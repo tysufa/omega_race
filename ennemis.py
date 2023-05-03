@@ -38,7 +38,7 @@ class Ennemy_list :
         tab.append(ennemi)
 
 class Ennemi:
-    def __init__ (self,x,y,WINDOW,imagepath):
+    def __init__ (self,x,y,WINDOW,rect,imagepath):
         self.x=x
         self.y=y
         self.alive=True
@@ -46,6 +46,7 @@ class Ennemi:
         tu=pygame.display.get_window_size()
         self.height=tu[1]
         self.widht=tu[0]
+        self.centre=rect
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
@@ -55,10 +56,20 @@ class Ennemi:
             self.y=randint(10,tu[1]-10)
 
     def colmurver (self):
-        return (self.x+15>(self.widht // 2 -self.widht // 6) and self.x-15<(self.widht // 2 +self.widht // 6) and self.y+15>(self.height // 2 -self.height // 6) and self.y-15<(self.height // 2 +self.height // 6) and (self.y<(self.height // 2 -self.height // 6) or self.y>(self.height // 2 +self.height // 6)))
+        if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
+            # si l'écart entre le haut du vaisseau et le bas du rectangle est suffisament faible
+            if abs(self.hitbox.top - self.centre.bottom) <= 10:
+                return True
+
+            elif abs(self.hitbox.bottom - self.centre.top) <= 10:
+                return True
 
     def colmurhor (self):
-        return (self.x+15>(self.widht // 2 -self.widht // 6) and self.x-15<(self.widht // 2 +self.widht // 6) and self.y+15>(self.height // 2 -self.height // 6) and self.y-15<(self.height // 2 +self.height // 6) and (self.x<(self.widht // 2 -self.widht // 6) or self.x>(self.widht // 2 +self.widht // 6)))
+        if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
+            if abs(self.hitbox.right - self.centre.left) <= 10:
+                return True
+            elif abs(self.hitbox.left - self.centre.right) <= 10:
+                return True
 
     def colver (self):
         return self.y+10 >= self.height or self.y-10 <= 0 or self.colmurver()#essayer de récuperer les dimensions de la fenètre + essayer de prendre en compte le carré central
@@ -80,8 +91,8 @@ class mine(Ennemi):#La mine est un cercle blanc immobile.
         pass
 
 class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
-    def __init__ (self,x,y,WINDOW):
-        super().__init__(x,y,WINDOW,"image/Asteroid 01 - Base.png")
+    def __init__ (self,x,y,WINDOW,rect):
+        super().__init__(x,y,WINDOW,rect,"image/Asteroid 01 - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation=randint(1,360)#rotation de l'ennemi, en degrés, 0 étant a droite
         self.angle=randint(0,360)
@@ -98,9 +109,11 @@ class asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
         self.angle+=self.rotation/abs(self.rotation)
         if super().colhor():
             self.senscos=-self.senscos
+            self.x+=3*(cos(radians(self.rotation)))*self.senscos
             #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
         if super().colver():
             self.rotation = -self.rotation#car sin est paire. fonctione.
+            self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
 class bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
