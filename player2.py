@@ -9,15 +9,13 @@ pygame.init()
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, size, rect_centre):
         super().__init__()
-        self.base_image = pygame.image.load(
-            "image/Kla'ed/Base/Kla'ed - Frigate - Base.png").convert_alpha()
+        self.base_image = pygame.image.load(PLAYER_IMAGE).convert_alpha()
         # on tourne l'image vers la droite
         self.base_image = pygame.transform.rotozoom(self.base_image, -90, 1)
         self.image = self.base_image
 
         self.x = x
         self.y = y
-        self.size = size
         # le rectangle du milieu pour les collisions
         self.rect_centre = rect_centre
 
@@ -28,12 +26,9 @@ class Player(pygame.sprite.Sprite):
         self.max_velocity = MAX_PLAYER_SPEED
         self.angle = 0
 
-        self.wall_distance = 10
-
         self.rect = self.image.get_rect(center=(self.x, self.y))  # pour l'affichage et la position de l'img
 
-        self.taille_hitbox = (44, 44)
-        self.hitbox = pygame.rect.Rect((self.x, self.y), self.taille_hitbox)  # pour une taille de hitbox constante
+        self.hitbox = pygame.rect.Rect((self.x, self.y), HITBOX_SIZE)  # pour une taille de hitbox constante
 
         self.alive = True
 
@@ -53,13 +48,13 @@ class Player(pygame.sprite.Sprite):
         self.projectiles = pygame.sprite.Group()
         self.has_shot = False
 
-        self.rect_ecran = pygame.rect.Rect((0, 0), self.size) # on créer un rectangle qui prend toute la fenetre
+        self.rect_ecran = pygame.rect.Rect((0, 0), SIZE) # on créer un rectangle qui prend toute la fenetre
 
     def rotate(self, direction):
         if direction == "R":  # si on veut tourner vers la droite
-            self.angle -= 5
+            self.angle -= ROTATION_SPEED
         elif direction == "L":
-            self.angle += 5
+            self.angle += ROTATION_SPEED
 
         # rotozoom à une meilleur qualité que rotate
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
@@ -94,48 +89,53 @@ class Player(pygame.sprite.Sprite):
             if not sprite.stay:
                 sprite.show = False  # on cache tous les sprites
 
-        if keys[pygame.K_UP]:
-            self.move()
-            self.anim1.show = True  # on veut afficher l'animation des réacteurs
+        if self.alive:
+            if keys[pygame.K_UP]:
+                self.move()
+                self.anim1.show = True  # on veut afficher l'animation des réacteurs
 
-        if keys[pygame.K_z]:
-            if not self.has_shot:
-                self.projectiles.add(Projectiles(self.x, self.y, self.angle))
-                self.has_shot = True
-                self.test = pygame.time.get_ticks()
+            if keys[pygame.K_z]:
+                if not self.has_shot:
+                    self.projectiles.add(Projectiles(self.x, self.y, self.angle))
+                    self.has_shot = True
+                    self.test = pygame.time.get_ticks()
 
-        if keys[pygame.K_SPACE]:
-            self.alive = False
-            self.anim3.show = True
+            if keys[pygame.K_SPACE]:
+                self.alive = False
+                self.anim3.show = True
 
-        if keys[pygame.K_RIGHT]:
-            self.rotate("R")
+            if keys[pygame.K_RIGHT]:
+                self.rotate("R")
+                for sprite in self.player_anim.sprites():
+                    sprite.rotate("R")  # on fait tourner chaque sprite du vaisseau vers la droite
+
+            if keys[pygame.K_LEFT]:
+                self.rotate("L")
+                for sprite in self.player_anim.sprites():
+                    sprite.rotate("L")
+
+            self.projectiles.update()
+
+            # on update les coordonnées
+            self.x += self.velocity.x * self.speed
+            self.y -= self.velocity.y * self.speed
+
+            self.player_anim.update()  # on update chaque sprite d'animation du joueur
+
             for sprite in self.player_anim.sprites():
-                sprite.rotate("R")  # on fait tourner chaque sprite du vaisseau vers la droite
+                sprite.rect.center = (self.x, self.y)  # on change la position de chaque animation
 
-        if keys[pygame.K_LEFT]:
-            self.rotate("L")
-            for sprite in self.player_anim.sprites():
-                sprite.rotate("L")
+            # on check les collisions
+            self.collision_bord()
+            self.collision_centre()
 
-        self.projectiles.update()
+            # on update les positions de rect et hitbox
+            self.rect.center = (self.x, self.y)
+            self.hitbox.center = (self.x, self.y)
 
-        # on update les coordonnées
-        self.x += self.velocity.x * self.speed
-        self.y -= self.velocity.y * self.speed
-
-        self.player_anim.update()  # on update chaque sprite d'animation du joueur
-
-        for sprite in self.player_anim.sprites():
-            sprite.rect.center = (self.x, self.y)  # on change la position de chaque animation
-
-        # on check les collisions
-        self.collision_bord()
-        self.collision_centre()
-
-        # on update les positions de rect et hitbox
-        self.rect.center = (self.x, self.y)
-        self.hitbox.center = (self.x, self.y)
+        else:
+            self.projectiles.update()
+            self.anim3.update()
 
 
     def collision_bord(self):
@@ -144,23 +144,23 @@ class Player(pygame.sprite.Sprite):
                 projectile.remove(self.projectiles)
 
         # si le haut du vaisseau dépasse le haut de l'écran
-        if self.hitbox.top < self.wall_distance:
-            self.hitbox.top = self.wall_distance + 1  # on se replace 1 pixel en dessous
+        if self.hitbox.top < WALL_DISTANCE:
+            self.hitbox.top = WALL_DISTANCE + 1  # on se replace 1 pixel en dessous
             self.y = self.hitbox.center[1]  # on update aussi la coordonnée y car on a seulement modifié hitbox
             self.velocity.y *= -self.velocity_lost  # on inverse la direction pour rebondir et on perd de la vitesse
 
-        if self.hitbox.bottom > self.size[1] - self.wall_distance:
-            self.hitbox.bottom = self.size[1] - self.wall_distance - 1
+        if self.hitbox.bottom > SIZE[1] - WALL_DISTANCE:
+            self.hitbox.bottom = SIZE[1] - WALL_DISTANCE - 1
             self.y = self.hitbox.center[1]
             self.velocity.y *= -self.velocity_lost
 
-        if self.hitbox.left < self.wall_distance:
-            self.hitbox.left = self.wall_distance + 1
+        if self.hitbox.left < WALL_DISTANCE:
+            self.hitbox.left = WALL_DISTANCE + 1
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
 
-        if self.hitbox.right > self.size[0] - self.wall_distance:
-            self.hitbox.right = self.size[0] - self.wall_distance - 1
+        if self.hitbox.right > SIZE[0] - WALL_DISTANCE:
+            self.hitbox.right = SIZE[0] - WALL_DISTANCE - 1
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
 
@@ -233,9 +233,9 @@ class PlayerAnim(pygame.sprite.Sprite):
 
     def rotate(self, direction=None):
         if direction == "R":  # si on veut tourner vers la droite
-            self.angle -= 5
+            self.angle -= ROTATION_SPEED
         elif direction == "L":
-            self.angle += 5
+            self.angle += ROTATION_SPEED
 
         # rotozoom à une meilleur qualité que rotate
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
