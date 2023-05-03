@@ -14,7 +14,7 @@ class Game:
         self.window = pygame.display.set_mode(size)
         pygame.display.set_caption(title)
 
-        self.background = pygame.image.load("image/Space Background2.png")
+        self.background = pygame.image.load("image/Space Background.png")
 
         # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square = pygame.rect.Rect((0, 0, size[0] // 3, size[1] // 3))
@@ -63,7 +63,7 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        for i in range(1):
+        for i in range(15):
             self.ennemis.tab.append(asteroid(360,240,self.window))
 
     def update(self):
@@ -79,8 +79,8 @@ class Game:
                 if wall.displayed:
                     wall.draw(self.window)
 
+            self.player.player_anim.draw(self.window)
             if self.player.alive:
-                self.player.player_anim.draw(self.window)
                 self.player_group.draw(self.window)
 
             self.ennemis.draw()

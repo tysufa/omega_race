@@ -13,6 +13,8 @@ class Projectiles(pygame.sprite.Sprite):
         self.anim_group = pygame.sprite.Group(self.anim1)
 
         self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.anim1.angle = 90
+        self.anim1.rotate()
 
 
         self.velocity = cos(radians(self.direction)) * 7, sin(radians(self.direction)) * 7

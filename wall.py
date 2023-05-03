@@ -27,9 +27,5 @@ class Wall(pygame.sprite.Sprite):
 
     def update(self):
         if self.displayed and self.timer is not None:
-            if pygame.time.get_ticks() - self.timer > 150:
+            if pygame.time.get_ticks() - self.timer > 180:
                 self.displayed = False
-
-
-def make_walls(wall_number, size):
-    pass
