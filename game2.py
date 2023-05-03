@@ -65,10 +65,12 @@ class Game:
 
     def spawn(self):
         while len(self.ennemis.tab)<10:
-            self.ennemis.tab.append(asteroid(randint(0,720),randint(0,480),self.window,self.center_square))
+            self.ennemis.tab.append(asteroid(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(self.center_square) :
+            spawncenter = pygame.rect.Rect((self.center_square.x,self.center_square.y),(self.center_square.width+self.ennemis.tab[-1].hitbox.width,self.center_square.height+self.ennemis.tab[-1].hitbox.height))
+            spawncenter.center=self.center_square.center
+            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter) :
                 self.ennemis.tab[-1].alive=False
                 self.ennemis.tab.pop(-1)
 
@@ -79,7 +81,6 @@ class Game:
 
     def draw(self):
         self.window.blit(self.background, (0, 0))
-
         if not self.in_menu:
             for wall in self.walls.sprites():
                 if wall.displayed:
