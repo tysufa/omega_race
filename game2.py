@@ -15,7 +15,7 @@ class Game:
         self.window = pygame.display.set_mode(size)
         pygame.display.set_caption(title)
 
-        self.background = pygame.image.load("image/Space Background2.png")
+        self.background = pygame.image.load("image/Space Background.png")
 
         # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square = pygame.rect.Rect((0, 0, size[0] // 3, size[1] // 3))
@@ -86,8 +86,8 @@ class Game:
                 if wall.displayed:
                     wall.draw(self.window)
 
+            self.player.player_anim.draw(self.window)
             if self.player.alive:
-                self.player.player_anim.draw(self.window)
                 self.player_group.draw(self.window)
 
             self.ennemis.draw()
@@ -98,7 +98,6 @@ class Game:
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
             for projectile in self.player.projectiles.sprites():
-                print(projectile.anim_group)
                 projectile.anim_group.draw(self.window)
 
         else:

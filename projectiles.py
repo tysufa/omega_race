@@ -13,6 +13,8 @@ class Projectiles(pygame.sprite.Sprite):
         self.anim_group = pygame.sprite.Group(self.anim1)
 
         self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.anim1.angle = 90
+        self.anim1.rotate()
 
 
         self.velocity = cos(radians(self.direction)) * 7, sin(radians(self.direction)) * 7
@@ -22,7 +24,6 @@ class Projectiles(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y -= self.velocity[1]
-        print(self.velocity)
         # ça marche je sais pas pourquoi, j'ai pas envie de savoir pourquoi et je saurais pas pourquoi
         self.image = self.anim1.image
         self.anim_group.update()

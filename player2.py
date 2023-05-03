@@ -44,14 +44,10 @@ class Player(pygame.sprite.Sprite):
         self.anim3 = PlayerAnim(self.x, self.y, 8, (64, 64), 50,
                                 "image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png", True)
 
-        self.anim5 = PlayerAnim(100, 50, 5, (8, 16), 2000,
-                          "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png", True)
-
         self.player_anim = pygame.sprite.Group()
         self.player_anim.add(self.anim1)
         self.player_anim.add(self.anim2)
         self.player_anim.add(self.anim3)
-        self.player_anim.add(self.anim5)
 
 
         self.projectiles = pygame.sprite.Group()
@@ -100,7 +96,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_UP]:
             self.move()
             self.anim1.show = True  # on veut afficher l'animation des réacteurs
-            self.anim5.show = True  # on veut afficher l'animation des réacteurs
 
         if keys[pygame.K_z]:
             if not self.has_shot:
