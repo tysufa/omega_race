@@ -45,7 +45,7 @@ class Game:
 
         ####
 
-        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], SIZE, self.center_square)
+        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], SIZE, self.center_square, self.ennemis)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
@@ -64,7 +64,7 @@ class Game:
 
     def spawn(self):
 
-        while len(self.ennemis.tab)<10:
+        while len(self.ennemis.tab)<7:
             self.ennemis.tab.append(Bull(randint(40,SIZE[0]-40),randint(40,SIZE[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y), PLAYER_SAFE_SPAWN_ZONE) 
             spawnbox.center=self.player.hitbox.center
@@ -76,8 +76,11 @@ class Game:
 
     def update(self):
         self.player_group.update()
-        self.walls.update()
-        self.ennemis.update(self.player, self.player.projectiles)
+        if self.player.alive:
+            self.walls.update()
+            self.ennemis.update(self.player, self.player.projectiles)
+        else:
+            self.ennemis = self.player.ennemis
 
     def draw(self):
         self.window.blit(self.background, (0, 0))
@@ -86,9 +89,11 @@ class Game:
                 if wall.displayed:
                     wall.draw(self.window)
 
+
             self.player.player_anim.draw(self.window)
             if self.player.alive:
                 self.player_group.draw(self.window)
+            
 
             self.ennemis.draw()
 
@@ -96,6 +101,8 @@ class Game:
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+            
+
             self.player.projectiles.draw(self.window)
 
         else:

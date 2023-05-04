@@ -3,17 +3,19 @@ from math import cos, sin, radians
 from projectiles import Projectiles
 from constantes import *
 from animation import Anim
+from ennemis import Ennemy_list
 
 pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, rect_centre):
+    def __init__(self, x, y, size, rect_centre, ennemis):
         super().__init__()
         self.base_image = pygame.image.load(PLAYER_IMAGE).convert_alpha()
         # on tourne l'image vers la droite
         self.base_image = pygame.transform.rotozoom(self.base_image, -90, 1)
         self.image = self.base_image
+        self.ennemis = ennemis
 
         self.x = x
         self.y = y
@@ -59,7 +61,10 @@ class Player(pygame.sprite.Sprite):
     def die(self):
         self.alive = False
         self.explosion_anim.show = True
-
+        self.engine_anim.show = False
+        self.death_timer = pygame.time.get_ticks()
+        self.ennemis = Ennemy_list()
+        
 
     def move(self):
         # la prochaine velocité
@@ -74,6 +79,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self):
+
         if self.reloading: # si on est en train de "recharger" :
             if pygame.time.get_ticks() - self.time > FIRE_RATE: # si on à dépassé le temps de recharge
                 self.reloading = False # on peut à nouveau tirer
@@ -105,28 +111,37 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
-            self.projectiles.update()
 
             # on update les coordonnées
             self.x += self.velocity.x * self.speed
             self.y -= self.velocity.y * self.speed
 
-            self.player_anim.update()  # on update chaque sprite d'animation du joueur
-
-            for sprite in self.player_anim.sprites():
-                sprite.rect.center = (self.x, self.y)  # on change la position de chaque animation
-
-            # on check les collisions
-            self.collision_bord()
-            self.collision_centre()
-
-            # on update les positions de rect et hitbox
-            self.rect.center = (self.x, self.y)
-            self.hitbox.center = (self.x, self.y)
-
+        
         else:
-            self.projectiles.update()
-            self.explosion_anim.update()
+            if pygame.time.get_ticks() - self.death_timer > RESPAWN_TIME:
+                self.x = 40
+                self.y = 40
+                self.velocity.x = 0
+                self.velocity.y = 0
+                self.alive = True
+
+
+        self.player_anim.update()
+
+        # on check les collisions
+        self.collision_bord()
+        self.collision_centre()
+
+        # on update les positions de rect et hitbox
+        self.rect.center = (self.x, self.y)
+        self.hitbox.center = (self.x, self.y)
+
+
+        for anim in self.player_anim.sprites():
+            anim.rect.center = (self.x, self.y)  # on change la position de chaque animation
+
+
+        self.projectiles.update()
 
 
     def collision_bord(self):

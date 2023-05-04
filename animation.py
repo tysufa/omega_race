@@ -31,8 +31,6 @@ class Anim(pygame.sprite.Sprite):
         # on commence en tournant l'animation vers la droite comme le joueur
         self.angle = -90
 
-        self.image = pygame.transform.rotate(self.image, self.angle)
-
         self.base_image = self.image  # l'image que l'on fera tourner pour éviter une perte de qualité de l'image
 
         self.rect = self.image.get_rect(center=(x, y))
@@ -54,6 +52,19 @@ class Anim(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
 
     def update(self):
+        if self.show:
+            if self.frame == -1: # on passe directement à la première frame pour éviter d'afficher du noir
+                self.frame = 0
+
+            if pygame.time.get_ticks() - self.timer > self.frames_delay:  # savoir si on passe au sprite suivant
+                self.frame += 1
+                self.timer = pygame.time.get_ticks()
+
+            if self.frame > self.frame_number:
+                self.frame = -1
+                self.show = False # on n'affiche plus l'animation
+        else:
+            self.frame = -1 # on passe à -1 pour n'afficher que du noir et donc ne rien afficher à l'écran
 
         self.base_image.fill("black")  # on efface l'image précédente
         # on affiche la nouvelle image
@@ -61,14 +72,4 @@ class Anim(pygame.sprite.Sprite):
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
-        if self.show:
-            if pygame.time.get_ticks() - self.timer > self.frames_delay:  # savoir si on passe au sprite suivant
-                self.frame += 1
-                self.timer = pygame.time.get_ticks()
-
-            if self.frame > self.frame_number:
-                self.frame = 0  # on repasse à la première image
-                self.show = False # on n'affiche plus l'animation
-        else:
-            self.frame = -1 # on passe à -1 pour n'afficher que du noir et donc ne rien afficher à l'écran
         

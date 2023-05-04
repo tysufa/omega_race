@@ -16,6 +16,7 @@ HITBOX_SIZE = (44, 44)
 ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
 PLAYER_INITIAL_POSITION = (130, 160)
+RESPAWN_TIME = 1000 # temps en millisecodes
 
 MAX_AMO = 5
 FIRE_RATE = 500
