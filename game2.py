@@ -14,7 +14,7 @@ class Game:
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(title)
 
-        self.background = pygame.image.load("image/Space Background.png")
+        self.background = pygame.image.load(BACKGROUND_IMAGE)
 
         # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
@@ -24,10 +24,10 @@ class Game:
         self.high_score = 0
 
         # les 4 textes à afficher pour score et high score
-        text1 = Text("Comic Sans MS", "score", 24, self.center_square.right - 5, self.center_square.top, "white")
-        text2 = Text("Comic Sans MS", str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
-        text3 = Text("Comic Sans MS", "high score", 24, self.center_square.right - 5, text2.rect.bottom, "white")
-        text4 = Text("Comic Sans MS", str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
+        text1 = Text(GAME_FONT, "score", 24, self.center_square.right - 5, self.center_square.top, "white")
+        text2 = Text(GAME_FONT, str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
+        text3 = Text(GAME_FONT, "high score", 24, self.center_square.right - 5, text2.rect.bottom, "white")
+        text4 = Text(GAME_FONT, str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
 
         # on créer un groupe qui contient les sprites de text
@@ -45,7 +45,7 @@ class Game:
 
         ####
 
-        self.player = Player(130, 160, SIZE, self.center_square)
+        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], SIZE, self.center_square)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
@@ -53,7 +53,7 @@ class Game:
         self.in_menu = False
         self.menu = Menu(self.window)
 
-        pygame.mixer.music.load("music/bgm_1.mp3")
+        pygame.mixer.music.load(GAME_MUSIC)
 
         self.clock = pygame.time.Clock()
 
@@ -65,7 +65,7 @@ class Game:
     def spawn(self):
         while len(self.ennemis.tab)<10:
             self.ennemis.tab.append(Bull(randint(40,SIZE[0]-40),randint(40,SIZE[1]-40),self.window,self.center_square))
-            spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
+            spawnbox = pygame.rect.Rect((self.player.x,self.player.y), PLAYER_SAFE_SPAWN_ZONE) 
             spawnbox.center=self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x,self.center_square.y),(self.center_square.width+self.ennemis.tab[-1].hitbox.width,self.center_square.height+self.ennemis.tab[-1].hitbox.height))
             spawncenter.center=self.center_square.center
@@ -116,7 +116,7 @@ class Game:
             self.in_menu = True
 
         if not self.playing_music:
-            pygame.mixer.music.play(10, fade_ms=1500)
+            pygame.mixer.music.play(10, fade_ms=0)
             self.playing_music = True
 
     def run(self):
