@@ -64,7 +64,7 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        while len(self.ennemis.tab)<10:
+        while len(self.ennemis.tab)<100:
             self.ennemis.tab.append(Bull(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
@@ -118,9 +118,9 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
 
-        if not self.playing_music:
+        """if not self.playing_music:
             pygame.mixer.music.play(10, fade_ms=1500)
-            self.playing_music = True
+            self.playing_music = True"""
 
     def run(self):
         continuer = True

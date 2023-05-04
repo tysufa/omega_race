@@ -12,39 +12,50 @@ def rotate (xa,ya,xb,yb):
         ret = -ret
     return ret
 
-class Ennemy_list :
+def modulo_rot (rot):
+    """
+    renvoie rot [360]
+    """
+    if rot<0:
+        return rot+360
+    elif rot>360:
+        return rot-360
+    else:
+        return rot
+
+class Ennemy_list : #liste des ennemis en jeu
     def __init__ (self):
         self.tab=[]
 
     def update(self, player, projectiles_list):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
-        for i in range(len(self.tab)):
+        for i in range(len(self.tab)): #pour chaque entité :
 
-            if self.tab[i].colide(player.hitbox):
+            if self.tab[i].colide(player.hitbox): #si ils touchent le joueur, on tue ce dernier.
                 player.die()
 
-            for proj in projectiles_list.sprites():
-                if self.tab[i].colide(proj.rect): # si l'objet est en colision avec le joueur
-                    self.tab[i].alive = False # alors on tue l'objet
+            for proj in projectiles_list.sprites(): #pour chaque projectile :
+                if self.tab[i].colide(proj.rect): # si l'ennemi est en colision avec le projectile
+                    self.tab[i].alive = False # alors on tue l'ennemi
                     proj.remove(projectiles_list) # on supprime le projectile du groupe
 
-            if self.tab[i].alive:
-                if type(self.tab[i])!=Bull :
+            if self.tab[i].alive:# si l'ennemi est vivant :
+                if type(self.tab[i])!=Bull : #les ennemis de type Bull sont un cas particulier, car ils ont besoin des coordonées du joueur.
                     self.tab[i].move()
                 else:
                     self.tab[i].move(player.x,player.y)
-            else:
-                tmp.pop(i - a)  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-                a += 1
-        self.tab = tmp.copy()
+            else: #si l'ennemi n'est pas vivant :
+                tmp.pop(i - a) #on le retire de la copie de la liste d'ennemi
+                a += 1 # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+        self.tab = tmp.copy() #on transforme le tableau en sa copie vidée des ennemis morts.
 
     def draw (self):
-        for i in range(len(self.tab)):
+        for i in range(len(self.tab)): #pour chaque ennemi dans la liste
             if self.tab[i].alive:
-                self.tab[i].draw()
+                self.tab[i].draw() #on dessine l'ennemi
 
-    def ajouter (self,ennemi):
+    def ajouter (self,ennemi): #pk j'ai créé ça serrieux...
         tab.append(ennemi)
 
 class Ennemi:
@@ -54,7 +65,7 @@ class Ennemi:
         self.x=x
         self.y=y
 
-        #logique de spawn :
+        #logique de spawn : (à été déplacé dans game2, mais on garde ça au cas où)
 
 
         #Données globales
@@ -135,7 +146,7 @@ class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
     def __init__ (self,x,y,WINDOW,rect,vitesse=1):
         super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship - Frigate - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
-        self.rotation=rotate(x,y,0,0)
+        self.rotation=0
         self.vitesse=vitesse
 
     def draw (self):
@@ -145,9 +156,19 @@ class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
         self.hitbox.center = self.image_rect.center
 
     def move(self,x,y):
+        self.rotation = modulo_rot(self.rotation)
         self.x+=self.vitesse*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=self.vitesse*(sin(radians(self.rotation)))
-        self.rotation=rotate(self.x,self.y,x,y)
+        objectif =  modulo_rot(rotate(self.x,self.y,x,y))
+        calcul=modulo_rot(objectif-self.rotation)
+        if calcul>0 and calcul<180:
+            self.rotation+=+0.7
+        else :
+            self.rotation+=-0.7
+        if calcul<10 or calcul >350:
+            self.vitesse=2
+        else:
+            self.vitesse=0.7
         if super().colhor() or super().colver() :
             pass#self.alive=False
 
