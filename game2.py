@@ -1,25 +1,24 @@
 import pygame.time
-
 from player2 import Player
 from ennemis import *
 from text import Text
 from wall import Wall
 from menu import Menu
 from random import randint
+from constantes import *
 
 
 class Game:
     def __init__(self, size, title):
         self.playing_music = False
-        self.size = size
-        self.window = pygame.display.set_mode(size)
+        self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(title)
 
         self.background = pygame.image.load("image/Space Background.png")
 
         # on fait le carré principale en fonction de la taille de la fenetre
-        self.center_square = pygame.rect.Rect((0, 0, size[0] // 3, size[1] // 3))
-        self.center_square.center = (size[0] // 2, size[1] // 2)  # on place le carré au centre de l'écran
+        self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
+        self.center_square.center = (SIZE[0] // 2, SIZE[1] // 2)  # on place le carré au centre de l'écran
 
         self.score = 1000
         self.high_score = 0
@@ -35,10 +34,10 @@ class Game:
         self.text_group = pygame.sprite.Group(text1, text2, text3, text4)
 
         ##### walls ######
-        top_wall = Wall(10, 10, self.size[0] - 20, 1, 1, "white")
-        right_wall = Wall(self.size[0] - 10, 10, 1, self.size[1] - 20, 1, "white")
-        down_wall = Wall(10, self.size[1] - 10, self.size[0] - 20, 1, 1, "white")
-        left_wall = Wall(10, 10, 1, self.size[1] - 20, 1, "white")
+        top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE*2, 1, 1, "white")
+        right_wall = Wall(SIZE[0] - WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE*2, 1, "white")
+        down_wall = Wall(10, SIZE[1] - WALL_DISTANCE, SIZE[0] - WALL_DISTANCE*2, 1, 1, "white")
+        left_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE*2, 1, "white")
 
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
@@ -46,7 +45,7 @@ class Game:
 
         ####
 
-        self.player = Player(130, 160, self.size, self.center_square)
+        self.player = Player(130, 160, SIZE, self.center_square)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
@@ -64,8 +63,9 @@ class Game:
                 wall.show()
 
     def spawn(self):
-        while len(self.ennemis.tab)<100:
-            self.ennemis.tab.append(Bull(randint(40,self.size[0]-40),randint(40,self.size[1]-40),self.window,self.center_square))
+
+        while len(self.ennemis.tab)<10:
+            self.ennemis.tab.append(Bull(randint(40,SIZE[0]-40),randint(40,SIZE[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x,self.center_square.y),(self.center_square.width+self.ennemis.tab[-1].hitbox.width,self.center_square.height+self.ennemis.tab[-1].hitbox.height))
@@ -97,8 +97,6 @@ class Game:
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
             self.player.projectiles.draw(self.window)
-            for projectile in self.player.projectiles.sprites():
-                projectile.anim_group.draw(self.window)
 
         else:
             self.menu.draw()

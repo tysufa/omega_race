@@ -144,7 +144,7 @@ class Asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
 
 class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
     def __init__ (self,x,y,WINDOW,rect,vitesse=1):
-        super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship - Frigate - Base.png")
+        super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship/Nautolan Ship - Frigate - Base.png")
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation=0
         self.vitesse=vitesse
