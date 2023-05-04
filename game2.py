@@ -63,6 +63,7 @@ class Game:
                 wall.show()
 
     def spawn(self):
+
         while len(self.ennemis.tab)<10:
             self.ennemis.tab.append(Bull(randint(40,SIZE[0]-40),randint(40,SIZE[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y), PLAYER_SAFE_SPAWN_ZONE) 
