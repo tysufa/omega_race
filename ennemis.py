@@ -30,6 +30,8 @@ def modulo_rot(rot):
 class Ennemy_list:  # liste des ennemis en jeu
     def __init__(self):
         self.tab = []
+        self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
+        self.explosion_sound.set_volume(0.15)
 
     def update(self, player, projectiles_list):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -43,6 +45,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
                     self.tab[i].alive = False  # alors on tue l'ennemi
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
+                    self.explosion_sound.play()
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
                 if type(self.tab[i]) != Bull:  # les ennemis de type Bull sont un cas particulier, car ils ont besoin des coordonées du joueur.
