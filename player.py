@@ -78,15 +78,27 @@ class Player(pygame.sprite.Sprite):
         self.explosion_sound.play()
 
     def move(self):
+        angle_x = cos(radians(self.angle))
+        angle_y = sin(radians(self.angle))
         # la prochaine velocité
         new_velocity_x = (self.velocity.x + cos(radians(self.angle)))
         new_velocity_y = (self.velocity.y + sin(radians(self.angle)))
 
         # on change la vélicité que si elle ne dépasse pas le maximum
-        if abs(new_velocity_x) < self.max_velocity:
-            self.velocity.x = new_velocity_x
-        if abs(new_velocity_y) < self.max_velocity:
-            self.velocity.y = new_velocity_y
+        if angle_x < 0:
+            if new_velocity_x > self.max_velocity*angle_x:
+                self.velocity.x = new_velocity_x
+        else:
+            if new_velocity_x < self.max_velocity*angle_x:
+                self.velocity.x = new_velocity_x
+
+        if angle_y < 0:
+            if new_velocity_y > self.max_velocity*angle_y:
+                self.velocity.y = new_velocity_y
+        else:
+            if new_velocity_y < self.max_velocity*angle_y:
+                self.velocity.y = new_velocity_y
+
 
     def update(self):
 
