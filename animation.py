@@ -1,31 +1,4 @@
 import pygame
-from math import sin, cos, radians
-from constantes import *
-
-
-class Projectiles(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction):
-        super().__init__()
-        self.x, self.y = x, y
-        self.direction = direction
-        self.anim1 = Anim(self.x, self.y, 3, (8, 16), 50,
-                                "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png", True)
-
-        self.anim1.angle = self.direction-90
-        self.image = self.anim1.image
-
-        self.rect = self.image.get_rect(center=(self.x, self.y))
-        self.anim = pygame.sprite.Group(self.anim1)
-
-        self.velocity = cos(radians(self.direction)) * BULLET_SPEED, sin(radians(self.direction)) * BULLET_SPEED
-
-    def update(self):
-        self.rect.x += self.velocity[0]
-        self.rect.y -= self.velocity[1]
-        # ça marche je sais pas pourquoi, j'ai pas envie de savoir pourquoi et je saurais pas pourquoi
-        self.anim.update()
-        self.image = self.anim1.image
-
 
 
 class Anim(pygame.sprite.Sprite):
@@ -38,7 +11,7 @@ class Anim(pygame.sprite.Sprite):
         self.image_path = image_path
         self.x = x
         self.y = y
-        self.stay = stay
+        self.stay = stay # cette variable sert à cacher certaines animations avant d'avoir atteint la dernière image
 
         # on créer une surface pour contenir notre image
         self.image = pygame.Surface(self.frame_size).convert_alpha()
@@ -53,12 +26,10 @@ class Anim(pygame.sprite.Sprite):
         self.image.blit(self.image_to_blit, (0, 0), (self.frame * self.frame_size[0], 0, self.frame_size[0], self.frame_size[1]))
 
         # savoir si on affiche le sprite ou non
-        self.show = True
+        self.show = False
 
         # on commence en tournant l'animation vers la droite comme le joueur
-        self.angle = 0
-
-        self.image = pygame.transform.rotate(self.image, self.angle)
+        self.angle = -90
 
         self.base_image = self.image  # l'image que l'on fera tourner pour éviter une perte de qualité de l'image
 
@@ -81,6 +52,19 @@ class Anim(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
 
     def update(self):
+        if self.show:
+            if self.frame == -1: # on passe directement à la première frame pour éviter d'afficher du noir
+                self.frame = 0
+
+            if pygame.time.get_ticks() - self.timer > self.frames_delay:  # savoir si on passe au sprite suivant
+                self.frame += 1
+                self.timer = pygame.time.get_ticks()
+
+            if self.frame > self.frame_number:
+                self.frame = -1
+                self.show = False # on n'affiche plus l'animation
+        else:
+            self.frame = -1 # on passe à -1 pour n'afficher que du noir et donc ne rien afficher à l'écran
 
         self.base_image.fill("black")  # on efface l'image précédente
         # on affiche la nouvelle image
@@ -88,11 +72,4 @@ class Anim(pygame.sprite.Sprite):
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
-
-        if pygame.time.get_ticks() - self.timer > self.frames_delay:  # savoir si on passe au sprite suivant
-            self.frame += 1
-            self.timer = pygame.time.get_ticks()
-
-        if self.frame > self.frame_number:
-            self.frame = 0  # on repasse à la première image
-            self.show = False
+        
