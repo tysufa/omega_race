@@ -20,7 +20,7 @@ class Projectiles(pygame.sprite.Sprite):
         self.velocity = cos(radians(self.direction)) * BULLET_SPEED, sin(radians(self.direction)) * BULLET_SPEED
 
     def update(self):
-        self.rect.x += self.velocity[0] 
+        self.rect.x += self.velocity[0]
         self.rect.y -= self.velocity[1]
         # ça marche je sais pas pourquoi, j'ai pas envie de savoir pourquoi et je saurais pas pourquoi
         self.anim.update()
@@ -88,7 +88,7 @@ class Anim(pygame.sprite.Sprite):
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
-        
+
         if pygame.time.get_ticks() - self.timer > self.frames_delay:  # savoir si on passe au sprite suivant
             self.frame += 1
             self.timer = pygame.time.get_ticks()
@@ -96,4 +96,3 @@ class Anim(pygame.sprite.Sprite):
         if self.frame > self.frame_number:
             self.frame = 0  # on repasse à la première image
             self.show = False
-        

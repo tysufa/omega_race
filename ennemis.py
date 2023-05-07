@@ -59,7 +59,7 @@ class Ennemy_list : #liste des ennemis en jeu
         tab.append(ennemi)
 
 class Ennemi:
-    def __init__ (self,x,y,WINDOW,rect,imagepath):
+    def __init__ (self,x,y,WINDOW,rect,imagepath,hitbox_size=(35,35)):
         self.alive=True #Etat
         #Position et mouvements
         self.x=x
@@ -79,7 +79,7 @@ class Ennemi:
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
-        self.hitbox = pygame.rect.Rect((x,y),(35,35))
+        self.hitbox = pygame.rect.Rect((x,y),hitbox_size)
 
     def colmurver (self):
         if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
@@ -98,10 +98,10 @@ class Ennemi:
                 return True
 
     def colver (self):
-        return self.y+10 >= self.height or self.y-10 <= 0 or self.colmurver()
+        return self.y+10 >= self.height or self.y-10 <= 0
 
     def colhor (self):
-        return self.x+10 >= self.widht or self.x-10 <= 0 or self.colmurhor()
+        return self.x+10 >= self.widht or self.x-10 <= 0
 
     def colide (self,rect):
         return self.hitbox.colliderect(rect)
@@ -133,18 +133,18 @@ class Asteroid(Ennemi):#l'asteroid est un cercle jaune au mouvement aléatoire
         self.x+=1*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y+=1*(sin(radians(self.rotation)))
         self.angle+=self.rotation/abs(self.rotation)
-        if super().colhor():
+        if super().colhor() or super.colmurhor():
             self.senscos=-self.senscos
             self.x+=3*(cos(radians(self.rotation)))*self.senscos
             #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
-        if super().colver():
+        if super().colver() or super.colmurver():
             self.rotation = -self.rotation#car sin est paire. fonctione.
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
 class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
     def __init__ (self,x,y,WINDOW,rect,vitesse=1):
-        super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship/Nautolan Ship - Frigate - Base.png")
+        super().__init__(x,y,WINDOW,rect,"image/Nautolan Ship/Nautolan Ship - Frigate - Base.png",(20,20))
         self.senscos=1#multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation=0
         self.vitesse=vitesse
@@ -154,6 +154,7 @@ class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
         self.image = pygame.transform.rotozoom(self.base_image, 270-self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        #pygame.draw.rect(self.window,"red",self.hitbox,1)
 
     def move(self,x,y):
         self.rotation = modulo_rot(self.rotation)
@@ -169,8 +170,12 @@ class Bull(Ennemi):#le bull est un cercle vert qui s'orriente à l'apparition ve
             self.vitesse=2
         else:
             self.vitesse=0.7
-        if super().colhor() or super().colver() :
-            pass#self.alive=False
+        if super().colver() :
+            self.rotation = -self.rotation
+        if super().colhor() :
+            self.rotation = self.rotation + 90
+        #if  super().colmurver():
+
 
 class shooter(Ennemi):
     def _init__ (self,x,y,WINDOW,liste):
@@ -178,7 +183,6 @@ class shooter(Ennemi):
         self.liste=liste
         self.height=20
         self.width=40
-
     def draw(self):
         pygame.draw.rect(self.window, (255,255,0), (self.x-self.width/2, self.y-self.height/2), self.height,self.widht)
     def move(self):

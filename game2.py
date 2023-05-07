@@ -7,6 +7,12 @@ from menu import Menu
 from random import randint
 from constantes import *
 
+"""def les4mousquerectanglesduroimerlinnononlachangerapaslenomdecettefonction (window):
+    zh=pygame.rect.Rect((0, 0, SIZE[0], SIZE[1] // 2))
+    zb=pygame.rect.Rect((0, SIZE[1] // 2, SIZE[0], SIZE[1] // 2))
+    zg=pygame.rect.Rect((0, 0, SIZE[0]//2, SIZE[1]))
+    zd=pygame.rect.Rect((SIZE[0]//2, 0,SIZE[0]//2 , SIZE[1]))
+    zones={"zb":zb,}"""
 
 class Game:
     def __init__(self, size, title):
@@ -64,7 +70,7 @@ class Game:
 
     def spawn(self):
 
-        while len(self.ennemis.tab)<10:
+        while len(self.ennemis.tab)<20:
             self.ennemis.tab.append(Bull(randint(40,SIZE[0]-40),randint(40,SIZE[1]-40),self.window,self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x,self.player.y),(400,400))
             spawnbox.center=self.player.hitbox.center
@@ -91,7 +97,7 @@ class Game:
                 self.player_group.draw(self.window)
 
             self.ennemis.draw()
-
+            #les4mousquerectanglesduroimerlin(self.window)
 
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
