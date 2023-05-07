@@ -21,6 +21,7 @@ class Game:
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent
         self.background.fill((255, 255, 255, 160), special_flags=BLEND_RGBA_MULT)
+        # self.background.fill((255, 255, 255, 160), special_flags=BLEND_ADD)
 
         # on créer une image pour le nombre de vies tourné vers la droite
         self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), -90)
@@ -38,7 +39,6 @@ class Game:
         text3 = Text(GAME_FONT, "high score", 24, self.center_square.right - 5, text2.rect.bottom, "white")
         text4 = Text(GAME_FONT, str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
-
 
         # on créer un groupe qui contient les sprites de text
         self.text_group = pygame.sprite.Group(text1, text2, text3, text4)
@@ -61,11 +61,10 @@ class Game:
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
 
-        self.in_menu = False
+        self.in_menu = True
         self.menu = Menu(self.window)
 
-        pygame.mixer.music.load(GAME_MUSIC)
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(0.4)
 
         self.clock = pygame.time.Clock()
 
@@ -82,20 +81,21 @@ class Game:
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
+                self.center_square.width + self.ennemis.tab[-1].hitbox.width,
+                self.center_square.height + self.ennemis.tab[-1].hitbox.height))
             spawncenter.center = self.center_square.center
             if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
                 self.ennemis.tab[-1].alive = False
                 self.ennemis.tab.pop(-1)
 
     def update(self):
-        self.player_group.update() # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
-        if self.player.alive:
-            self.walls.update()
-            self.ennemis.update(self.player, self.player.projectiles)
-        else:
-            self.respawn()
+        if not self.game_over:
+            self.player_group.update()  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+            if self.player.alive:
+                self.walls.update()
+                self.ennemis.update(self.player, self.player.projectiles)
+            else:
+                self.respawn()
 
     def respawn(self):
         if self.player.nb_life >= 0:
@@ -114,7 +114,7 @@ class Game:
 
             for i in range(self.player.nb_life):
                 # on affiche un vaisseau pour chaque vie du personnage
-                self.window.blit(self.player_image, (self.center_square.left, self.center_square.top + i*50))
+                self.window.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
 
             for wall in self.walls.sprites():
                 if wall.displayed:
@@ -130,20 +130,20 @@ class Game:
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
-            
+
         else:
-            self.window.fill(LIGHT_GREY) # on remplit l'image de gris
-            self.window.blit(self.background, (0, 0)) # on applique le fond transparent par dessus le fond gris
+            self.window.fill(LIGHT_GREY)  # on remplit l'image de gris
+            self.window.blit(self.background, (0, 0))  # on applique le fond transparent par dessus le fond gris
             self.menu.draw()
 
         if self.game_over:
             self.window.blit(self.game_over_image, (0, 0))
 
-
         pygame.display.flip()
 
     def menu_loop(self):
         if self.menu.menu_actions():
+            pygame.mixer.music.unload()
             self.in_menu = False
 
     def game_loop(self):
@@ -155,9 +155,9 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
 
-        if not self.playing_music:
-            pygame.mixer.music.play(10, fade_ms=0)
-            self.playing_music = True
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(GAME_MUSIC)
+            pygame.mixer.music.play(fade_ms=1000)
 
     def run(self):
         continuer = True
