@@ -30,8 +30,9 @@ class Game:
         self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
         self.center_square.center = (SIZE[0] // 2, SIZE[1] // 2)  # on place le carré au centre de l'écran
 
-        self.score = 1000
-        self.high_score = 0
+        self.score = 0
+        with open("score.txt", "r") as fichier:
+                self.high_score = int(fichier.readline())
 
         # les 4 textes à afficher pour score et high score
         text1 = Text(GAME_FONT, "score", 24, self.center_square.right - 5, self.center_square.top, "white")
@@ -103,7 +104,7 @@ class Game:
                     self.respawn()
                 
                 if self.test2:
-                    if pygame.time.get_ticks()-self.test > 100 and pygame.time.get_ticks()-self.test < 1000:
+                    if pygame.time.get_ticks()-self.test > 75 and pygame.time.get_ticks()-self.test < 1000:
                         pygame.time.delay(1000)
 
             else:
@@ -120,11 +121,15 @@ class Game:
                 self.player.respawn = False
                 self.player.alive = True
                 self.player.projectiles = pygame.sprite.Group()
-                print("yo")
                 self.test = pygame.time.get_ticks()
                 self.test2 = True
         else:
             self.game_over = True
+
+            # on update le meilleur score            
+            if self.high_score < self.score:
+                with open("score.txt", "w") as fichier:
+                    fichier.write(str(self.score))
 
     def draw(self):
         if not self.in_menu:
