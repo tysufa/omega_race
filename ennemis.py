@@ -151,9 +151,35 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
-class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
-    def __init__(self, x, y, WINDOW, rect, vitesse=1):
-        super().__init__(x, y, WINDOW, rect, "image/Nautolan Ship/Nautolan Ship - Frigate - Base.png")
+class Tir(Ennemi):
+    def __init__(self, x, y, WINDOW, rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Asteroid 01 - Base.png")
+        self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
+        self.rotation = randint(1, 360)  # rotation de l'ennemi, en degrés, 0 étant a droite
+        self.angle = randint(0, 360)
+
+    def draw(self):
+        self.window.blit(self.image, self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+
+    def move(self):
+        self.x+=1*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=1*(sin(radians(self.rotation)))
+        self.angle+=self.rotation/abs(self.rotation)
+        if super().colhor() or super.colmurhor():
+            self.senscos=-self.senscos
+            self.x+=3*(cos(radians(self.rotation)))*self.senscos
+            #self.rotation = self.rotation + 90#suposément car cos(o+pi/2)=-cos. Ne marche cepandant pas. (décalage + bug 1fois/2
+        if super().colver() or super.colmurver():
+            self.rotation = -self.rotation#car sin est paire. fonctione.
+            self.y+=3*(sin(radians(self.rotation)))
+        self.image_rect.center=(self.x,self.y)
+
+class Chargeur(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
+    def __init__(self, x, y, WINDOW, rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png")
         self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation = 0
         self.vitesse = vitesse
@@ -167,8 +193,7 @@ class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition
 
     def move(self, x, y):
         self.rotation = modulo_rot(self.rotation)
-        self.x += self.vitesse * (cos(radians(
-            self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.x += self.vitesse * (cos(radians(self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y += self.vitesse * (sin(radians(self.rotation)))
         objectif = modulo_rot(rotate(self.x, self.y, x, y))
         calcul = modulo_rot(objectif - self.rotation)
@@ -185,20 +210,16 @@ class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition
         if super().colhor() :
             self.rotation = self.rotation + 90
 
-class shooter(Ennemi):
+class Tourelle(Ennemi):
     def _init__(self, x, y, WINDOW, liste):
-        super().__init__(x, y, WINDOW)
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png")
         self.liste = liste
         self.height = 20
         self.width = 40
     def draw(self):
-        pygame.draw.rect(self.window, (255, 255, 0), (self.x - self.width / 2, self.y - self.height / 2), self.height,
-                         self.widht)
+        self.window.blit(self.image, self.image_rect)
+        """self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center"""
 
     def move(self):
-        self.x += self.vitesse * (cos(radians(
-            self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y += self.vitesse * (sin(radians(self.rotation)))
-        self.liste.ajouter
-        if super().colhor() or super().colver():
-            self.alive = False
+        self.list.tab.append(Asteroid(self.x,self.y, self.window, self.center_square))
