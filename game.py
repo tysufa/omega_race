@@ -53,7 +53,7 @@ class Game:
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
         self.ennemis = Ennemy_list()
-        self.starting_ennemis_number = 5
+        self.starting_ennemis_number = 1
 
         ####
 
@@ -81,7 +81,8 @@ class Game:
 
         while len(self.ennemis.tab) < self.starting_ennemis_number:
             self.ennemis.tab.append(
-                Bull(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                Asteroid(800, 50, self.window, self.center_square))
+                
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
