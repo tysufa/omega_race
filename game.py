@@ -30,18 +30,19 @@ class Game:
         self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
         self.center_square.center = (SIZE[0] // 2, SIZE[1] // 2)  # on place le carré au centre de l'écran
 
-        self.score = 1000
-        self.high_score = 0
+        self.score = 0
+        with open("score.txt", "r") as fichier:
+                self.high_score = int(fichier.readline())
 
         # les 4 textes à afficher pour score et high score
         text1 = Text(GAME_FONT, "score", 24, self.center_square.right - 5, self.center_square.top, "white")
-        text2 = Text(GAME_FONT, str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
-        text3 = Text(GAME_FONT, "high score", 24, self.center_square.right - 5, text2.rect.bottom, "white")
+        self.score_text = Text(GAME_FONT, str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
+        text3 = Text(GAME_FONT, "high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
         text4 = Text(GAME_FONT, str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
 
         # on créer un groupe qui contient les sprites de text
-        self.text_group = pygame.sprite.Group(text1, text2, text3, text4)
+        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, text4)
 
         ##### walls ######
         top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
@@ -52,6 +53,7 @@ class Game:
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
         self.ennemis = Ennemy_list()
+        self.starting_ennemis_number = 5
 
         ####
 
@@ -61,11 +63,13 @@ class Game:
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
 
-        self.in_menu = True
+        self.in_menu = False
         self.menu = Menu(self.window)
 
-        pygame.mixer.music.set_volume(0.4)
+        self.test = 0
+        self.test2 = False
 
+        pygame.mixer.music.set_volume(0.4)
         self.clock = pygame.time.Clock()
 
     def wall_collisions(self):
@@ -75,7 +79,7 @@ class Game:
 
     def spawn(self):
 
-        while len(self.ennemis.tab) < 5:
+        while len(self.ennemis.tab) < self.starting_ennemis_number:
             self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,self.ennemis))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
@@ -92,9 +96,21 @@ class Game:
             self.player_group.update()  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
             if self.player.alive:
                 self.walls.update()
-                self.ennemis.update(self.player, self.player.projectiles)
+                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
+                if len(self.ennemis.tab) == 0:
+                    self.starting_ennemis_number += 1
+                    self.player.respawn_function()
+                    self.respawn()
+
+                if self.test2:
+                    if pygame.time.get_ticks()-self.test > 75 and pygame.time.get_ticks()-self.test < 1000:
+                        pygame.time.delay(1000)
+
             else:
                 self.respawn()
+                self.test = pygame.time.get_ticks()
+
+            self.score_text.change_text(str(self.score))
 
     def respawn(self):
         if self.player.nb_life >= 0:
@@ -104,8 +120,15 @@ class Game:
                 self.player.respawn = False
                 self.player.alive = True
                 self.player.projectiles = pygame.sprite.Group()
+                self.test = pygame.time.get_ticks()
+                self.test2 = True
         else:
             self.game_over = True
+
+            # on update le meilleur score
+            if self.high_score < self.score:
+                with open("score.txt", "w") as fichier:
+                    fichier.write(str(self.score))
 
     def draw(self):
         if not self.in_menu:
@@ -168,11 +191,11 @@ class Game:
                     pygame.quit()
                     exit()
 
+            self.draw()
             if self.in_menu:
                 self.menu_loop()
             else:
                 self.game_loop()
 
-            self.draw()
 
             self.clock.tick(60)

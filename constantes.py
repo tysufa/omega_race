@@ -12,8 +12,8 @@ PLAYER_SAFE_SPAWN_ZONE = (400,400)
 
 ##### Player #####
 MAX_PLAYER_SPEED = 15
-PLAYER_SPEED = 0.2
-VELOCITY_LOST = 0.6
+PLAYER_SPEED = 0.3
+VELOCITY_LOST = 0.5
 HITBOX_SIZE = (44, 44)
 ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
@@ -28,3 +28,6 @@ BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 
 
 LIGHT_GREY = (231, 229, 230)
+
+
+SCORE_ADD = 500
