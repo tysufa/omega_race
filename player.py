@@ -5,6 +5,7 @@ from math import cos, sin, radians
 from projectiles import Projectiles
 from constantes import *
 from animation import Anim
+from particles import Particle
 
 pygame.init()
 
@@ -21,9 +22,11 @@ class Player(pygame.sprite.Sprite):
         self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.shooting_sound = pygame.mixer.Sound("sound/shooting.wav")
         self.bouncing_sound = pygame.mixer.Sound("sound/bouncing.wav")
+        self.dissapearing_sound = pygame.mixer.Sound("sound/laser_dissapearing.wav")
         self.shooting_sound.set_volume(0.15)
         self.explosion_sound.set_volume(0.3)
         self.bouncing_sound.set_volume(1)
+        self.dissapearing_sound.set_volume(0.05)
 
         self.x = x
         self.y = y
@@ -56,7 +59,18 @@ class Player(pygame.sprite.Sprite):
         self.projectiles = pygame.sprite.Group()  # le groupe qui contiendra les projectiles à l'écran du joueur
         self.reloading = False  # sert à tester si on peut tirer à nouveau ou non
 
-        self.rect_ecran = pygame.rect.Rect((0, 0), SIZE)  # on créer un rectangle qui prend toute la fenetre
+        self.rect_ecran = pygame.rect.Rect((WALL_DISTANCE, WALL_DISTANCE), (
+            SIZE[0] - WALL_DISTANCE * 2,
+            SIZE[1] - WALL_DISTANCE * 2))  # on créer un rectangle qui prend toute la fenetre
+
+        self.particles = []
+
+    def dispawn_projectile(self, projectile):
+        for i in range(10):
+            self.particles.append(
+                Particle(projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5))
+        projectile.remove(self.projectiles)
+        self.dissapearing_sound.play()
 
     def rotate(self, direction):
         if direction == "R":  # si on veut tourner vers la droite
@@ -99,19 +113,18 @@ class Player(pygame.sprite.Sprite):
 
         # on change la vélicité que si elle ne dépasse pas le maximum
         if angle_x < 0:
-            if new_velocity_x > self.max_velocity*angle_x:
+            if new_velocity_x > self.max_velocity * angle_x:
                 self.velocity.x = new_velocity_x
         else:
-            if new_velocity_x < self.max_velocity*angle_x:
+            if new_velocity_x < self.max_velocity * angle_x:
                 self.velocity.x = new_velocity_x
 
         if angle_y < 0:
-            if new_velocity_y > self.max_velocity*angle_y:
+            if new_velocity_y > self.max_velocity * angle_y:
                 self.velocity.y = new_velocity_y
         else:
-            if new_velocity_y < self.max_velocity*angle_y:
+            if new_velocity_y < self.max_velocity * angle_y:
                 self.velocity.y = new_velocity_y
-
 
     def update(self):
 
@@ -152,6 +165,19 @@ class Player(pygame.sprite.Sprite):
             self.y -= self.velocity.y * self.speed
 
         else:
+            if pygame.time.get_ticks() - self.death_timer > RESPAWN_TIME:
+                self.x = random.randint(WALL_DISTANCE, SIZE[
+                    0] - WALL_DISTANCE)  # même si l'on touche le mur on sera téléporté à l'intérieur de la fenetre de jeu
+                self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
+                self.hitbox.center = self.x, self.y
+                while self.hitbox.colliderect(self.rect_centre):  # on ne veut pas respawn dans le rectangle au centre
+                    self.x = random.randint(WALL_DISTANCE, SIZE[0] - WALL_DISTANCE)
+                    self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
+                    self.hitbox.center = self.x, self.y
+
+                self.velocity.x = 0
+                self.velocity.y = 0
+                self.respawn = True
             if pygame.time.get_ticks() - self.death_timer >= RESPAWN_TIME:
                 self.respawn_function()
 
@@ -173,7 +199,7 @@ class Player(pygame.sprite.Sprite):
     def collision_bord(self):
         for projectile in self.projectiles.sprites():
             if not projectile.rect.colliderect(self.rect_ecran):  # si le projectile n'est pas sur l'écran
-                projectile.remove(self.projectiles)
+                self.dispawn_projectile(projectile)
 
         bounced = False
 
@@ -207,8 +233,9 @@ class Player(pygame.sprite.Sprite):
 
     def collision_centre(self):
         for projectile in self.projectiles.sprites():
+            # on fais dispawn les projectiles qui passent par le centre
             if projectile.rect.colliderect(self.rect_centre):
-                projectile.remove(self.projectiles)  # on supprime les projectiles qui passent par le centre
+                self.dispawn_projectile(projectile)
 
         if self.hitbox.colliderect(self.rect_centre):  # si on a une collision avec le rectangle du milieu
             self.bouncing_sound.play()

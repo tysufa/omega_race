@@ -54,3 +54,12 @@ class Menu:
 
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play()
+
+    def menu_loop(self):
+        continuer = True
+        while continuer:
+            if pygame.key.get_mods()[pygame.K_ESCAPE]:
+                continuer = False
+
+            self.draw()
+            pygame.display.flip()

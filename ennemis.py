@@ -78,6 +78,7 @@ class Ennemy_list:  # liste des ennemis en jeu
             if self.tab[i].alive:
                 self.tab[i].draw()  # on dessine l'ennemi
 
+
 class Ennemi:
     def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35)):
         self.alive=True #Etat
