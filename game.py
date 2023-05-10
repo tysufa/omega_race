@@ -53,7 +53,7 @@ class Game:
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
         self.ennemis = Ennemy_list()
-        self.starting_ennemis_number = 5
+        self.starting_ennemis_number = 1
 
         ####
 
@@ -177,9 +177,9 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
 
-        """if not pygame.mixer.music.get_busy():
+        if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(GAME_MUSIC)
-            pygame.mixer.music.play(fade_ms=1000)"""
+            pygame.mixer.music.play(fade_ms=1000)
 
     def run(self):
         continuer = True
