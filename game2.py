@@ -141,6 +141,8 @@ class Game:
             else:
                 self.game_loop()
 
+            print(self.ennemis)
+
             self.draw()
 
             self.clock.tick(60)
