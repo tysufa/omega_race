@@ -80,7 +80,7 @@ class Game:
     def spawn(self):
 
         while len(self.ennemis.tab) < self.starting_ennemis_number:
-            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,self.ennemis))
+            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -98,7 +98,7 @@ class Game:
                 self.walls.update()
                 self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
                 if len(self.ennemis.tab) == 0:
-                    self.starting_ennemis_number += 1
+                    self.starting_ennemis_number *=2
                     self.player.respawn_function()
                     self.respawn()
 
@@ -177,9 +177,9 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
 
-        if not pygame.mixer.music.get_busy():
+        """if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(GAME_MUSIC)
-            pygame.mixer.music.play(fade_ms=1000)
+            pygame.mixer.music.play(fade_ms=1000)"""
 
     def run(self):
         continuer = True
