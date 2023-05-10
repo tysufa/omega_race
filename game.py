@@ -19,7 +19,7 @@ class Game:
         pygame.display.set_caption(TITLE)
 
         self.background = pygame.image.load(BACKGROUND_IMAGE)
-        #self.game_over_image = pygame.image.load("C:\Users\grand\Documents\programmation\omega_race\image/image/GameOver(A)@2x.png")
+        self.game_over_image = pygame.image.load("image/GameOver(A)@2x.png")
 
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent

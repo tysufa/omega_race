@@ -5,8 +5,8 @@ pygame.init()
 
 window = pygame.display.set_mode((720, 480))
 
-bg = pygame.image.load("../image/background/Space Background.png")
-circle = pygame.image.load("../circle.png")
+bg = pygame.image.load("image/background/Space Background.png")
+circle = pygame.image.load("circle.png")
 player = pygame.image.load("player.png")
 circle = pygame.transform.scale(circle, (200, 200))
 

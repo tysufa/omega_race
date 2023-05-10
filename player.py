@@ -19,14 +19,14 @@ class Player(pygame.sprite.Sprite):
         self.image = self.base_image
         self.ennemis = ennemis
 
-        self.explosion_sound = pygame.mixer.Sound("C:\Users\grand\Documents\programmation\omega_race\image\sound\explosion.wav")
-        self.shooting_sound = pygame.mixer.Sound("C:\Users\grand\Documents\programmation\omega_race\image/sound/shooting.wav")
-        self.bouncing_sound = pygame.mixer.Sound("C:\Users\grand\Documents\programmation\omega_race\image/sound/bouncing.wav")
-        self.dissapearing_sound = pygame.mixer.Sound("C:\Users\grand\Documents\programmation\omega_race\image/sound/laser_dissapearing.wav")
+        self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
+        self.shooting_sound = pygame.mixer.Sound("sound/shooting.wav")
+        self.bouncing_sound = pygame.mixer.Sound("sound/bouncing.wav")
+        self.dissapearing_sound = pygame.mixer.Sound("sound/laser_dissapearing.wav")
         self.shooting_sound.set_volume(0.15)
         self.explosion_sound.set_volume(0.3)
         self.bouncing_sound.set_volume(1)
-        self.dissapearing_sound.set_volume(0.3)
+        self.dissapearing_sound.set_volume(0.05)
 
         self.x = x
         self.y = y
@@ -49,9 +49,9 @@ class Player(pygame.sprite.Sprite):
         self.respawn = False
 
         self.engine_anim = Anim(self.x, self.y, 11, (64, 64), 50,
-                                "C:/Users/grand/Documents/programmation/omega_race/image/image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False)
+                                "image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False)
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
-                                   "C:/Users/grand/Documents/programmation/omega_race/image/image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png", True)
+                                   "image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png", True)
 
         self.player_anim = pygame.sprite.Group(self.engine_anim,
                                                self.explosion_anim)  # on créer un groupe contenant les animations du joueur

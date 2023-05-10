@@ -25,7 +25,7 @@ class Menu:
 
         self.over = ["white", "white", "white"]
 
-        self.select_sound = pygame.mixer.Sound("../sound/select.wav")
+        self.select_sound = pygame.mixer.Sound("sound/select.wav")
 
         pygame.mixer.music.load(MENU_MUSIC)
 

@@ -30,7 +30,7 @@ def modulo_rot(rot):
 class Ennemy_list:  # liste des ennemis en jeu
     def __init__(self):
         self.tab = []
-        self.explosion_sound = pygame.mixer.Sound("../sound/explosion.wav")
+        self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
 
     def update(self, player, projectiles_list):
@@ -62,7 +62,7 @@ class Ennemy_list:  # liste des ennemis en jeu
             if self.tab[i].alive:
                 self.tab[i].draw()  # on dessine l'ennemi
 
-    def ajouter(self, ennemi):  # pk j'ai créé ça serrieux...
+    def ajouter(self, ennemi):  # pk j'ai créé ça serrieux... # je me demande aussi
         tab.append(ennemi)
 
 
@@ -73,7 +73,7 @@ class Ennemi:
         self.x=x
         self.y=y
 
-        # logique de spawn : (à été déplacé dans game2, mais on garde ça au cas où)
+        # logique de spawn : (à été déplacé dans game2, mais on garde ça au cas où) # y'a plus rien on pourrait enlever ce commentaire là non ?
 
         # Données globales
         self.window = WINDOW  # mettre la fenettre en imput pour pouvoir s'afficher

@@ -22,7 +22,7 @@ RESPAWN_TIME = 50 * 9 # durée de l'animation de mort x nombre de frame sur l'an
 LIFE_NB = 2
 
 MAX_AMO = 5
-FIRE_RATE = 600 # temps en millisecodes
+FIRE_RATE = 10 # temps en millisecodes
 BULLET_SPEED = 20 * PLAYER_SPEED
 BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 
