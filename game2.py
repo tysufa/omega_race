@@ -1,5 +1,5 @@
 import pygame.time
-from player2 import Player
+from player import Player
 from ennemis import *
 from text import Text
 from wall import Wall
@@ -59,7 +59,7 @@ class Game:
         self.in_menu = False
         self.menu = Menu(self.window)
 
-        pygame.mixer.music.load("music/bgm_1.mp3")
+        pygame.mixer.music.load("../music/bgm_1.mp3")
 
         self.clock = pygame.time.Clock()
 

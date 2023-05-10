@@ -25,7 +25,7 @@ class Menu:
 
         self.over = ["white", "white", "white"]
 
-        self.select_sound = pygame.mixer.Sound("sound/select.wav")
+        self.select_sound = pygame.mixer.Sound("../sound/select.wav")
 
         pygame.mixer.music.load(MENU_MUSIC)
 
@@ -54,3 +54,12 @@ class Menu:
 
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play()
+
+    def menu_loop(self):
+        continuer = True
+        while continuer:
+            if pygame.key.get_mods()[pygame.K_ESCAPE]:
+                continuer = False
+
+            self.draw()
+            pygame.display.flip()

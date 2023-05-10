@@ -1,3 +1,5 @@
+import random
+
 import pygame.time
 from player import Player
 from ennemis import *
@@ -6,6 +8,7 @@ from wall import Wall
 from menu import Menu
 from random import randint
 from constantes import *
+from particles import Particle
 
 
 class Game:
@@ -16,12 +19,11 @@ class Game:
         pygame.display.set_caption(TITLE)
 
         self.background = pygame.image.load(BACKGROUND_IMAGE)
-        self.game_over_image = pygame.image.load("image/GameOver(A)@2x.png")
+        #self.game_over_image = pygame.image.load("C:\Users\grand\Documents\programmation\omega_race\image/image/GameOver(A)@2x.png")
 
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent
         self.background.fill((255, 255, 255, 160), special_flags=BLEND_RGBA_MULT)
-        # self.background.fill((255, 255, 255, 160), special_flags=BLEND_ADD)
 
         # on créer une image pour le nombre de vies tourné vers la droite
         self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), -90)
@@ -46,10 +48,12 @@ class Game:
         ##### walls ######
         top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
         right_wall = Wall(SIZE[0] - WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE * 2, 1, "white")
-        down_wall = Wall(10, SIZE[1] - WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
+        down_wall = Wall(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
         left_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE * 2, 1, "white")
 
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
+
+        self.particles = []
 
         self.ennemis = Ennemy_list()
 
@@ -75,7 +79,7 @@ class Game:
 
     def spawn(self):
 
-        while len(self.ennemis.tab) < 5:
+        while len(self.ennemis.tab) < 0:
             self.ennemis.tab.append(
                 Bull(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
@@ -94,6 +98,23 @@ class Game:
             if self.player.alive:
                 self.walls.update()
                 self.ennemis.update(self.player, self.player.projectiles)
+
+                particule_copy = [particle for particle in self.particles if particle.radius > 0]
+                self.particles = particule_copy
+
+                particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
+                self.player.particles = particule_copy
+
+                for particle in self.particles:
+                    particle.update()
+
+                for particle in self.player.particles:
+                    particle.update()
+                    if particle.x < 0:
+                        print(particle.x)
+
+
+
             else:
                 self.respawn()
 
@@ -129,6 +150,11 @@ class Game:
 
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
+            for particle in self.particles:
+                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+            for particle in self.player.particles:
+                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
 
         else:
@@ -138,8 +164,6 @@ class Game:
 
         if self.game_over:
             self.window.blit(self.game_over_image, (0, 0))
-
-        pygame.display.flip()
 
     def menu_loop(self):
         if self.menu.menu_actions():
@@ -175,5 +199,6 @@ class Game:
                 self.game_loop()
 
             self.draw()
+            pygame.display.flip()
 
             self.clock.tick(60)

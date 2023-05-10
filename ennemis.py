@@ -30,7 +30,7 @@ def modulo_rot(rot):
 class Ennemy_list:  # liste des ennemis en jeu
     def __init__(self):
         self.tab = []
-        self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
+        self.explosion_sound = pygame.mixer.Sound("../sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
 
     def update(self, player, projectiles_list):
