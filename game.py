@@ -217,6 +217,8 @@ class Game:
                     exit()
 
             self.draw()
+            for projectile in self.player.projectiles.sprites():
+                pygame.draw.rect(self.window, "red", projectile.rect, 2)
             if self.in_menu:
                 self.menu_loop()
             else:
