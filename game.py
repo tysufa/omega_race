@@ -57,7 +57,7 @@ class Game:
         self.particles = []
 
         self.ennemis = Ennemy_list()
-        self.starting_ennemis_number = 0
+        self.starting_ennemis_number = 1
 
         ####
 
@@ -83,9 +83,7 @@ class Game:
 
     def spawn(self):
         while len(self.ennemis.tab) < self.starting_ennemis_number:
-            self.ennemis.tab.append(
-                Asteroid(800, 50, self.window, self.center_square))
-
+            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -102,10 +100,8 @@ class Game:
             if self.player.alive:
                 self.walls.update()
 
-                self.ennemis.update(self.player, self.player.projectiles, self.score)
 
-                particule_copy = [particle for particle in self.particles if particle.radius > 0]
-                self.particles = particule_copy
+                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
 
                 particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
                 self.player.particles = particule_copy
@@ -115,12 +111,10 @@ class Game:
 
                 for particle in self.player.particles:
                     particle.update()
-                    if particle.x < 0:
-                        print(particle.x)
 
-                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
+                
                 if len(self.ennemis.tab) == 0:
-                    self.starting_ennemis_number += 1
+                    self.starting_ennemis_number *=2
                     self.player.respawn_function()
                     self.respawn()
 
@@ -147,7 +141,7 @@ class Game:
         else:
             self.game_over = True
 
-            # on update le meilleur score            
+            # on update le meilleur score
             if self.high_score < self.score:
                 with open("score.txt", "w") as fichier:
                     fichier.write(str(self.score))
@@ -188,6 +182,7 @@ class Game:
         if self.game_over:
             self.window.blit(self.game_over_image, (0, 0))
 
+
     def menu_loop(self):
         if self.menu.menu_actions():
             pygame.mixer.music.unload()
@@ -216,15 +211,13 @@ class Game:
                     pygame.quit()
                     exit()
 
-            self.draw()
-            for projectile in self.player.projectiles.sprites():
-                pygame.draw.rect(self.window, "red", projectile.rect, 2)
             if self.in_menu:
                 self.menu_loop()
             else:
                 self.game_loop()
 
             self.draw()
+
             pygame.display.flip()
 
             self.clock.tick(60)

@@ -4,6 +4,7 @@ from random import randint
 from math import radians, sin, cos, acos, asin, degrees
 from constantes import *
 from animation import Anim
+from particles import create_particle_list
 
 
 # size : 720, 480
@@ -34,11 +35,10 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.tab = []
         self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
-    
+
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
-        test = True 
         for i in range(len(self.tab)):  # pour chaque entité :
 
             if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
@@ -46,21 +46,30 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
+                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
+                    
                     self.tab[i].alive = False  # alors on tue l'ennemi
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     self.explosion_sound.play()
                     score += SCORE_ADD
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
-                if type(self.tab[i]) != Bull:  # les ennemis de type Bull sont un cas particulier, car ils ont besoin des coordonées du joueur.
-                    self.tab[i].move()
+                if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
+                    if self.tab[i].needcord:
+                        tmp=self.tab[i].move(player.x, player.y,tmp)
+                    else:
+                        tmp=self.tab[i].move(tmp)
                 else:
-                    self.tab[i].move(player.x, player.y)
+                    if self.tab[i].needcord:
+                        self.tab[i].move(player.x, player.y)
+                    else:
+                        self.tab[i].move()
+
             else:  # si l'ennemi n'est pas vivant :
                 tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                 a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-
-            self.tab[i].death_anim()
+            if type(self.tab[i])==Asteroid :
+                self.tab[i].death_anim()
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
@@ -71,18 +80,16 @@ class Ennemy_list:  # liste des ennemis en jeu
             if self.tab[i].alive:
                 self.tab[i].draw()  # on dessine l'ennemi
 
-    def ajouter(self, ennemi):  # pk j'ai créé ça serrieux... # je me demande aussi
-        tab.append(ennemi)
-
 
 class Ennemi:
-    def __init__ (self,x,y,WINDOW,rect,imagepath,hitbox_size=(35,35)):
+    def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35)):
         self.alive=True #Etat
         #Position et mouvements
         self.x=x
         self.y=y
 
-        # logique de spawn : (à été déplacé dans game2, mais on garde ça au cas où) # y'a plus rien on pourrait enlever ce commentaire là non ?
+        self.needcord=needcord
+        self.needlist=needlist
 
         # Données globales
         self.window = WINDOW  # mettre la fenettre en imput pour pouvoir s'afficher
@@ -163,7 +170,6 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
             self.rotation = -self.rotation#car sin est paire. fonctione.
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
-
     def death_anim(self):
         self.explosion_anim.update()
         self.explosion_anim.angle = self.angle
@@ -171,12 +177,37 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.image = self.explosion_anim.image
 
 
-class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
-    def __init__(self, x, y, WINDOW, rect, vitesse=1):
-        super().__init__(x, y, WINDOW, rect, "image/Nautolan Ship/Nautolan Ship - Frigate - Base.png")
+class Tir(Ennemi):
+    def __init__(self, x, y, WINDOW, rect,rotation):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False,False,(10,10))
+        self.rotation = modulo_rot(rotation)  # rotation de l'ennemi, en degrés, 0 étant a droite
+        self.anim=Anim(self.x,self.y,7,(9,12),100,"image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False)
+    def draw(self):
+        self.anim.update()
+        self.anim.angle =  270 - self.rotation
+        self.anim.show = True
+        self.image = self.anim.image
+        self.window.blit(self.image, self.image_rect)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+
+
+
+        pygame.draw.rect(self.window,"red",self.hitbox,1)
+
+    def move(self):
+        self.x+=5*(cos(radians(self.rotation)))#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=5*(sin(radians(self.rotation)))
+        if super().colhor() or super().colmurhor() or super().colver() or super().colmurver():
+            self.alive=False
+        self.image_rect.center=(self.x,self.y)
+
+class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
+    def __init__(self, x, y, WINDOW, rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
         self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation = 0
-        self.vitesse = vitesse
+        self.vitesse = 1
 
     def draw(self):
         self.window.blit(self.image, self.image_rect)
@@ -187,8 +218,7 @@ class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition
 
     def move(self, x, y):
         self.rotation = modulo_rot(self.rotation)
-        self.x += self.vitesse * (cos(radians(
-            self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.x += self.vitesse * (cos(radians(self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
         self.y += self.vitesse * (sin(radians(self.rotation)))
         objectif = modulo_rot(rotate(self.x, self.y, x, y))
         calcul = modulo_rot(objectif - self.rotation)
@@ -205,20 +235,38 @@ class Bull(Ennemi):  # le bull est un cercle vert qui s'orriente à l'apparition
         if super().colhor() :
             self.rotation = self.rotation + 90
 
-class shooter(Ennemi):
-    def _init__(self, x, y, WINDOW, liste):
-        super().__init__(x, y, WINDOW)
-        self.liste = liste
-        self.height = 20
-        self.width = 40
+class Tourelle(Ennemi):
+    def __init__(self, x, y, WINDOW,rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",True,True)
+        self.rotation = 0
+        self.clock=randint(50,150)
     def draw(self):
-        pygame.draw.rect(self.window, (255, 255, 0), (self.x - self.width / 2, self.y - self.height / 2), self.height,
-                         self.widht)
+        self.window.blit(self.image, self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+    def move(self,x,y,liste):
+        self.rotation=rotate(self.x,self.y,x,y)
+        if self.clock==0:
+            liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+            self.clock=140
+        self.clock+=-1
+        return liste
 
-    def move(self):
-        self.x += self.vitesse * (cos(radians(
-            self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y += self.vitesse * (sin(radians(self.rotation)))
-        self.liste.ajouter
-        if super().colhor() or super().colver():
-            self.alive = False
+class Rocketship(Ennemi):
+    def __init__(self, x, y, WINDOW,rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Torpedo Ship.png",True,True)
+        self.rotation = 0
+        self.clock=randint(50,150)
+    def draw(self):
+        self.window.blit(self.image, self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+    def move(self,x,y,liste):
+        self.rotation=rotate(self.x,self.y,x,y)
+        if self.clock==0:
+            liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+            self.clock=70
+        self.clock+=-1
+        return liste

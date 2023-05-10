@@ -16,3 +16,10 @@ class Particle:
             self.y += self.velocity_y
             if self.x < 0: # si l'on dessine un cercle à gauche de l'écran des bugs graphiques apparaissent
                 self.x = 0
+
+def create_particle_list(particle_number, x, y, radius, velo_max_x , velo_max_y, max_dispawn_time, min_dispawn_time):
+    liste = []
+    for i in range(particle_number):
+        liste.append(Particle(x, y, radius, velo_max_x, velo_max_y, max_dispawn_time, min_dispawn_time))
+
+    return liste
