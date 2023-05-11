@@ -53,7 +53,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
-                    
+                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
                     self.tab[i].alive = False  # alors on tue l'ennemi
                     self.tempo = pygame.time.get_ticks()
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
@@ -74,14 +74,17 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
-                if type(self.tab[i])==Asteroid and pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number*self.tab[i].explosion_anim.frames_delay:
-                    tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
-                    a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-                
-                self.tab[i].death_anim() 
+                if type(self.tab[i])==Asteroid:
+                    if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
+                        tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
+                        a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+
+                    self.tab[i].death_anim()
 
                 #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
-            
+                else:
+                    tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
+                    a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
@@ -186,7 +189,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
             self.rotation = -self.rotation#car sin est paire. fonctione.
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
-        
+
     def death_anim(self):
         self.explosion_anim.update()
         self.explosion_anim.angle = self.angle
@@ -219,48 +222,93 @@ class Tir(Ennemi):
 class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
+        self.engine_anim=Anim(self.x,self.y,7,(64,64),50,"image/Nautolan/Engine Effects/Nautolan Ship - Frigate - Engine Effect.png",False)
+        self.engine_anim.shox=False
         self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation = 0
         self.vitesse = 1
+        self.objectif=(x,y)
         self.score_value = CHARGEUR_SCORE
-
     def draw(self):
-        self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.engine_anim.angle= 270 - self.rotation
+        if self.vitesse>1.5:
+            self.engine_anim.show=True
+        self.engine_anim.update()
+        self.window.blit(self.engine_anim.image, self.image_rect)
+        self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
 
     def move(self, x, y):
+        if not passe_par_milieu(self.x,self.y,x,y):#si on a une ligne de vue directe sur le joueur:
+            self.objectif=(x,y)
+        else :#si on ne peut pas acceder au joueur:
+            if not passe_par_milieu(self.x,self.y,self.x,y):
+                self.objectif=(self.x,y)
+            elif not passe_par_milieu(self.x,self.y,x,self.y):
+                self.objectif=(x,self.y)
+            else:
+                print("tu t trompé leonard")
         self.rotation = modulo_rot(self.rotation)
-        self.x += self.vitesse * (cos(radians(self.rotation))) * self.senscos  # le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y += self.vitesse * (sin(radians(self.rotation)))
-        objectif = modulo_rot(rotate(self.x, self.y, x, y))
-        calcul = modulo_rot(objectif - self.rotation)
-        if calcul > 0 and calcul < 180:
-            self.rotation += +0.7
+        objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
+        calcul_dirrection = modulo_rot(objectif - self.rotation)
+        if calcul_dirrection > 0 and calcul_dirrection < 180:
+            self.rotation += +1.5
         else:
-            self.rotation += -0.7
-        if calcul < 10 or calcul > 350:
-            self.vitesse = 2
+            self.rotation += -1.5
+        if calcul_dirrection < 10 or calcul_dirrection > 350:
+            self.vitesse = 3
         else:
             self.vitesse = 0.7
-        if super().colver() :
+        self.x += self.vitesse * (cos(radians(self.rotation)))
+        self.y += self.vitesse * (sin(radians(self.rotation)))
+        if super().colmurhor() and super().colmurver():
+            self.rotation = -(self.rotation + 90)
+            if self.y<SIZE[1]//2:
+                self.y+=-5
+            else:
+                self.y+=+5
+            if self.x<SIZE[0]//2:
+                self.x+=-5
+            else:
+                self.x+=+5
+        if super().colver():
             self.rotation = -self.rotation
-        if super().colhor() :
+        if super().colmurver():
+            self.rotation = -self.rotation
+            if self.y<SIZE[1]//2:
+                self.y+=-5
+            else:
+                self.y+=+5
+        if super().colhor():
             self.rotation = self.rotation + 90
+        if super().colmurhor():
+            self.rotation = self.rotation + 90
+            if self.x<SIZE[0]//2:
+                self.x+=-5
+            else:
+                self.x+=+5
 
 class Tourelle(Ennemi):
-    def __init__(self, x, y, WINDOW,rect):
-        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",True,True)
+    def __init__(self, x, y, WINDOW,rect,shield=True):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(25,25))
         self.rotation = 0
+        self.shield=shield
+        self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
         self.clock=randint(50,150)
         self.score_value = TOURELLE_SCORE
     def draw(self):
+        if self.shield:
+            self.shield_anim.show=True
         self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.shield_anim.angle= 270 - self.rotation
+        self.shield_anim.update()
+        self.window.blit(self.shield_anim.image, self.image_rect)
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y) :

@@ -57,7 +57,7 @@ class Game:
         self.particles = []
 
         self.ennemis = Ennemy_list()
-        self.starting_ennemis_number = 4
+        self.starting_ennemis_number = 1
 
         ####
 
