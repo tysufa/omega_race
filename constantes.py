@@ -7,7 +7,7 @@ GAME_MUSIC = "music/Race to Mars.mp3"
 MENU_MUSIC = "music/Checking Manifest.mp3"
 TITLE = "Omega Race"
 
-PLAYER_SAFE_SPAWN_ZONE = (400,400)
+PLAYER_SAFE_SPAWN_ZONE = (600,600)
 
 
 ##### Player #####
