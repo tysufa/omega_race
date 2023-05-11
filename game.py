@@ -61,7 +61,7 @@ class Game:
 
         ####
 
-        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], SIZE, self.center_square,
+        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square,
                              self.ennemis)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
@@ -116,7 +116,7 @@ class Game:
                     particle.update()
 
 
-                if len(self.ennemis.tab) == 0:
+                if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.starting_ennemis_number *=2
                     self.player.respawn_function()
                     self.respawn()

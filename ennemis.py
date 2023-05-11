@@ -42,12 +42,15 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.explosion_sound.set_volume(0.15)
         self.particle_list = []
         self.tempo = pygame.time.get_ticks()
+        self.only_bullet = False
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
+        self.only_bullet = True
         for i in range(len(self.tab)):  # pour chaque entité :
-
+            if not self.tab[i].is_bullet:
+                self.only_bullet = False
             if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
                 player.die()
 
@@ -83,6 +86,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
                 #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
                 else:
+                    self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
 
