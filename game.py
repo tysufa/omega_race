@@ -103,6 +103,9 @@ class Game:
                 particule_copy = [particle for particle in self.particles if particle.radius > 0]
                 self.particles = particule_copy
 
+
+                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
+
                 particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
                 self.player.particles = particule_copy
 
@@ -111,10 +114,8 @@ class Game:
 
                 for particle in self.player.particles:
                     particle.update()
-                    if particle.x < 0:
-                        print(particle.x)
 
-                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
+
                 if len(self.ennemis.tab) == 0:
                     self.starting_ennemis_number *=2
                     self.player.respawn_function()
@@ -184,6 +185,7 @@ class Game:
         if self.game_over:
             self.window.blit(self.game_over_image, (0, 0))
 
+
     def menu_loop(self):
         if self.menu.menu_actions():
             pygame.mixer.music.unload()
@@ -217,6 +219,7 @@ class Game:
                 self.game_loop()
 
             self.draw()
+
             pygame.display.flip()
 
             self.clock.tick(60)

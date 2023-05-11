@@ -5,7 +5,7 @@ from math import cos, sin, radians
 from projectiles import Projectiles
 from constantes import *
 from animation import Anim
-from particles import Particle
+from particles import create_particle_list
 
 pygame.init()
 
@@ -66,9 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.particles = []
 
     def dispawn_projectile(self, projectile):
-        for i in range(10):
-            self.particles.append(
-                Particle(projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5))
+        self.particles = create_particle_list(15, projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5)
         projectile.remove(self.projectiles)
         self.dissapearing_sound.play()
 
@@ -198,8 +196,20 @@ class Player(pygame.sprite.Sprite):
 
     def collision_bord(self):
         for projectile in self.projectiles.sprites():
-            if not projectile.rect.colliderect(self.rect_ecran):  # si le projectile n'est pas sur l'écran
+            if projectile.rect.top < WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
+
+            elif projectile.rect.bottom > SIZE[1] - WALL_DISTANCE:
+                self.dispawn_projectile(projectile)
+            
+            if projectile.rect.right > SIZE[0]:
+                self.dispawn_projectile(projectile)
+
+            elif projectile.rect.left < WALL_DISTANCE:
+                self.dispawn_projectile(projectile)
+
+
+
 
         bounced = False
 

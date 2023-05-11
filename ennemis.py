@@ -4,6 +4,7 @@ from random import randint
 from math import radians, sin, cos, acos, asin, degrees
 from constantes import *
 from animation import Anim
+from particles import create_particle_list
 
 
 # size : 720, 480
@@ -43,7 +44,6 @@ class Ennemy_list:  # liste des ennemis en jeu
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
-        test = True
         for i in range(len(self.tab)):  # pour chaque entité :
 
             if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
@@ -51,6 +51,8 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
+                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
+                    
                     self.tab[i].alive = False  # alors on tue l'ennemi
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     self.explosion_sound.play()
