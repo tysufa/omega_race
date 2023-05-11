@@ -16,6 +16,11 @@ def rotate(xa, ya, xb, yb):
         ret = -ret
     return ret
 
+def passe_par_milieu(xa, ya, xb, yb):
+    rect=pygame.rect.Rect((0, 0, SIZE[0] // 3+10, SIZE[1] // 3+10))
+    rect.center = (SIZE[0] // 2, SIZE[1] // 2)
+    return len(rect.clipline((xa,ya),(xb,yb)))!=0
+
 
 def modulo_rot(rot):
     """
@@ -189,13 +194,9 @@ class Tir(Ennemi):
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
 
-
-
-        pygame.draw.rect(self.window,"red",self.hitbox,1)
-
     def move(self):
-        self.x+=5*(cos(radians(self.rotation)))#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=5*(sin(radians(self.rotation)))
+        self.x+=4*(cos(radians(self.rotation)))#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=4*(sin(radians(self.rotation)))
         if super().colhor() or super().colmurhor() or super().colver() or super().colmurver():
             self.alive=False
         self.image_rect.center=(self.x,self.y)
@@ -245,9 +246,9 @@ class Tourelle(Ennemi):
         self.hitbox.center = self.image_rect.center
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
-        if self.clock==0:
+        if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y) :
             liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
-            self.clock=140
+            self.clock=100+randint(0,50)
         self.clock+=-1
         return liste
 
@@ -255,16 +256,55 @@ class Rocketship(Ennemi):
     def __init__(self, x, y, WINDOW,rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Torpedo Ship.png",True,True)
         self.rotation = 0
-        self.clock=randint(50,150)
+        self.vitesse=0
+        #self.clock=randint(50,150)
+        self.objectifx=x
+        self.objectify=y
     def draw(self):
         self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+    def destination(self):
+            self.objectifx=randint(40, SIZE[0] - 40)
+            self.objectify=randint(40, SIZE[1] - 40)
+            while passe_par_milieu(self.x,self.y,self.objectifx,self.objectify):
+                self.objectifx=randint(40, SIZE[0] - 40)
+                self.objectify=randint(40, SIZE[1] - 40)
+
     def move(self,x,y,liste):
-        self.rotation=rotate(self.x,self.y,x,y)
-        if self.clock==0:
-            liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
-            self.clock=70
-        self.clock+=-1
+        self.rotation = modulo_rot(self.rotation)
+        self.x += self.vitesse * (cos(radians(self.rotation)))
+        self.y += self.vitesse * (sin(radians(self.rotation)))
+        self.rotation = modulo_rot(self.rotation)
+        objectif = modulo_rot(rotate(self.x, self.y, x, y))
+        calcul = modulo_rot(objectif - self.rotation)
+        if calcul < 1 or calcul > 359:
+            if not passe_par_milieu(self.x,self.y,x,y):
+                liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+                self.destination()
+                while passe_par_milieu(self.x,self.y,self.objectifx,self.objectify):
+                    self.destination()
+        if abs(self.x-self.objectifx)<10 and abs(self.y-self.objectify)<10:
+            self.vitesse=0
+            if not passe_par_milieu(self.x,self.y,x,y):
+                if calcul < 1 or calcul > 359:
+                    liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+                    self.destination()
+            else:
+                    self.destination()
+        else:
+            self.rotation = modulo_rot(self.rotation)
+            objectif = modulo_rot(rotate(self.x, self.y, self.objectifx, self.objectify))
+            calcul = modulo_rot(objectif - self.rotation)
+            if calcul < 10 or calcul > 350:
+                self.vitesse += 0.1
+            if self.vitesse<0:
+                self.viresse=0
+            elif self.vitesse>1:
+                self.vitesse=1
+        if calcul > 0 and calcul < 180:
+            self.rotation += +2
+        else:
+            self.rotation += -2
         return liste

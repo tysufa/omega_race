@@ -57,7 +57,7 @@ class Game:
         self.particles = []
 
         self.ennemis = Ennemy_list()
-        self.starting_ennemis_number = 0
+        self.starting_ennemis_number = 4
 
         ####
 
@@ -83,7 +83,7 @@ class Game:
 
     def spawn(self):
         while len(self.ennemis.tab) < self.starting_ennemis_number:
-            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+            self.ennemis.tab.append(Rocketship(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -99,8 +99,6 @@ class Game:
             self.player_group.update()  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
             if self.player.alive:
                 self.walls.update()
-
-                self.ennemis.update(self.player, self.player.projectiles, self.score)
 
                 particule_copy = [particle for particle in self.particles if particle.radius > 0]
                 self.particles = particule_copy
@@ -213,8 +211,6 @@ class Game:
                     continuer = False
                     pygame.quit()
                     exit()
-
-            self.draw()
             if self.in_menu:
                 self.menu_loop()
             else:
