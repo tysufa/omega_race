@@ -83,7 +83,7 @@ class Game:
 
     def spawn(self):
         while len(self.ennemis.tab) < self.starting_ennemis_number:
-            self.ennemis.tab.append(Rocketship(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+            self.ennemis.tab.append(Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -109,8 +109,6 @@ class Game:
                 particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
                 self.player.particles = particule_copy
 
-                for particle in self.particles:
-                    particle.update()
 
                 for particle in self.player.particles:
                     particle.update()
@@ -172,8 +170,6 @@ class Game:
 
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
-            for particle in self.particles:
-                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
             for particle in self.player.particles:
                 pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
             for particle in self.ennemis.particle_list:

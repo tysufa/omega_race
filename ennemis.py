@@ -41,6 +41,7 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
         self.particle_list = []
+        self.tempo = pygame.time.get_ticks()
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -52,10 +53,9 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
-                    # peut potentiellement faire dispawn les autres particules du joueur
-                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
                     
                     self.tab[i].alive = False  # alors on tue l'ennemi
+                    self.tempo = pygame.time.get_ticks()
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     if not self.tab[i].is_bullet:
                         self.explosion_sound.play()
@@ -74,11 +74,14 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
-                self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
-                tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
-                a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-            if type(self.tab[i])==Asteroid :
-                self.tab[i].death_anim()
+                if type(self.tab[i])==Asteroid and pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number*self.tab[i].explosion_anim.frames_delay:
+                    tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
+                    a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+                
+                self.tab[i].death_anim() 
+
+                #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
+            
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
@@ -86,8 +89,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
-            if self.tab[i].alive:
-                self.tab[i].draw()  # on dessine l'ennemi
+            self.tab[i].draw()  # on dessine l'ennemi
 
 
 class Ennemi:
@@ -159,7 +161,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.rotation = randint(1, 360)  # rotation de l'ennemi, en degrés, 0 étant a droite
         self.angle = randint(0, 360)
 
-        self.explosion_anim = Anim(self.x, self.y, 6, (96, 96), 100,
+        self.explosion_anim = Anim(self.x, self.y, 6, (96, 96), 50,
                                    "image/asteroid/Asteroid 01 - Explode.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
 
@@ -181,6 +183,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
             self.rotation = -self.rotation#car sin est paire. fonctione.
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
+        
     def death_anim(self):
         self.explosion_anim.update()
         self.explosion_anim.angle = self.angle
