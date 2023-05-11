@@ -57,8 +57,9 @@ class Ennemy_list:  # liste des ennemis en jeu
                     
                     self.tab[i].alive = False  # alors on tue l'ennemi
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
-                    self.explosion_sound.play()
-                    score += SCORE_ADD
+                    if not self.tab[i].is_bullet:
+                        self.explosion_sound.play()
+                        score += SCORE_ADD
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
@@ -111,6 +112,8 @@ class Ennemi:
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
         self.hitbox = pygame.rect.Rect((x,y),hitbox_size)
+
+        self.is_bullet = False
 
     def colmurver(self):
         if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
@@ -190,6 +193,7 @@ class Tir(Ennemi):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False,False,(10,10))
         self.rotation = modulo_rot(rotation)  # rotation de l'ennemi, en degrés, 0 étant a droite
         self.anim=Anim(self.x,self.y,7,(9,12),100,"image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False)
+        self.is_bullet = True
     def draw(self):
         self.anim.update()
         self.anim.angle =  270 - self.rotation
