@@ -158,12 +158,18 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
+
             if keys[pygame.K_a]:
                 if not self.reloading:
                     self.projectiles.add(Projectiles(self.x, self.y, self.angle, True))  # on ajoute un nouveau projectile
                     self.shooting_sound.play()
                     self.reloading = True  # on passe en rechargement
                     self.time = pygame.time.get_ticks()
+
+            if keys[pygame.K_DOWN]:
+                self.velocity.x = 0
+                self.velocity.y = 0
+
 
             # on update les coordonnées
             self.x += self.velocity.x * self.speed
@@ -208,7 +214,7 @@ class Player(pygame.sprite.Sprite):
 
             elif projectile.rect.bottom > SIZE[1] - WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
-            
+
             if projectile.rect.right > SIZE[0]:
                 self.dispawn_projectile(projectile)
 

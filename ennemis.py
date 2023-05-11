@@ -17,8 +17,8 @@ def rotate(xa, ya, xb, yb):
         ret = -ret
     return ret
 
-def passe_par_milieu(xa, ya, xb, yb):
-    rect=pygame.rect.Rect((0, 0, SIZE[0] // 3+10, SIZE[1] // 3+10))
+def passe_par_milieu(xa, ya, xb, yb,marge=10):
+    rect=pygame.rect.Rect((0, 0, SIZE[0] // 3+marge, SIZE[1] // 3+marge))
     rect.center = (SIZE[0] // 2, SIZE[1] // 2)
     return len(rect.clipline((xa,ya),(xb,yb)))!=0
 
@@ -226,7 +226,7 @@ class Tir(Ennemi):
 class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
-        self.engine_anim=Anim(self.x,self.y,7,(64,64),50,"image/Nautolan/Engine Effects/Nautolan Ship - Frigate - Engine Effect.png",False)
+        self.engine_anim=Anim(self.x,self.y,6,(64,64),50,"image/Nautolan/Engine Effects/Nautolan Ship - Frigate - Engine Effect.png",False)
         self.engine_anim.shox=False
         self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation = 0
@@ -245,31 +245,9 @@ class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'ap
         self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
 
-    def move(self, x, y):
-        if not passe_par_milieu(self.x,self.y,x,y):#si on a une ligne de vue directe sur le joueur:
-            self.objectif=(x,y)
-        else :#si on ne peut pas acceder au joueur:
-            if not passe_par_milieu(self.x,self.y,self.x,y):
-                self.objectif=(self.x,y)
-            elif not passe_par_milieu(self.x,self.y,x,self.y):
-                self.objectif=(x,self.y)
-            else:
-                print("tu t trompé leonard")
-        self.rotation = modulo_rot(self.rotation)
-        objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
-        calcul_dirrection = modulo_rot(objectif - self.rotation)
-        if calcul_dirrection > 0 and calcul_dirrection < 180:
-            self.rotation += +1.5
-        else:
-            self.rotation += -1.5
-        if calcul_dirrection < 10 or calcul_dirrection > 350:
-            self.vitesse = 3
-        else:
-            self.vitesse = 0.7
-        self.x += self.vitesse * (cos(radians(self.rotation)))
-        self.y += self.vitesse * (sin(radians(self.rotation)))
+    def colisions(self):
         if super().colmurhor() and super().colmurver():
-            self.rotation = -(self.rotation + 90)
+            self.rotation = -self.rotation-90
             if self.y<SIZE[1]//2:
                 self.y+=-5
             else:
@@ -294,6 +272,48 @@ class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'ap
                 self.x+=-5
             else:
                 self.x+=+5
+    def move(self, x, y):
+        if not passe_par_milieu(self.x,self.y,x,y,15):#si on a une ligne de vue directe sur le joueur:
+            self.objectif=(x,y)#on se dirige vers lui
+        else :#si on ne peut pas acceder au joueur:
+            if self.x<SIZE[0]//2+SIZE[0]//6 and self.x>SIZE[0]//2-SIZE[0]//6 and x<SIZE[0]//2+SIZE[0]//6 and x>SIZE[0]//2+-SIZE[0]//6: # le joueur et l'ennemi sont a l'opposé du rect:
+                if self.x<SIZE[0]//2:
+                    self.objectif=(self.x-10, self.y)
+                else:
+                    self.objectif=(self.x+10, self.y)
+            elif self.y<SIZE[1]//2+SIZE[1]//6 and self.y>SIZE[1]//2-SIZE[1]//6 and y<SIZE[1]//2+SIZE[1]//6 and y>SIZE[1]//2-SIZE[1]//6: # le joueur et l'ennemi sont a l'opposé du rect:
+                if self.y<SIZE[1]//2:
+                    self.objectif=(self.x, self.y-10)
+                else:
+                    self.objectif=(self.x, self.y+10)
+            elif not passe_par_milieu(self.x,self.y,self.x,y) and not passe_par_milieu(self.x,self.y,x,self.y):
+                if not passe_par_milieu(x,y,self.x,y):
+                    self.objectif=(self.x,y)
+                else:
+                    self.objectif=(x,self.y)
+            elif not passe_par_milieu(self.x,self.y,self.x,y):
+                self.objectif=(self.x,y)
+            elif not passe_par_milieu(self.x,self.y,x,self.y):
+                self.objectif=(x,self.y)
+        self.rotation = modulo_rot(self.rotation)
+        objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
+        calcul_dirrection = modulo_rot(objectif - self.rotation)
+        if calcul_dirrection > 0 and calcul_dirrection < 180:
+            self.rotation += +1.5
+        else:
+            self.rotation += -1.5
+
+        if calcul_dirrection < 10 or calcul_dirrection > 350:
+            self.vitesse +=0.01
+        else:
+            self.vitesse +=-0.01
+        if self.vitesse >3:
+            self.vitesse=3
+        if self.vitesse<0.7:
+            self.vitesse=0.7
+        self.x += self.vitesse * (cos(radians(self.rotation)))
+        self.y += self.vitesse * (sin(radians(self.rotation)))
+        self.colisions()
 
 class Tourelle(Ennemi):
     def __init__(self, x, y, WINDOW,rect,shield=True):
