@@ -158,6 +158,12 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
+            if keys[pygame.K_DOWN]:
+                self.velocity.x = 0
+                self.velocity.y = 0
+
+
+
             # on update les coordonnées
             self.x += self.velocity.x * self.speed
             self.y -= self.velocity.y * self.speed
@@ -201,7 +207,7 @@ class Player(pygame.sprite.Sprite):
 
             elif projectile.rect.bottom > SIZE[1] - WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
-            
+
             if projectile.rect.right > SIZE[0]:
                 self.dispawn_projectile(projectile)
 
