@@ -111,6 +111,8 @@ class Game:
 
                 for particle in self.player.particles:
                     particle.update()
+                for particle in self.ennemis.particle_list:
+                    particle.update()
 
                 
                 if len(self.ennemis.tab) == 0:
@@ -170,6 +172,8 @@ class Game:
             for particle in self.particles:
                 pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
             for particle in self.player.particles:
+                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+            for particle in self.ennemis.particle_list:
                 pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu

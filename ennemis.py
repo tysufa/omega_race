@@ -35,6 +35,7 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.tab = []
         self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
+        self.particle_list = []
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -46,6 +47,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
+                    # peut potentiellement faire dispawn les autres particules du joueur
                     player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
                     
                     self.tab[i].alive = False  # alors on tue l'ennemi
@@ -66,6 +68,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
+                self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
                 tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                 a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
             if type(self.tab[i])==Asteroid :
