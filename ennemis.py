@@ -59,7 +59,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     if not self.tab[i].is_bullet:
                         self.explosion_sound.play()
-                        score += SCORE_ADD
+                        score += self.tab[i].score_value
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
@@ -116,6 +116,7 @@ class Ennemi:
         self.hitbox = pygame.rect.Rect((x,y),hitbox_size)
 
         self.is_bullet = False
+        self.score_value = 0
 
     def colmurver(self):
         if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
@@ -164,6 +165,8 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.explosion_anim = Anim(self.x, self.y, 6, (96, 96), 50,
                                    "image/asteroid/Asteroid 01 - Explode.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
+
+        self.score_value = ASTEROIDE_SCORE
 
     def draw(self):
         self.window.blit(self.image, self.image_rect)
@@ -219,6 +222,7 @@ class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'ap
         self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
         self.rotation = 0
         self.vitesse = 1
+        self.score_value = CHARGEUR_SCORE
 
     def draw(self):
         self.window.blit(self.image, self.image_rect)
@@ -251,6 +255,7 @@ class Tourelle(Ennemi):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",True,True)
         self.rotation = 0
         self.clock=randint(50,150)
+        self.score_value = TOURELLE_SCORE
     def draw(self):
         self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
@@ -272,6 +277,7 @@ class Rocketship(Ennemi):
         #self.clock=randint(50,150)
         self.objectifx=x
         self.objectify=y
+        self.score_value = ROCKETSHIP_SCORE
     def draw(self):
         self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
