@@ -109,10 +109,10 @@ class Game:
                 particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
                 self.player.particles = particule_copy
 
-                for particle in self.particles:
-                    particle.update()
 
                 for particle in self.player.particles:
+                    particle.update()
+                for particle in self.ennemis.particle_list:
                     particle.update()
 
 
@@ -170,9 +170,9 @@ class Game:
 
             self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
-            for particle in self.particles:
-                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
             for particle in self.player.particles:
+                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+            for particle in self.ennemis.particle_list:
                 pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
