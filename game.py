@@ -253,10 +253,6 @@ class Game:
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
 
-            pygame.draw.circle(self.window, "red", (10, 10), 10)
-            pygame.draw.circle(self.window, "red", (100, 100), 10)
-            pygame.draw.circle(self.window, "red", (600, 100), 10)
-
         else:
             self.window.fill(LIGHT_GREY)  # on remplit l'image de gris
             self.window.blit(self.background, (0, 0))  # on applique le fond transparent par dessus le fond gris
