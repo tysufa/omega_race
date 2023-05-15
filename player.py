@@ -11,7 +11,7 @@ pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, rect_centre, ennemis):
+    def __init__(self, x, y, rect_centre, ennemis):
         super().__init__()
         self.base_image = pygame.image.load(PLAYER_IMAGE).convert_alpha()
         # on tourne l'image vers la droite
@@ -158,7 +158,12 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
-
+            if keys[pygame.K_a]:
+                if not self.reloading:
+                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, True))  # on ajoute un nouveau projectile
+                    self.shooting_sound.play()
+                    self.reloading = True  # on passe en rechargement
+                    self.time = pygame.time.get_ticks()
 
             # on update les coordonnées
             self.x += self.velocity.x * self.speed

@@ -11,7 +11,7 @@ PLAYER_SAFE_SPAWN_ZONE = (600,600)
 
 
 ##### Player #####
-MAX_PLAYER_SPEED = 10
+MAX_PLAYER_SPEED = 7.5
 PLAYER_SPEED = 0.5
 VELOCITY_LOST = 0.5
 HITBOX_SIZE = (44, 44)
@@ -49,11 +49,12 @@ CHARGEUR_ANGLE_ACCELERATION = 15 #determine la moitié de l'angle devant le char
 CHARGEUR_SCORE = 300
 
 ###Tourelle###
-TOURELLE_INITIAL_CLOCK=(50,150)#fourchette du timer initial aléatoire pour le premier tir
-TOURELLE_NEW_CLOCK=(100,150)#fourchette du timer aléatoire pour les tirs suivants
+TOURELLE_INITIAL_CLOCK=(300,400)#fourchette du timer initial aléatoire pour le premier tir
+TOURELLE_NEW_CLOCK=(150,250)#fourchette du timer aléatoire pour les tirs suivants
 TOURELLE_SCORE = 400
 
 ###Miner###
 MINER_CLOCK=(200,300)
-MINER_SPEED=1
+MINER_SPEED=2
+MINER_MINES=10
 MINER_SCORE=400

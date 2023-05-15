@@ -42,12 +42,15 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.explosion_sound.set_volume(0.15)
         self.particle_list = []
         self.tempo = pygame.time.get_ticks()
+        self.only_bullet = False
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
         a = 0  # a=nombre d'entités suprimées du tableau a ce parcours de self.ennemy_list
+        self.only_bullet = True
         for i in range(len(self.tab)):  # pour chaque entité :
-
+            if not self.tab[i].is_bullet:
+                self.only_bullet = False
             if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
                 player.die()
 
@@ -149,9 +152,10 @@ class Ennemi:
 
 
 class Mine(Ennemi):  # La mine est un cercle blanc immobile.
-    def __init__(self, x, y, WINDOW, rect):
+    def __init__(self, x, y, WINDOW, rect,is_bullet=False):
         super().__init__(x, y, WINDOW, rect, "image/mine/mine2.png",False,False,(10,10))
-        self.score_value=1
+        self.score_value=15
+        self.is_bullet=is_bullet
     def draw(self):
         self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
@@ -331,6 +335,8 @@ class Tourelle(Ennemi):
     def draw(self):
         if self.shield:
             self.shield_anim.show=True
+        else:
+            self.shield_anim.show=False
         self.window.blit(self.image, self.image_rect)
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
@@ -348,10 +354,15 @@ class Tourelle(Ennemi):
 
 class Miner(Ennemi):
     def __init__(self, x, y, WINDOW, rect):
-         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",False,True)
-         self.rotation = randint(0,360)
-         self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
-         self.score_value = MINER_SCORE
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",False,True)
+        self.rotation = randint(0,360)
+        self.mines=MINER_MINES
+        self.vitesse=0
+        self.objectifx=0
+        self.objectify=0
+        self.destination()
+        self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
+        self.score_value = MINER_SCORE
 
     def draw(self):
         self.window.blit(self.image, self.image_rect)
@@ -359,21 +370,46 @@ class Miner(Ennemi):
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
 
-    def colisions(self):
-        self.rotation=modulo_rot(self.rotation)
-        if super().colver() or super().colmurver():
-            self.rotation = -self.rotation
-        if super().colhor() or super().colmurhor():
-            self.rotation = (self.rotation + 90)%360
+    def destination(self):
+        self.objectifx=randint(40, SIZE[0] - 40)
+        self.objectify=randint(40, SIZE[1] - 40)
+        i=0
+        while passe_par_milieu(self.x,self.y,self.objectifx,self.objectify,20) and i<10:
+            self.objectifx=randint(40, SIZE[0] - 40)
+            self.objectify=randint(40, SIZE[1] - 40)
+            i+=1
+        if i==10:
+            if self.x<SIZE[0] - 40:
+                self.objectifx=self.x+10
+            elif self.x>40:
+                self.objectifx=self.x-10
+
 
     def move(self,liste):
-        if self.clock<1:
-            liste.append(Mine(self.x,self.y, self.window, self.centre))
-            self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
+        if abs(self.x-self.objectifx)<10 and abs(self.y-self.objectify)<10:
+            self.destination()
+            self.clock-=10
+        if self.mines>0:
+            if self.clock<1:
+                liste.append(Mine(self.x-20*(cos(radians(self.rotation))),self.y-20*(sin(radians(self.rotation))), self.window, self.centre,True))
+                self.mines-=1
+                self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
         self.clock+=-1
-        self.x += MINER_SPEED * (cos(radians(self.rotation)))
-        self.y += MINER_SPEED * (sin(radians(self.rotation)))
-        self.colisions()
+        self.rotation = modulo_rot(self.rotation)
+        self.x += self.vitesse * (cos(radians(self.rotation)))
+        self.y += self.vitesse * (sin(radians(self.rotation)))
+        objectif = modulo_rot(rotate(self.x, self.y, self.objectifx, self.objectify))
+        calcul = modulo_rot(objectif - self.rotation)
+        if calcul < 10 or calcul > 350:
+            self.vitesse += 0.1
+        else:
+            self.vitesse=0
+        if self.vitesse>MINER_SPEED:
+            self.vitesse=MINER_SPEED
+        if calcul > 0 and calcul < 180:
+            self.rotation += +2
+        else:
+            self.rotation += -2
         return liste
 
 class Rocketship(Ennemi):
@@ -389,10 +425,11 @@ class Rocketship(Ennemi):
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+
     def destination(self):
             self.objectifx=randint(40, SIZE[0] - 40)
             self.objectify=randint(40, SIZE[1] - 40)
-            while passe_par_milieu(self.x,self.y,self.objectifx,self.objectify):
+            while passe_par_milieu(self.x,self.y,self.objectifx,self.objectify,20):
                 self.objectifx=randint(40, SIZE[0] - 40)
                 self.objectify=randint(40, SIZE[1] - 40)
 
@@ -400,7 +437,6 @@ class Rocketship(Ennemi):
         self.rotation = modulo_rot(self.rotation)
         self.x += self.vitesse * (cos(radians(self.rotation)))
         self.y += self.vitesse * (sin(radians(self.rotation)))
-        self.rotation = modulo_rot(self.rotation)
         objectif = modulo_rot(rotate(self.x, self.y, x, y))
         calcul = modulo_rot(objectif - self.rotation)
         if calcul < 1 or calcul > 359:
