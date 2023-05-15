@@ -9,16 +9,16 @@ class Menu:
     def __init__(self, window):
         self.window = window
 
-        self.title = Text(FONT, "OMEGA RACE", 20, SIZE[0]//2, SIZE[1]//2, "blue")
+        self.title = Text("OMEGA RACE", 20, SIZE[0]//2, SIZE[1]//2, "blue")
         self.title.rect.center = SIZE[0]//2, 100
 
-        self.jouer = Text(FONT, "Jouer", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
+        self.jouer = Text("Jouer", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
         self.jouer.rect.center = SIZE[0] // 2, 200
 
-        self.boutique = Text(FONT, "boutique", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
+        self.boutique = Text("boutique", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
         self.boutique.rect.center = SIZE[0] // 2, 300
 
-        self.option = Text(FONT, "options", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
+        self.option = Text("options", 20, SIZE[0] // 2, SIZE[1] // 2, "blue")
         self.option.rect.center = SIZE[0] // 2, 400
 
         self.text_group = pygame.sprite.Group(self.title, self.jouer, self.boutique, self.option)
