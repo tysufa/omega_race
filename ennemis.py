@@ -54,12 +54,15 @@ class Ennemy_list:  # liste des ennemis en jeu
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
                     player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
-                    self.tab[i].alive = False  # alors on tue l'ennemi
+                    if self.tab[i].shield and abs(rotate(self.tab[i].x,self.tab[i].y,proj.x,proj.y)-self.tab[i].rotation)<90:
+                        self.tab[i].shield=False
+                    else:
+                        self.tab[i].alive = False  # alors on tue l'ennemi
+                        if not self.tab[i].is_bullet:
+                            self.explosion_sound.play()
+                            score += self.tab[i].score_value
                     self.tempo = pygame.time.get_ticks()
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
-                    if not self.tab[i].is_bullet:
-                        self.explosion_sound.play()
-                        score += self.tab[i].score_value
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
@@ -102,15 +105,11 @@ class Ennemi:
         #Position et mouvements
         self.x=x
         self.y=y
-
         self.needcord=needcord
         self.needlist=needlist
 
         # Données globales
         self.window = WINDOW  # mettre la fenettre en imput pour pouvoir s'afficher
-        tu = pygame.display.get_window_size()
-        self.height = tu[1]
-        self.widht = tu[0]
         self.centre = rect
 
         # rectangles
@@ -119,6 +118,7 @@ class Ennemi:
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
         self.hitbox = pygame.rect.Rect((x,y),hitbox_size)
 
+        self.shield=False
         self.is_bullet = False
         self.score_value = 0
 
@@ -139,10 +139,10 @@ class Ennemi:
                 return True
 
     def colver (self):
-        return self.y+10 >= self.height or self.y-10 <= 0
+        return self.y+10 >= SIZE[1] or self.y-10 <= 0
 
     def colhor (self):
-        return self.x+10 >= self.widht or self.x-10 <= 0
+        return self.x+10 >= SIZE[0] or self.x-10 <= 0
 
     def colide(self, rect):
         return self.hitbox.colliderect(rect)
@@ -150,11 +150,13 @@ class Ennemi:
 
 class Mine(Ennemi):  # La mine est un cercle blanc immobile.
     def __init__(self, x, y, WINDOW, rect):
-        super().__init__(x, y, WINDOW, rect, "image/mine2.png")
-
+        super().__init__(x, y, WINDOW, rect, "image/mine/mine2.png",False,False,(10,10))
+        self.score_value=1
     def draw(self):
         self.window.blit(self.image, self.image_rect)
-
+        #pygame.draw.rect(self.window,"red",self.hitbox,1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
     def move(self):
         pass
 
@@ -179,8 +181,8 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.hitbox.center = self.image_rect.center
 
     def move(self):
-        self.x+=1*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=1*(sin(radians(self.rotation)))
+        self.x+=ASTEROID_VITESSE*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
+        self.y+=ASTEROID_VITESSE*(sin(radians(self.rotation)))
         self.angle+=self.rotation/abs(self.rotation)
         if super().colhor() or super().colmurhor():
             self.senscos=-self.senscos
@@ -214,19 +216,18 @@ class Tir(Ennemi):
         self.hitbox.center = self.image_rect.center
 
     def move(self):
-        self.x+=4*(cos(radians(self.rotation)))#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
-        self.y+=4*(sin(radians(self.rotation)))
+        self.x+=TIR_VITESSE*(cos(radians(self.rotation)))
+        self.y+=TIR_VITESSE*(sin(radians(self.rotation)))
         if super().colhor() or super().colmurhor() or super().colver() or super().colmurver():
             self.alive=False
         self.image_rect.center=(self.x,self.y)
 
-class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'apparition vers le centre de l'écran
+class Chargeur(Ennemi):
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
         self.engine_anim=Anim(self.x,self.y,6,(64,64),50,"image/Nautolan/Engine Effects/Nautolan Ship - Frigate - Engine Effect.png",False)
-        self.engine_anim.shox=False
-        self.senscos = 1  # multiplicateur du sens g/d. est un fix de merde temporaire pour les bugs de cette rotation
-        self.rotation = 0
+        self.engine_anim.show=False
+        self.rotation = randint(0,360)
         self.vitesse = 1
         self.objectif=(x,y)
         self.score_value = CHARGEUR_SCORE
@@ -269,56 +270,63 @@ class Chargeur(Ennemi):  # le Chargeur est un cercle vert qui s'orriente à l'ap
                 self.x+=-5
             else:
                 self.x+=+5
-    def move(self, x, y):
-        if not passe_par_milieu(self.x,self.y,x,y,15):#si on a une ligne de vue directe sur le joueur:
+
+    def choix_objectif(self,x,y):
+        if not passe_par_milieu(self.x,self.y,x,y,20):#si on a une ligne de vue directe sur le joueur:
             self.objectif=(x,y)#on se dirige vers lui
         else :#si on ne peut pas acceder au joueur:
             if self.x<SIZE[0]//2+SIZE[0]//6 and self.x>SIZE[0]//2-SIZE[0]//6 and x<SIZE[0]//2+SIZE[0]//6 and x>SIZE[0]//2+-SIZE[0]//6: # le joueur et l'ennemi sont a l'opposé du rect:
-                if self.x<SIZE[0]//2:
+                if self.x<SIZE[0]//2:#on sort de ce coté du rect, en passant par le plus proche
                     self.objectif=(self.x-10, self.y)
                 else:
                     self.objectif=(self.x+10, self.y)
             elif self.y<SIZE[1]//2+SIZE[1]//6 and self.y>SIZE[1]//2-SIZE[1]//6 and y<SIZE[1]//2+SIZE[1]//6 and y>SIZE[1]//2-SIZE[1]//6: # le joueur et l'ennemi sont a l'opposé du rect:
-                if self.y<SIZE[1]//2:
+                if self.y<SIZE[1]//2:#on sort de ce coté du rect, en passant par le plus proche
                     self.objectif=(self.x, self.y-10)
                 else:
                     self.objectif=(self.x, self.y+10)
-            elif not passe_par_milieu(self.x,self.y,self.x,y) and not passe_par_milieu(self.x,self.y,x,self.y):
-                if not passe_par_milieu(x,y,self.x,y):
+            elif not passe_par_milieu(self.x,self.y,self.x,y) and not passe_par_milieu(self.x,self.y,x,self.y):#si on à accés aux deux points :
+                if not passe_par_milieu(x,y,self.x,y):#on prends celui des deux qui donne accés au joueur
                     self.objectif=(self.x,y)
                 else:
                     self.objectif=(x,self.y)
-            elif not passe_par_milieu(self.x,self.y,self.x,y):
+            elif not passe_par_milieu(self.x,self.y,self.x,y):#sinon, si on peut, on se mets de façon a partager le x ou le y du joueur
                 self.objectif=(self.x,y)
             elif not passe_par_milieu(self.x,self.y,x,self.y):
                 self.objectif=(x,self.y)
+
+    def move(self, x, y):
+        self.choix_objectif(x,y)
         self.rotation = modulo_rot(self.rotation)
         objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
         calcul_dirrection = modulo_rot(objectif - self.rotation)
+        #pour tourner dans le bon sens:
         if calcul_dirrection > 0 and calcul_dirrection < 180:
-            self.rotation += +1.5
+            self.rotation += +CHARGEUR_ROTATION_SPEED
         else:
-            self.rotation += -1.5
-
-        if calcul_dirrection < 10 or calcul_dirrection > 350:
-            self.vitesse +=0.01
+            self.rotation += -CHARGEUR_ROTATION_SPEED
+        #pour accelerer si l'objectif est en vue et ralentir sinon:
+        if calcul_dirrection < CHARGEUR_ANGLE_ACCELERATION or calcul_dirrection > 360-CHARGEUR_ANGLE_ACCELERATION:
+            self.vitesse +=CHARGEUR_ACCELERATION
         else:
-            self.vitesse +=-0.01
-        if self.vitesse >3:
-            self.vitesse=3
-        if self.vitesse<0.7:
-            self.vitesse=0.7
+            self.vitesse +=-CHARGEUR_DECELERATION
+        #on limite la vitesse
+        if self.vitesse >CHARGEUR_MAX_SPEED:
+            self.vitesse=CHARGEUR_MAX_SPEED
+        if self.vitesse<CHARGEUR_MIN_SPEED:
+            self.vitesse=CHARGEUR_MIN_SPEED
+        #on effectue enfin le mouvement
         self.x += self.vitesse * (cos(radians(self.rotation)))
         self.y += self.vitesse * (sin(radians(self.rotation)))
         self.colisions()
 
 class Tourelle(Ennemi):
-    def __init__(self, x, y, WINDOW,rect,shield=True):
+    def __init__(self, x, y, WINDOW,rect,shield=False):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(25,25))
         self.rotation = 0
         self.shield=shield
         self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
-        self.clock=randint(50,150)
+        self.clock=randint(TOURELLE_INITIAL_CLOCK[0],TOURELLE_INITIAL_CLOCK[1])
         self.score_value = TOURELLE_SCORE
     def draw(self):
         if self.shield:
@@ -334,8 +342,38 @@ class Tourelle(Ennemi):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y) :
             liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
-            self.clock=100+randint(0,50)
+            self.clock=randint(TOURELLE_NEW_CLOCK[0],TOURELLE_NEW_CLOCK[1])
         self.clock+=-1
+        return liste
+
+class Miner(Ennemi):
+    def __init__(self, x, y, WINDOW, rect):
+         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Support - Base.png",False,True)
+         self.rotation = randint(0,360)
+         self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
+         self.score_value = MINER_SCORE
+
+    def draw(self):
+        self.window.blit(self.image, self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, 90 - self.rotation, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+
+    def colisions(self):
+        self.rotation=modulo_rot(self.rotation)
+        if super().colver() or super().colmurver():
+            self.rotation = -self.rotation
+        if super().colhor() or super().colmurhor():
+            self.rotation = (self.rotation + 90)%360
+
+    def move(self,liste):
+        if self.clock<1:
+            liste.append(Mine(self.x,self.y, self.window, self.centre))
+            self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
+        self.clock+=-1
+        self.x += MINER_SPEED * (cos(radians(self.rotation)))
+        self.y += MINER_SPEED * (sin(radians(self.rotation)))
+        self.colisions()
         return liste
 
 class Rocketship(Ennemi):
@@ -343,7 +381,6 @@ class Rocketship(Ennemi):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Torpedo Ship.png",True,True)
         self.rotation = 0
         self.vitesse=0
-        #self.clock=randint(50,150)
         self.objectifx=x
         self.objectify=y
         self.score_value = ROCKETSHIP_SCORE

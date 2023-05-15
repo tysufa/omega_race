@@ -158,10 +158,6 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
-            if keys[pygame.K_DOWN]:
-                self.velocity.x = 0
-                self.velocity.y = 0
-
 
 
             # on update les coordonnées

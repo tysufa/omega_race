@@ -21,7 +21,6 @@ PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9 # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 2
 
-MAX_AMO = 5
 FIRE_RATE = 600 # temps en millisecodes
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.3 * PLAYER_SPEED
 BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
@@ -30,7 +29,31 @@ BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 LIGHT_GREY = (231, 229, 230)
 
 
-ASTEROIDE_SCORE = 100
-CHARGEUR_SCORE = 300
-TOURELLE_SCORE = 400
 ROCKETSHIP_SCORE = 500
+
+###Ennemis###
+
+###Asteroid###
+ASTEROID_VITESSE=1
+ASTEROIDE_SCORE = 100
+###Tir###
+TIR_VITESSE=4
+
+###Chargeur###
+CHARGEUR_ROTATION_SPEED=1.5
+CHARGEUR_MIN_SPEED=0.7
+CHARGEUR_MAX_SPEED=3
+CHARGEUR_ACCELERATION=0.1
+CHARGEUR_DECELERATION=0.1
+CHARGEUR_ANGLE_ACCELERATION = 15 #determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
+CHARGEUR_SCORE = 300
+
+###Tourelle###
+TOURELLE_INITIAL_CLOCK=(50,150)#fourchette du timer initial aléatoire pour le premier tir
+TOURELLE_NEW_CLOCK=(100,150)#fourchette du timer aléatoire pour les tirs suivants
+TOURELLE_SCORE = 400
+
+###Miner###
+MINER_CLOCK=(200,300)
+MINER_SPEED=1
+MINER_SCORE=400
