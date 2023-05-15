@@ -8,7 +8,6 @@ from wall import Wall
 from menu import Menu
 from random import randint
 from constantes import *
-from particles import Particle
 
 
 class Game:
@@ -37,10 +36,10 @@ class Game:
             self.high_score = int(fichier.readline())
 
         # les 4 textes à afficher pour score et high score
-        text1 = Text(GAME_FONT, "score", 24, self.center_square.right - 5, self.center_square.top, "white")
-        self.score_text = Text(GAME_FONT, str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
-        text3 = Text(GAME_FONT, "high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
-        text4 = Text(GAME_FONT, str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
+        text1 = Text("score", 24, self.center_square.right - 5, self.center_square.top, "white")
+        self.score_text = Text(str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
+        text3 = Text("high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
+        text4 = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
 
         # on créer un groupe qui contient les sprites de text
@@ -76,6 +75,7 @@ class Game:
         pygame.mixer.music.set_volume(0.4)
         self.clock = pygame.time.Clock()
 
+
     def wall_collisions(self):
         for wall in self.walls:
             if self.player.hitbox.colliderect(wall.rect):
@@ -83,7 +83,7 @@ class Game:
 
     def spawn(self):
         while len(self.ennemis.tab) < self.starting_ennemis_number:
-            self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
             spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
             spawnbox.center = self.player.hitbox.center
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -176,6 +176,10 @@ class Game:
                 pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
 
             pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+
+            pygame.draw.circle(self.window, "red", (10, 10), 10)
+            pygame.draw.circle(self.window, "red", (100, 100), 10)
+            pygame.draw.circle(self.window, "red", (600, 100), 10)
 
         else:
             self.window.fill(LIGHT_GREY)  # on remplit l'image de gris
