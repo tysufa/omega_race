@@ -124,7 +124,7 @@ class Player(pygame.sprite.Sprite):
             if new_velocity_y < self.max_velocity * angle_y:
                 self.velocity.y = new_velocity_y
 
-    def update(self):
+    def update(self, window):
 
         if self.reloading:  # si on est en train de "recharger" :
             if pygame.time.get_ticks() - self.time > FIRE_RATE:  # si on à dépassé le temps de recharge
@@ -143,7 +143,7 @@ class Player(pygame.sprite.Sprite):
 
             if keys[pygame.K_z]:
                 if not self.reloading:
-                    self.projectiles.add(Projectiles(self.x, self.y, self.angle))  # on ajoute un nouveau projectile
+                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, window))  # on ajoute un nouveau projectile
                     self.shooting_sound.play()
                     self.reloading = True  # on passe en rechargement
                     self.time = pygame.time.get_ticks()
@@ -158,9 +158,13 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
+            if keys[pygame.K_DOWN]:
+                self.velocity.x = 0
+                self.velocity.y = 0
+
             if keys[pygame.K_a]:
                 if not self.reloading:
-                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, True))  # on ajoute un nouveau projectile
+                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, window, True))  # on ajoute un nouveau projectile
                     self.shooting_sound.play()
                     self.reloading = True  # on passe en rechargement
                     self.time = pygame.time.get_ticks()
@@ -199,7 +203,7 @@ class Player(pygame.sprite.Sprite):
         for anim in self.player_anim.sprites():
             anim.rect.center = (self.x, self.y)  # on change la position de chaque animation
 
-        self.projectiles.update()
+        self.projectiles.update(self.ennemis)
 
     def collision_bord(self):
         for projectile in self.projectiles.sprites():

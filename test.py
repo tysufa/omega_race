@@ -1,44 +1,68 @@
-import pygame
-import random
+import pygame as py  
 
-pygame.init()
+# define constants  
+WIDTH = 500  
+HEIGHT = 500  
+FPS = 30  
 
-window = pygame.display.set_mode((720, 480))
+# define colors  
+BLACK = (0 , 0 , 0)  
+GREEN = (0 , 255 , 0)  
 
-bg = pygame.image.load("image/background/Space Background.png")
-circle = pygame.image.load("circle.png")
-player = pygame.image.load("player.png")
-circle = pygame.transform.scale(circle, (200, 200))
+# initialize pygame and create screen  
+py.init()  
+screen = py.display.set_mode((WIDTH , HEIGHT))  
+# for setting FPS  
+clock = py.time.Clock()  
 
-continuer = True
+rot = 0  
+rot_speed = 2  
 
-clock = pygame.time.Clock()
+# define a surface (RECTANGLE)  
+image_orig = py.Surface((100 , 50))  
+# for making transparent background while rotating an image  
+image_orig.set_colorkey(BLACK)  
+# fill the rectangle / surface with green color  
+image_orig.fill(GREEN)  
+# creating a copy of orignal image for smooth rotation  
+image = image_orig.copy()  
+image.set_colorkey(BLACK)  
+# define rect for placing the rectangle at the desired position  
+rect = image.get_rect()  
+rect.center = (WIDTH // 2 , HEIGHT // 2)  
 
+rect2 = py.rect.Rect(200-30, 200-30, 40, 40)
+i = 0
+# keep rotating the rectangle until running is set to False  
+running = True  
+while running:  
+    # set FPS  
+    clock.tick(FPS)  
+    # clear the screen every time before drawing new objects  
+    screen.fill(BLACK)  
+    # check for the exit  
+    for event in py.event.get():  
+        if event.type == py.QUIT:  
+            running = False  
 
-def circle_surf(color, radius):
-    surf = pygame.surface.Surface((radius * 2, radius * 2))
-    pygame.draw.circle(surf, color, (radius, radius), radius)
-    surf.set_colorkey("black")
-    return surf
+    # making a copy of the old center of the rectangle  
+    old_center = rect.center  
+    # defining angle of the rotation  
+    rot += 1
+    # rotating the orignal image  
+    new_image = py.transform.rotate(image_orig , rot)
+    rect = new_image.get_rect()  
+    # set the rotated rectangle to the old center  
+    rect.center = old_center  
 
+    if rect.colliderect(rect2):
+        print(i)
+        i += 1
+    
+    py.draw.rect(screen, "blue", rect2)
+    # drawing the rotated rectangle to the screen  
+    screen.blit(new_image , rect)  
+    # flipping the display after drawing everything  
+    py.display.flip()  
 
-while continuer:
-
-    window.blit(bg, (0,0))
-    window.fill((0, 0, 0), special_flags=pygame.BLEND_RGB_SUB)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            continuer = False
-
-    pos = pygame.mouse.get_pos()
-    r = 15 * 4
-    window.blit(player, (pos[0]-40, pos[1]-40))
-    # window.blit(circle_surf((100, 100, 100), r), (pos[0] - r, pos[1] - r), special_flags=pygame.BLEND_RGB_ADD)
-    # window.blit(circle_surf((50, 50, 50), r*3), (pos[0] - r*3, pos[1] - r*3), special_flags=pygame.BLEND_RGB_ADD)
-
-    window.blit(circle, (pos[0]-100, pos[1]-100), special_flags=pygame.BLEND_RGB_ADD)
-
-    pygame.display.flip()
-
-    clock.tick(60)
+py.quit()  
