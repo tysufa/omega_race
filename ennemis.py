@@ -51,16 +51,14 @@ class Ennemy_list:  # liste des ennemis en jeu
         for i in range(len(self.tab)):  # pour chaque entité :
             if not self.tab[i].is_bullet:
                 self.only_bullet = False
-            if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
-                player.die()
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
-                if self.tab[i].colide(proj.rect):  # si l'ennemi est en colision avec le projectile
+                if self.tab[i].colide(proj.rect) and self.tab[i].alive:  # si l'ennemi est en colision avec le projectile
                     player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
                     if self.tab[i].shield and abs(rotate(self.tab[i].x,self.tab[i].y,proj.x,proj.y)-self.tab[i].rotation)<90:
                         self.tab[i].shield=False
                     else:
-                        self.tab[i].alive = False  # alors on tue l'ennemi
+                        self.tab[i].alive = False
                         if not self.tab[i].is_bullet:
                             self.explosion_sound.play()
                             score += self.tab[i].score_value
@@ -68,6 +66,8 @@ class Ennemy_list:  # liste des ennemis en jeu
                     proj.remove(projectiles_list)  # on supprime le projectile du groupe
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
+                if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
+                    player.die()
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
                     if self.tab[i].needcord:
                         tmp=self.tab[i].move(player.x, player.y,tmp)
@@ -80,18 +80,12 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
-                if type(self.tab[i])==Asteroid:
-                    if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
-                        tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
-                        a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
-
-                    self.tab[i].death_anim()
-
-                #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
-                else:
-                    self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
+                if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
+                self.tab[i].death_anim()
+
+                #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
@@ -104,7 +98,9 @@ class Ennemy_list:  # liste des ennemis en jeu
 
 class Ennemi:
     def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35)):
-        self.alive=True #Etat
+        #Etat
+        self.alive=True
+        self.dying=False
         #Position et mouvements
         self.x=x
         self.y=y
@@ -124,6 +120,7 @@ class Ennemi:
         self.shield=False
         self.is_bullet = False
         self.score_value = 0
+
 
     def colmurver(self):
         if self.hitbox.colliderect(self.centre):  # si on a une collision avec le rectangle du milieu
@@ -153,9 +150,15 @@ class Ennemi:
 
 class Mine(Ennemi):  # La mine est un cercle blanc immobile.
     def __init__(self, x, y, WINDOW, rect,is_bullet=False):
-        super().__init__(x, y, WINDOW, rect, "image/mine/mine2.png",False,False,(10,10))
+        super().__init__(x, y, WINDOW, rect, "image/mine/mine4.png",False,False,(30,30))
         self.score_value=15
         self.is_bullet=is_bullet
+
+        #pour l'animation de mort:
+        self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Bomber.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
+
     def draw(self):
         self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
@@ -164,6 +167,11 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
     def move(self):
         pass
 
+    def death_anim(self):#ce serait bie d'uniformiser les self.angle et self.rotation pour en faire une méthode du super
+        self.explosion_anim.update()
+        self.explosion_anim.angle =randint(0,360)
+        self.explosion_anim.show = True
+        self.image = self.explosion_anim.image
 
 class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoire
     def __init__(self, x, y, WINDOW, rect):
@@ -172,6 +180,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.rotation = randint(1, 360)  # rotation de l'ennemi, en degrés, 0 étant a droite
         self.angle = randint(0, 360)
 
+        #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 6, (96, 96), 50,
                                    "image/asteroid/Asteroid 01 - Explode.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
@@ -197,7 +206,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
             self.y+=3*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
-    def death_anim(self):
+    def death_anim(self):#ce serait bie d'uniformiser les self.angle et self.rotation pour en faire une méthode du super
         self.explosion_anim.update()
         self.explosion_anim.angle = self.angle
         self.explosion_anim.show = True
@@ -210,6 +219,12 @@ class Tir(Ennemi):
         self.rotation = modulo_rot(rotation)  # rotation de l'ennemi, en degrés, 0 étant a droite
         self.anim=Anim(self.x,self.y,7,(9,12),100,"image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False)
         self.is_bullet = True
+
+        #pour pas que le jeu implose:
+        self.explosion_anim = Anim(self.x, self.y, 0, (64, 64), 0,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Frigate.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
+
     def draw(self):
         self.anim.update()
         self.anim.angle =  270 - self.rotation
@@ -226,6 +241,8 @@ class Tir(Ennemi):
             self.alive=False
         self.image_rect.center=(self.x,self.y)
 
+    def death_anim(self):
+        pass
 class Chargeur(Ennemi):
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
@@ -235,15 +252,22 @@ class Chargeur(Ennemi):
         self.vitesse = 1
         self.objectif=(x,y)
         self.score_value = CHARGEUR_SCORE
+
+        #pour l'animation de mort:
+        self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Frigate.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
+
     def draw(self):
-        self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
-        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
-        self.hitbox.center = self.image_rect.center
-        self.engine_anim.angle= 270 - self.rotation
-        if self.vitesse>1.5:
-            self.engine_anim.show=True
-        self.engine_anim.update()
-        self.window.blit(self.engine_anim.image, self.image_rect)
+        if self.alive:
+            self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
+            self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+            self.hitbox.center = self.image_rect.center
+            self.engine_anim.angle= 270 - self.rotation
+            if self.vitesse>1.5:
+                self.engine_anim.show=True
+            self.engine_anim.update()
+            self.window.blit(self.engine_anim.image, self.image_rect)
         self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
 
@@ -324,6 +348,12 @@ class Chargeur(Ennemi):
         self.y += self.vitesse * (sin(radians(self.rotation)))
         self.colisions()
 
+    def death_anim(self):
+        self.explosion_anim.update()
+        self.explosion_anim.angle = 270-self.rotation
+        self.explosion_anim.show = True
+        self.image = self.explosion_anim.image
+
 class Tourelle(Ennemi):
     def __init__(self, x, y, WINDOW,rect,shield=False):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(25,25))
@@ -332,6 +362,12 @@ class Tourelle(Ennemi):
         self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
         self.clock=randint(TOURELLE_INITIAL_CLOCK[0],TOURELLE_INITIAL_CLOCK[1])
         self.score_value = TOURELLE_SCORE
+
+        #pour l'animation de mort:
+        self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Bomber.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
+
     def draw(self):
         if self.shield:
             self.shield_anim.show=True
@@ -344,6 +380,7 @@ class Tourelle(Ennemi):
         self.shield_anim.angle= 270 - self.rotation
         self.shield_anim.update()
         self.window.blit(self.shield_anim.image, self.image_rect)
+
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y) :
@@ -351,6 +388,12 @@ class Tourelle(Ennemi):
             self.clock=randint(TOURELLE_NEW_CLOCK[0],TOURELLE_NEW_CLOCK[1])
         self.clock+=-1
         return liste
+
+    def death_anim(self):
+        self.explosion_anim.update()
+        self.explosion_anim.angle = self.rotation
+        self.explosion_anim.show = True
+        self.image = self.explosion_anim.image
 
 class Miner(Ennemi):
     def __init__(self, x, y, WINDOW, rect):
@@ -363,6 +406,11 @@ class Miner(Ennemi):
         self.destination()
         self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
         self.score_value = MINER_SCORE
+
+        #pour l'animation de mort:
+        self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Support.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
 
     def draw(self):
         self.window.blit(self.image, self.image_rect)
@@ -411,6 +459,12 @@ class Miner(Ennemi):
         else:
             self.rotation += -2
         return liste
+
+    def death_anim(self):
+        self.explosion_anim.update()
+        self.explosion_anim.angle = self.rotation
+        self.explosion_anim.show = True
+        self.image = self.explosion_anim.image
 
 class Rocketship(Ennemi):
     def __init__(self, x, y, WINDOW,rect):
