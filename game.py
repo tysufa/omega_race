@@ -71,14 +71,13 @@ class Game:
             for j in range(len(self.levels[i])):
                 self.levels[i][j]=int(self.levels[i][j])
         ####
-
         self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square,
-                             self.ennemis)
+                             self.ennemis.tab)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
 
-        self.in_menu = True
+        self.in_menu = False
         self.menu = Menu(self.window)
 
         self.test = 0
@@ -121,10 +120,12 @@ class Game:
                 else:
                     ennemis_apparus+=1
 
+
     def update(self):
         if not self.game_over:
-            self.player_group.update()  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+            self.player_group.update(self.window)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
             if self.player.alive:
+                self.player.ennemis = self.ennemis.tab
                 self.walls.update()
 
                 particule_copy = [particle for particle in self.particles if particle.radius > 0]

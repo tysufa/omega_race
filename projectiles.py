@@ -5,12 +5,13 @@ from animation import Anim
 
 
 class Projectiles(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction, rocket=False):
+    def __init__(self, x, y, direction, window, rocket=False):
         super().__init__()
         self.x, self.y = x, y
         self.x_init, self.y_init = x, y
         self.direction = direction%360
         self.rocket = rocket
+        self.window = window
         if not rocket:
             self.bullet_anim = Anim(self.x, self.y, 3, (8, 16), 50,
                                     BULLET_SPRITESHEET, True)
@@ -29,9 +30,9 @@ class Projectiles(pygame.sprite.Sprite):
 
         self.velocity = [cos(radians(self.direction)) * BULLET_SPEED, sin(radians(self.direction)) * BULLET_SPEED]
 
-    def update(self):
+    def update(self, ennemis):
         if self.rocket:
-            self.get_direction()
+            self.get_direction(ennemis)
             self.velocity[1] = cos(radians(self.bullet_anim.angle)) * BULLET_SPEED
             self.velocity[0] = -sin(radians(self.bullet_anim.angle)) * BULLET_SPEED
 
@@ -56,22 +57,26 @@ class Projectiles(pygame.sprite.Sprite):
             ret = -ret
         return ret
 
-    def get_direction(self):
-        pos1 = (100, 100)
-        pos2 = (600, 100)
+    def get_direction(self, ennemis):
+        self.direction = self.direction%360
+        angle_min = 180 # si l'angle minimum est supérieur au champs de vision on ira tout droit
 
+        center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
+        angle_min = self.rotation(self.hitbox.x, self.hitbox.y, ennemis[0].x, ennemis[0].y)
+        pos = ennemis[0].x, ennemis[0].y
+
+
+        print(angle_min-self.direction%180, self.direction%180)
 
         # angle1 correspond à l'écart en angle entre le vaisseau et le point (100, 100) compris entre 0 et 180°
-        angle1 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 100, 100))-self.direction))
+        #angle1 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 100, 100))-self.direction))
 
-        angle2 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 600, 100))-self.direction))
+        # angle2 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 600, 100))-self.direction))
 
-        if angle1 <70 or angle2 < 70: # si on à un point dans le "champ de vision"
-            if angle2 < angle1: # on se dirige vers le point le plus proche 
-                pos = pos2
-            else:
-                pos = pos1
+        if angle_min < 70 and False: # si l'ennemi est dans le "champ de vision"
 
+            # pos = pygame.mouse.get_pos()
+            pygame.draw.line(self.window, "orange", (self.x, self.y), (pos[0], pos[1]))
 
             self.bullet_anim.angle = self.bullet_anim.angle%360
 
@@ -82,5 +87,7 @@ class Projectiles(pygame.sprite.Sprite):
 
             if calcul_dirrection > 0 and calcul_dirrection < 180:
                 self.bullet_anim.angle += 3
+                self.direction += 3
             else:
                 self.bullet_anim.angle -= 3
+                self.direction -= 3
