@@ -19,7 +19,7 @@ ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
 PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9 # durée de l'animation de mort x nombre de frame sur l'animation de la mort
-LIFE_NB = 2
+LIFE_NB = 4
 
 FIRE_RATE = 600 # temps en millisecodes
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.3 * PLAYER_SPEED
@@ -45,7 +45,7 @@ CHARGEUR_MIN_SPEED=0.7
 CHARGEUR_MAX_SPEED=3
 CHARGEUR_ACCELERATION=0.1
 CHARGEUR_DECELERATION=0.1
-CHARGEUR_ANGLE_ACCELERATION = 15 #determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
+CHARGEUR_ANGLE_ACCELERATION = 20 #determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 CHARGEUR_SCORE = 300
 
 ###Tourelle###

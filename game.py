@@ -58,7 +58,7 @@ class Game:
         self.starting_ennemis_number = 1
 
         #### Levels ####
-        self.level=8
+        self.level=1
         self.levels=[]
         import csv
         with open("levels.csv", "r") as fichier:
@@ -94,81 +94,32 @@ class Game:
                 wall.show()
 
     def spawn(self):
-
-        ennemis_apparus=0
         spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
         spawnbox.center = self.player.hitbox.center
-        while ennemis_apparus < self.levels[self.level-1][0]:
-            self.ennemis.tab.append(Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
-        ennemis_apparus=0
-        while ennemis_apparus < self.levels[self.level-1][1]:
-            self.ennemis.tab.append(Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
-        ennemis_apparus=0
-        while ennemis_apparus < self.levels[self.level-1][2]:
-            self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
-        ennemis_apparus=0
-        while ennemis_apparus < self.levels[self.level-1][3]:
-            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
-        ennemis_apparus=0
-        while ennemis_apparus < self.levels[self.level-1][4]:
-            self.ennemis.tab.append(Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
-        ennemis_apparus=0
-        while ennemis_apparus < self.levels[self.level-1][5]:
-            self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
-            spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-            self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-            self.center_square.height + self.ennemis.tab[-1].hitbox.height))
-            spawncenter.center = self.center_square.center
-            if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
-                self.ennemis.tab[-1].alive = False
-                self.ennemis.tab.pop(-1)
-            else:
-                ennemis_apparus+=1
+        for i in range (len(self.levels[self.level-1])):
+            ennemis_apparus=0
+            while ennemis_apparus < self.levels[self.level-1][i]:
+                if i==0:
+                    self.ennemis.tab.append(Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                elif i==1:
+                    self.ennemis.tab.append(Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                elif i==2:
+                    self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                elif i==3:
+                    self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                elif i==4:
+                    self.ennemis.tab.append(Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
+                elif i==5:
+                    self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
+                spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
+                self.center_square.width + self.ennemis.tab[-1].hitbox.width,
+                self.center_square.height + self.ennemis.tab[-1].hitbox.height))
+                spawncenter.center = self.center_square.center
+                if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
+                    self.ennemis.tab[-1].alive = False
+                    self.ennemis.tab.pop(-1)
+                else:
+                    ennemis_apparus+=1
 
     def update(self):
         if not self.game_over:
