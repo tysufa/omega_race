@@ -92,12 +92,12 @@ class Game:
             if self.player.hitbox.colliderect(wall.rect):
                 wall.show()
 
-    def spawn(self):
+    def spawn(self,level):#self.levels[self.level-1]
         spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
         spawnbox.center = self.player.hitbox.center
-        for i in range (len(self.levels[self.level-1])):
+        for i in range (len(level)):
             ennemis_apparus=0
-            while ennemis_apparus < self.levels[self.level-1][i]:
+            while ennemis_apparus < level[i]:
                 if i==0:
                     self.ennemis.tab.append(Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
                 elif i==1:
@@ -159,11 +159,34 @@ class Game:
 
             self.score_text.change_text(str(self.score))
 
+    def decompter (self):
+        ret=[0 for i in range(6)]
+        for en in self.ennemis.tab :
+            if type(en)==Mine:
+                ret[0]+=1
+            if type(en)==Asteroid:
+                ret[1]+=1
+            if type(en)==Chargeur:
+                ret[2]+=1
+            if type(en)==Tourelle:
+                if en.shield:
+                    ret[5]+=1
+                else:
+                    ret[3]+=1
+            if type(en)==Miner:
+                ret[4]+=1
+        return ret
+
     def respawn(self):
         if self.player.nb_life >= 0:
             if self.player.respawn:
-                self.ennemis = Ennemy_list()
-                self.spawn()
+                if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                    self.ennemis = Ennemy_list()
+                    self.spawn(self.levels[self.level-1])
+                else:
+                    tempo_level=self.decompter()
+                    self.ennemis = Ennemy_list()
+                    self.spawn(tempo_level)
                 self.player.respawn = False
                 self.player.alive = True
                 self.player.projectiles = pygame.sprite.Group()
@@ -227,14 +250,14 @@ class Game:
 
         if keys[pygame.K_ESCAPE]:
             self.in_menu = True
-
+        """
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(GAME_MUSIC)
-            pygame.mixer.music.play(fade_ms=1000)
+            pygame.mixer.music.play(fade_ms=1000)"""
 
     def run(self):
         continuer = True
-        self.spawn()
+        self.spawn(self.levels[self.level-1])
         while continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

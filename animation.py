@@ -72,4 +72,3 @@ class Anim(pygame.sprite.Sprite):
         self.rotate()  # on update à chaque tour self.image par rapport à self.base_image
         self.image.set_colorkey("black")  # on enlève le fond noir
 
-        

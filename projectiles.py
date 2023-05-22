@@ -66,7 +66,7 @@ class Projectiles(pygame.sprite.Sprite):
         pos = ennemis[0].x, ennemis[0].y
 
 
-        print(angle_min-self.direction%180, self.direction%180)
+        #print(angle_min-self.direction%180, self.direction%180)
 
         # angle1 correspond à l'écart en angle entre le vaisseau et le point (100, 100) compris entre 0 et 180°
         #angle1 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 100, 100))-self.direction))

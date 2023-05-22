@@ -21,7 +21,7 @@ PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9 # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 4
 
-FIRE_RATE = 500 # temps en millisecodes
+FIRE_RATE = 100 # temps en millisecodes
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.3 * PLAYER_SPEED
 BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 
@@ -49,7 +49,7 @@ CHARGEUR_ANGLE_ACCELERATION = 20 #determine la moitié de l'angle devant le char
 CHARGEUR_SCORE = 300
 
 ###Tourelle###
-TOURELLE_INITIAL_CLOCK=(300,400)#fourchette du timer initial aléatoire pour le premier tir
+TOURELLE_INITIAL_CLOCK=(200,300)#fourchette du timer initial aléatoire pour le premier tir
 TOURELLE_NEW_CLOCK=(150,250)#fourchette du timer aléatoire pour les tirs suivants
 TOURELLE_SCORE = 400
 
