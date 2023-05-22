@@ -8,6 +8,7 @@ from menu import Menu
 from random import randint
 from constantes import *
 import csv
+import sys
 
 class Game:
     def __init__(self):
@@ -41,8 +42,10 @@ class Game:
         text4 = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
 
+        self.level_text = Text("niveau 1", 24, self.center_square.center[0], self.center_square.top + 5, "white")
+
         # on créer un groupe qui contient les sprites de text
-        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, text4)
+        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, text4, self.level_text)
 
         ##### walls ######
         top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
@@ -58,7 +61,7 @@ class Game:
         self.starting_ennemis_number = 1
 
         #### Levels ####
-        self.level=8
+        self.level=1
         self.levels=[]
         import csv
         with open("levels.csv", "r") as fichier:
@@ -78,13 +81,36 @@ class Game:
         self.player_group.add(self.player)
 
         self.in_menu = False
-        self.menu = Menu(self.window)
 
         self.test = 0
         self.test2 = False
 
         pygame.mixer.music.set_volume(0.4)
         self.clock = pygame.time.Clock()
+        self.menu = Menu(self.window, self.clock)
+
+
+    def test_menu(self):
+        continuer = True
+
+        text1 = Text("score", 24, self.center_square.right - 5, self.center_square.top, "white")
+        self.score_text = Text(str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
+        text3 = Text("high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
+        text4 = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
+                     "white")
+
+        while continuer:
+            self.window.fill("black")
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        continuer = False
+
+            pygame.display.update()
+            self.clock.tick(60)
 
 
     def wall_collisions(self):
@@ -196,6 +222,7 @@ class Game:
 
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.level+=1
+                    self.level_text.change_text("niveau " + str(self.level))
                     self.player.respawn_function()
                     self.respawn()
 
@@ -275,9 +302,6 @@ class Game:
         self.update()
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
 
-        if keys[pygame.K_ESCAPE]:
-            self.in_menu = True
-
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.load(GAME_MUSIC)
             pygame.mixer.music.play(fade_ms=1000)
@@ -291,10 +315,11 @@ class Game:
                     continuer = False
                     pygame.quit()
                     exit()
-            if self.in_menu:
-                self.menu_loop()
-            else:
-                self.game_loop()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.menu.menu_loop()
+            
+            self.game_loop()
 
             self.draw()
 

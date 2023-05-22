@@ -1,13 +1,15 @@
 import pygame
 from text import Text
 from constantes import *
+import sys
 
 pygame.init()
 
 
 class Menu:
-    def __init__(self, window):
+    def __init__(self, window, clock):
         self.window = window
+        self.clock = clock
 
         self.title = Text("OMEGA RACE", 20, SIZE[0]//2, SIZE[1]//2, "blue")
         self.title.rect.center = SIZE[0]//2, 100
@@ -57,9 +59,19 @@ class Menu:
 
     def menu_loop(self):
         continuer = True
+
         while continuer:
-            if pygame.key.get_mods()[pygame.K_ESCAPE]:
-                continuer = False
+            self.window.fill("black")
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        continuer = False
 
             self.draw()
-            pygame.display.flip()
+            pygame.display.update()
+
+
+            self.clock.tick(60)
