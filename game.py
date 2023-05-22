@@ -71,14 +71,13 @@ class Game:
             for j in range(len(self.levels[i])):
                 self.levels[i][j]=int(self.levels[i][j])
         ####
-
         self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square,
-                             self.ennemis)
+                             self.ennemis.tab)
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
 
-        self.in_menu = True
+        self.in_menu = False
         self.menu = Menu(self.window)
 
         self.test = 0
@@ -94,7 +93,6 @@ class Game:
                 wall.show()
 
     def spawn(self):
-
         ennemis_apparus=0
         spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
         spawnbox.center = self.player.hitbox.center
@@ -158,6 +156,8 @@ class Game:
             else:
                 ennemis_apparus+=1
         ennemis_apparus=0
+
+
         while ennemis_apparus < self.levels[self.level-1][5]:
             self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
             spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
@@ -170,10 +170,12 @@ class Game:
             else:
                 ennemis_apparus+=1
 
+
     def update(self):
         if not self.game_over:
-            self.player_group.update()  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+            self.player_group.update(self.window)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
             if self.player.alive:
+                self.player.ennemis = self.ennemis.tab
                 self.walls.update()
 
                 particule_copy = [particle for particle in self.particles if particle.radius > 0]

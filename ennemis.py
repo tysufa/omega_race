@@ -55,15 +55,16 @@ class Ennemy_list:  # liste des ennemis en jeu
             for proj in projectiles_list.sprites():  # pour chaque projectile :
                 if self.tab[i].colide(proj.rect) and self.tab[i].alive:  # si l'ennemi est en colision avec le projectile
                     player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
-                    if self.tab[i].shield and abs(rotate(self.tab[i].x,self.tab[i].y,proj.x,proj.y)-self.tab[i].rotation)<90:
+                    if self.tab[i].shield and abs(rotate(self.tab[i].x,self.tab[i].y,proj.x,proj.y)-self.tab[i].rotation)%360<180:
                         self.tab[i].shield=False
+                        proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     else:
                         self.tab[i].alive = False
                         if not self.tab[i].is_bullet:
                             self.explosion_sound.play()
                             score += self.tab[i].score_value
+                            proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     self.tempo = pygame.time.get_ticks()
-                    proj.remove(projectiles_list)  # on supprime le projectile du groupe
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
                 if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
@@ -84,8 +85,6 @@ class Ennemy_list:  # liste des ennemis en jeu
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
                 self.tab[i].death_anim()
-
-                #self.particle_list = create_particle_list(15, self.tab[i].x, self.tab[i].y, randint(4, 6), 2, 2, 0.3, 0.5)
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
