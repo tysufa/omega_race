@@ -33,33 +33,6 @@ class Menu:
 
         pygame.mixer.music.load(MENU_MUSIC)
 
-    def draw(self):
-        pass
-        #pygame.draw.rect(self.window, self.over[0], self.jouer.rect)
-        #pygame.draw.rect(self.window, self.over[1], self.boutique.rect)
-        #pygame.draw.rect(self.window, self.over[2], self.option.rect)
-        self.text_group.draw(self.window)
-
-    def menu_actions(self):
-        mouse_events = pygame.mouse.get_pressed()
-        self.over = ["white", "white", "white"]
-
-        if self.jouer.rect.collidepoint(pygame.mouse.get_pos()):
-            self.over[0] = "red"
-            if mouse_events[0]:
-                self.select_sound.set_volume(0.15)
-                self.select_sound.play()
-                return True
-
-        elif self.boutique.rect.collidepoint(pygame.mouse.get_pos()):
-            self.over[1] = "red"
-
-        elif self.option.rect.collidepoint(pygame.mouse.get_pos()):
-            self.over[2] = "red"
-
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.play()
-
     def menu_loop(self):
         continuer = True
 
@@ -72,8 +45,49 @@ class Menu:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         continuer = False
+            
+            self.text_group.draw(self.window)
+            pygame.display.update()
 
-            self.draw()
+
+            self.clock.tick(60)
+
+
+class GameOver:
+    def __init__(self, window, clock):
+        self.window = window
+        self.clock = clock
+
+        self.jouer = Text("Jouer", 40, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.jouer.rect.center = SIZE[0] // 2, SIZE[0] // 2
+
+        self.boutique = Text("boutique", 40, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.boutique.rect.center = SIZE[0] // 2 + 100, SIZE[0] // 2
+
+        self.text_group = pygame.sprite.Group(self.jouer, self.boutique)
+
+        self.over = ["white", "white", "white"]
+
+        self.select_sound = pygame.mixer.Sound("sound/select.wav")
+
+        self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
+
+        pygame.mixer.music.load(MENU_MUSIC)
+
+    def game_over_loop(self):
+        continuer = True
+
+        while continuer:
+            self.window.blit(self.menu_image, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        continuer = False
+            
+            self.text_group.draw(self.window)
             pygame.display.update()
 
 

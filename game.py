@@ -4,7 +4,7 @@ from player import Player
 from ennemis import *
 from text import Text
 from wall import Wall
-from menu import Menu
+from menu import Menu, GameOver
 from random import randint
 from constantes import *
 import csv
@@ -17,12 +17,13 @@ class Game:
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
-        self.background = pygame.image.load(BACKGROUND_IMAGE)
-        self.game_over_image = pygame.image.load("image/GameOver(A)@2x.png")
+        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png"]
+
+        self.background_img = pygame.image.load(random.choice(self.backgrounds))
 
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent
-        self.background.fill((255, 255, 255, 220), special_flags=BLEND_RGBA_MULT)
+        #self.background.fill((255, 255, 255, 220), special_flags=BLEND_RGBA_MULT)
 
         # on créer une image pour le nombre de vies tourné vers la droite
         self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), -90)
@@ -88,6 +89,7 @@ class Game:
         pygame.mixer.music.set_volume(0.4)
         self.clock = pygame.time.Clock()
         self.menu = Menu(self.window, self.clock)
+        self.game_over_class = GameOver(self.window, self.clock)
 
 
     def wall_collisions(self):
@@ -197,7 +199,7 @@ class Game:
                 self.test = pygame.time.get_ticks()
                 self.test2 = True
         else:
-            self.game_over = True
+            self.game_over_class.game_over_loop()
 
             # on update le meilleur score
             if self.high_score < self.score:
@@ -206,7 +208,7 @@ class Game:
 
     def draw(self):
         if not self.in_menu:
-            self.window.blit(self.background, (0, 0))
+            self.window.blit(self.background_img, (0, 0))
 
             for i in range(self.player.nb_life):
                 # on affiche un vaisseau pour chaque vie du personnage
@@ -266,6 +268,7 @@ class Game:
                         self.menu.menu_loop()
             
             self.game_loop()
+            print(self.game_over)
 
             self.draw()
 
