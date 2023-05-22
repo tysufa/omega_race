@@ -53,21 +53,21 @@ class Ennemy_list:  # liste des ennemis en jeu
                 self.only_bullet = False
 
             for proj in projectiles_list.sprites():  # pour chaque projectile :
-                if self.tab[i].colide(proj.rect) and self.tab[i].alive:  # si l'ennemi est en colision avec le projectile
-                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
-                    if self.tab[i].shield and abs(rotate(self.tab[i].x,self.tab[i].y,proj.x,proj.y)-self.tab[i].rotation)%360<180:
+                if self.tab[i].shield:
+                    if self.tab[i].shieldbox.colliderect(proj.rect):
                         self.tab[i].shield=False
                         proj.remove(projectiles_list)  # on supprime le projectile du groupe
-                    else:
-                        self.tab[i].alive = False
-                        if not self.tab[i].is_bullet:
-                            self.explosion_sound.play()
-                            score += self.tab[i].score_value
-                            proj.remove(projectiles_list)  # on supprime le projectile du groupe
+                if self.tab[i].colide(proj.rect) and self.tab[i].alive:  # si l'ennemi est en colision avec le projectile
+                    player.particles = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
+                    self.tab[i].alive = False
+                    if not self.tab[i].is_bullet:
+                        self.explosion_sound.play()
+                        score += self.tab[i].score_value
+                        proj.remove(projectiles_list)  # on supprime le projectile du groupe
                     self.tempo = pygame.time.get_ticks()
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
-                if self.tab[i].colide(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
+                if self.tab[i].killbox.colliderect(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
                     player.die()
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
                     if self.tab[i].needcord:
@@ -114,7 +114,8 @@ class Ennemi:
         self.image = pygame.image.load(imagepath).convert_alpha()
         self.base_image = self.image
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
-        self.hitbox = pygame.rect.Rect((x,y),hitbox_size)
+        self.hitbox = pygame.rect.Rect((x,y),(hitbox_size[0]+10,hitbox_size[1]+10))
+        self.killbox =  pygame.rect.Rect((x,y),(max(hitbox_size[0]-10,1),max(hitbox_size[1]-10,1)))#hitbox qui tue le joueur
 
         self.shield=False
         self.is_bullet = False
@@ -148,10 +149,12 @@ class Ennemi:
 
 
 class Mine(Ennemi):  # La mine est un cercle blanc immobile.
-    def __init__(self, x, y, WINDOW, rect,is_bullet=False):
-        super().__init__(x, y, WINDOW, rect, "image/mine/mine4.png",False,False,(30,30))
+    def __init__(self, x, y, WINDOW, rect):
+        super().__init__(x, y, WINDOW, rect, "image/mine/mine1.png",False,False,(30,30))
         self.score_value=15
-        self.is_bullet=is_bullet
+
+        self.anim= Anim(self.x, self.y, 1, (32, 32), 400,
+                                   "image/mine/mines2.png", True)
 
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
@@ -159,10 +162,15 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
 
     def draw(self):
+        if self.alive:
+            self.anim.update()
+            self.anim.show = True
+            self.image = self.anim.image
         self.window.blit(self.image, self.image_rect)
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
     def move(self):
         pass
 
@@ -191,6 +199,7 @@ class Asteroid(Ennemi):  # l'asteroid est un cercle jaune au mouvement aléatoir
         self.image = pygame.transform.rotozoom(self.base_image, self.angle, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
 
     def move(self):
         self.x+=ASTEROID_VITESSE*(cos(radians(self.rotation)))*self.senscos#le *senscos ne devrait pas être nécéssaire mais bon pour l'instant
@@ -232,6 +241,7 @@ class Tir(Ennemi):
         self.window.blit(self.image, self.image_rect)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
 
     def move(self):
         self.x+=TIR_VITESSE*(cos(radians(self.rotation)))
@@ -242,6 +252,7 @@ class Tir(Ennemi):
 
     def death_anim(self):
         pass
+
 class Chargeur(Ennemi):
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
@@ -268,6 +279,7 @@ class Chargeur(Ennemi):
             self.engine_anim.update()
             self.window.blit(self.engine_anim.image, self.image_rect)
         self.window.blit(self.image, self.image_rect)
+        self.killbox.center = self.image_rect.center
         #pygame.draw.rect(self.window,"red",self.hitbox,1)
 
     def colisions(self):
@@ -299,7 +311,7 @@ class Chargeur(Ennemi):
                 self.x+=+5
 
     def choix_objectif(self,x,y):
-        if not passe_par_milieu(self.x,self.y,x,y,20):#si on a une ligne de vue directe sur le joueur:
+        if not passe_par_milieu(self.x,self.y,x,y,40):#si on a une ligne de vue directe sur le joueur:
             self.objectif=(x,y)#on se dirige vers lui
         else :#si on ne peut pas acceder au joueur:
             if self.x<SIZE[0]//2+SIZE[0]//6 and self.x>SIZE[0]//2-SIZE[0]//6 and x<SIZE[0]//2+SIZE[0]//6 and x>SIZE[0]//2+-SIZE[0]//6: # le joueur et l'ennemi sont a l'opposé du rect:
@@ -357,10 +369,15 @@ class Tourelle(Ennemi):
     def __init__(self, x, y, WINDOW,rect,shield=False):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(25,25))
         self.rotation = 0
-        self.shield=shield
-        self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
         self.clock=randint(TOURELLE_INITIAL_CLOCK[0],TOURELLE_INITIAL_CLOCK[1])
         self.score_value = TOURELLE_SCORE
+
+        #sheild:
+        self.shield=shield
+        self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
+        if shield:
+            self.shieldbox=pygame.rect.Rect((self.x-20*(cos(radians(self.rotation))),self.y-20*(sin(radians(self.rotation)))),(self.hitbox.width+10,self.hitbox.height+10))
+        self.hitbox.center = (self.x,self.y)
 
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
@@ -376,9 +393,14 @@ class Tourelle(Ennemi):
         self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
         self.shield_anim.angle= 270 - self.rotation
         self.shield_anim.update()
         self.window.blit(self.shield_anim.image, self.image_rect)
+        if self.shield:
+            self.shieldbox.center = self.image_rect.center
+            """pygame.draw.rect(self.window,"red",self.hitbox,1)
+            pygame.draw.rect(self.window,"blue",self.shieldbox,1)"""
 
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
@@ -416,6 +438,7 @@ class Miner(Ennemi):
         self.image = pygame.transform.rotozoom(self.base_image, 90 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
 
     def destination(self):
         self.objectifx=randint(40, SIZE[0] - 40)
@@ -438,7 +461,7 @@ class Miner(Ennemi):
             self.clock-=10
         if self.mines>0:
             if self.clock<1:
-                liste.append(Mine(self.x-20*(cos(radians(self.rotation))),self.y-20*(sin(radians(self.rotation))), self.window, self.centre,True))
+                liste.append(Mine(self.x-20*(cos(radians(self.rotation))),self.y-20*(sin(radians(self.rotation))), self.window, self.centre))
                 self.mines-=1
                 self.clock=randint(MINER_CLOCK[0],MINER_CLOCK[1])
         self.clock+=-1
