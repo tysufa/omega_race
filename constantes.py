@@ -19,7 +19,7 @@ ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
 PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9 # durée de l'animation de mort x nombre de frame sur l'animation de la mort
-LIFE_NB = 0
+LIFE_NB = 3
 
 FIRE_RATE = 550 # temps en millisecodes
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.3 * PLAYER_SPEED

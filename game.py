@@ -17,10 +17,11 @@ class Game:
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
-        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png"]
 
-        self.background_img = pygame.image.load(random.choice(self.backgrounds))
+        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png", "image/background/Space Background2.png", "image/background/Space Background3.png", "image/background/Space Background4.png", "image/background/Space Background5.png"]
 
+        # self.background_img = pygame.image.load(random.choice(self.backgrounds))
+        self.background_img = pygame.image.load(self.backgrounds[-1])
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent
         #self.background.fill((255, 255, 255, 220), special_flags=BLEND_RGBA_MULT)
