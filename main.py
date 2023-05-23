@@ -1,5 +1,7 @@
 from game import Game
+from menu import Menu
 
-jeu = Game()
 
-jeu.run()
+menu = Menu()
+menu.run()
+

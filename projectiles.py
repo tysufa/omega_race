@@ -66,14 +66,14 @@ class Projectiles(pygame.sprite.Sprite):
         pos = ennemis[0].x, ennemis[0].y
 
 
-        print(angle_min-self.direction%180, self.direction%180)
+        # print(angle_min-self.direction%180, self.direction%180)
 
         # angle1 correspond à l'écart en angle entre le vaisseau et le point (100, 100) compris entre 0 et 180°
         #angle1 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 100, 100))-self.direction))
 
         # angle2 = 180 - abs(180-abs(abs(self.rotation(self.x, self.y, 600, 100))-self.direction))
 
-        if angle_min < 70 and False: # si l'ennemi est dans le "champ de vision"
+        if angle_min < 70 or True: # si l'ennemi est dans le "champ de vision"
 
             # pos = pygame.mouse.get_pos()
             pygame.draw.line(self.window, "orange", (self.x, self.y), (pos[0], pos[1]))

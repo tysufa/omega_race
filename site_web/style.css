@@ -1,0 +1,25 @@
+body
+{
+color : white;
+background-color : black;
+background-image: url("img.png");
+background-position: left top;
+background-attachment: fixed;
+}
+
+#logo
+{
+margin-left: 1em;
+}
+
+
+p
+{
+background-color: black;
+margin : 100px ;
+}
+
+a
+{
+color : #00ff2a;
+}
