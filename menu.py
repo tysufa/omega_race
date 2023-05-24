@@ -52,9 +52,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
-                        
-            if pressed:
-                print("test")
+
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
@@ -68,14 +66,21 @@ class Menu:
                 self.jouer.color = "orange"
                 self.jouer.change_text("Jouer", False)
                 if pressed:
-                    self.game.start_game()
+                    self.select_sound.play()
+                    self.game.reset_game()
+                    self.game.run()
 
             elif self.cartes.rect.collidepoint(pygame.mouse.get_pos()):
                 self.cartes.color = "orange"
                 self.cartes.change_text("Cartes", False)
+                if pressed:
+                    self.select_sound.play()
+                    
             elif self.option.rect.collidepoint(pygame.mouse.get_pos()):
                 self.option.color = "orange"
                 self.option.change_text("Options", False)
+                if pressed:
+                    self.select_sound.play()
                 
             
             self.text_group.draw(self.window)

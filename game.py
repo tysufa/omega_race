@@ -85,13 +85,13 @@ class Game:
         
         self.game_over = GameOver(self.window, self.clock)
 
-        self.test = 0
-        self.test2 = False
+        self.time_after_death = 0
+        self.respawn_after_dying = False
 
         pygame.mixer.music.set_volume(0.4)
     
     
-    def start_game(self):
+    def reset_game(self):
         self.playing_music = False
 
         self.continuer = True
@@ -108,10 +108,11 @@ class Game:
         self.level_text.change_text("Niveau " + str(self.level))
         
         self.player.nb_life = LIFE_NB
+        self.player.alive = True
+        self.player.explosion_anim.show = False
+        self.player.respawn_function()
         
         self.spawn(self.levels[self.level-1])
-        
-        self.run()
         
 
     def wall_collisions(self):
@@ -169,20 +170,17 @@ class Game:
                 for particle in self.ennemis.particle_list:
                     particle.update()
 
-
-            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                self.level+=1
-                self.level_text.change_text("niveau " + str(self.level))
-                self.player.respawn_function()
-                self.respawn()
             
-                if self.test2:
-                    if pygame.time.get_ticks() - self.test > 75 and pygame.time.get_ticks() - self.test < 1000:
-                        pygame.time.delay(1000)
+            self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
+            
+            if self.respawn_after_dying:
+                if pygame.time.get_ticks() - self.time_after_death > 75 and pygame.time.get_ticks() - self.time_after_death < 1000:
+                    pygame.time.delay(1000)
             
         else:
+            print("tset")
             self.respawn()
-            self.test = pygame.time.get_ticks()
+            self.time_after_death = pygame.time.get_ticks() # on appelle cette ligne qu'une seule fois après la mort du joueur
 
         self.score_text.change_text(str(self.score))
 
@@ -209,6 +207,8 @@ class Game:
         if self.player.nb_life >= 0:
             if self.player.respawn:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                    self.level+=1
+                    self.level_text.change_text("niveau " + str(self.level))
                     self.ennemis = Ennemy_list()
                     self.spawn(self.levels[self.level-1])
                 else:
@@ -218,8 +218,8 @@ class Game:
                 self.player.respawn = False
                 self.player.alive = True
                 self.player.projectiles = pygame.sprite.Group()
-                self.test = pygame.time.get_ticks()
-                self.test2 = True
+                self.time_after_death = pygame.time.get_ticks()
+                self.respawn_after_dying = True
         else:
             # on update le meilleur score
             if self.high_score < self.score:
@@ -277,8 +277,11 @@ class Game:
                     exit()
             
             self.game_loop()
-            print("test")
-            if self.continuer:
+            if self.game_over.restart:
+                self.reset_game()
+                self.game_over.restart = False
+                
+            if self.continuer: # évite un clignement à l'écran quand on revient au menu après un game over
                 self.draw()
 
             pygame.display.flip()
@@ -302,6 +305,8 @@ class GameOver:
         self.select_sound = pygame.mixer.Sound("sound/select.wav")
 
         self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
+        
+        self.restart = False
 
         pygame.mixer.music.load(MENU_MUSIC)
 
@@ -327,19 +332,20 @@ class GameOver:
             self.menu.color = "white"
             self.menu.change_text("Menu", False)
             
-            # print(pygame.mouse.get_pressed())
-            
                     
             if self.rejouer.rect.collidepoint(pygame.mouse.get_pos()):
                 self.rejouer.color = "orange"
                 self.rejouer.change_text("Rejouer", False)
                 if pressed:
+                    self.select_sound.play()
+                    self.restart = True
                     continuer = False
 
             elif self.menu.rect.collidepoint(pygame.mouse.get_pos()):
                 self.menu.color = "orange"
                 self.menu.change_text("Menu", False)
                 if pressed:
+                    self.select_sound.play()
                     continuer = False
             
             self.text_group.draw(self.window)
