@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<title>Le developpement</title>
+		<link rel="stylesheet" href="style.css" type="text/css">
+	</head>
+	
+	<body>
+		<p>
+			Dans cette page, nous allons détailler les différents systémes qui composent le jeu, ainsi que les erreurs et raisonements qui ont permi de corriger ces dernières.
+		</p>
+        <h1>Les explications de Philémon :</h1>
+            <h2>Le joueur</h2>
+            <h2>Le menu</h2>
+            <h2>Les graphismes et autres</h2>
+		<h1>Les explications de Léonard :</h1>
+            <h2>Les ennemis</h2>
+                <h3>Les asteroides: la trigonomètrie en panique</h3>
+                    <p>
+                        Les asteroides ne sont pas sensé être des ennemis compliqués. Ils ont une vitesse fixe, une rotation de leur image et une orientation a 360°. Leur mouvement consiste a apliquer le cos et le sin de leur orientation a leur x et y respectivement. Le problème survient au niveau du rebond sur les murs : 
+                        <ul>
+                            <li>Pour un rebond sur l'axe vertical, la trigonomètrie est de notre coté: il suffit de mettre un moins devant notre orientation et celà inverse le sin et par la même notre vélocité y.</li>
+                            <li>En revanche, concernant l'axe horizontal, les chôses se compliquent. En théorie, il suffit d'ajouter pi/2 (soit 90°) à notre orientation pour inverser notre cos et notre vélocité x. Malheuresement, pour une raison qui a l'heure actuelle n'est encore que spéculée, celà ne fonctione qu'une fois sur deux. C'est pourquoi, pour l'instant, les astéroides utilisent une variable senscos, qui vaut 1 ou -1, et qui change en cas de colision horizontale</li>
+                        </ul>
+                    </p>
+                <h3>Les chargeurs: éloigne toi des murs !</h3>
+                <h3>Les tourelles: un bouclier quantique</h3>
+                    <p>
+                        Les tourelles sont des ennemis imobiles, qui s'orientent vers le joueur et lui tirrent dessus à intervalles semi-réguliers (présence d'aléatoire pour éviter que tous les tirs soient simultanés). Rien de très compliqué a programer jusqu'ici. Cepandant nous avons 
+                    </p>
+                <h3>Les mineurs: comment les rendre gérables</h3>
+            <h2>Les niveaux</h2>
+                <h3>Un fichier qui fait tout</h3>
+                <h3>Out of range: différentes solutions</h3>
+            <h2>Le site web</h2>
+        <p>
+            Pour revenir à la page principale, <a href="index.html">cliquez ici</a><br>
+            Pour en apprendre plus sur l'équipe de développement, <a href="groupe.html">cliquez ici</a>
+        </p>
+		
+	</body>
+</html>
