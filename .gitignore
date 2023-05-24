@@ -4,8 +4,6 @@ __pycache__/
 
 .idea
 
-score.txt
-
 *.txt
 
 *.bak

@@ -372,6 +372,8 @@ class Tourelle(Ennemi):
         self.clock=randint(TOURELLE_INITIAL_CLOCK[0],TOURELLE_INITIAL_CLOCK[1])
         self.score_value = TOURELLE_SCORE
 
+        self.base_image = pygame.transform.scale(self.base_image, (80, 80))
+
         #sheild:
         self.shield=shield
         self.shield_anim=Anim(self.x,self.y,9,(64,64),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield.png",False)
