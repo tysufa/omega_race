@@ -37,9 +37,10 @@ class Menu:
 
     def run(self):
         continuer = True
-
+        pressed = False
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
+            pressed = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -47,6 +48,13 @@ class Menu:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         continuer = False
+                        
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]:
+                        pressed = True
+                        
+            if pressed:
+                print("test")
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
@@ -59,8 +67,8 @@ class Menu:
             if self.jouer.rect.collidepoint(pygame.mouse.get_pos()):
                 self.jouer.color = "orange"
                 self.jouer.change_text("Jouer", False)
-                if pygame.mouse.get_pressed()[0] or pygame.key.get_pressed()[pygame.K_RETURN]:
-                    self.game.run()
+                if pressed:
+                    self.game.start_game()
 
             elif self.cartes.rect.collidepoint(pygame.mouse.get_pos()):
                 self.cartes.color = "orange"
@@ -77,40 +85,3 @@ class Menu:
             self.clock.tick(60)
 
 
-class GameOver:
-    def __init__(self, window, clock):
-        self.window = window
-        self.clock = clock
-
-        self.jouer = Text("Jouer", 40, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.jouer.rect.center = SIZE[0] // 2, SIZE[0] // 2
-
-        self.cartes = Text("Cartes", 40, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.cartes.rect.center = SIZE[0] // 2 + 100, SIZE[0] // 2
-
-        self.text_group = pygame.sprite.Group(self.jouer, self.cartes)
-
-        self.select_sound = pygame.mixer.Sound("sound/select.wav")
-
-        self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
-
-        pygame.mixer.music.load(MENU_MUSIC)
-
-    def game_over_loop(self):
-        continuer = True
-
-        while continuer:
-            self.window.blit(self.menu_image, (0, 0))
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        continuer = False
-            
-            self.text_group.draw(self.window)
-            pygame.display.update()
-
-
-            self.clock.tick(60)

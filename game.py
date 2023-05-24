@@ -13,11 +13,11 @@ class Game:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
-        self.game_over = False
         self.playing_music = False
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
+        self.continuer = True
 
         self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png", "image/background/Space Background2.png", "image/background/Space Background3.png", "image/background/Space Background4.png", "image/background/Space Background5.png"]
 
@@ -82,17 +82,37 @@ class Game:
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
-
-        self.in_menu = False
+        
+        self.game_over = GameOver(self.window, self.clock)
 
         self.test = 0
         self.test2 = False
 
         pygame.mixer.music.set_volume(0.4)
-        
-        # self.menu = Menu(self.window, self.clock)
-        # self.game_over_class = GameOver(self.window, self.clock)
+    
+    
+    def start_game(self):
+        self.playing_music = False
 
+        self.continuer = True
+
+        self.background_img = pygame.image.load(random.choice(self.backgrounds))
+
+        self.score = 0
+        with open("score.txt", "r") as fichier:
+            self.high_score = int(fichier.readline())
+
+        self.ennemis = Ennemy_list()
+
+        self.level=1
+        self.level_text.change_text("Niveau " + str(self.level))
+        
+        self.player.nb_life = LIFE_NB
+        
+        self.spawn(self.levels[self.level-1])
+        
+        self.run()
+        
 
     def wall_collisions(self):
         for wall in self.walls:
@@ -129,43 +149,43 @@ class Game:
 
 
     def update(self):
-        if not self.game_over:
-            self.player_group.update(self.window)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
-            if self.player.alive:
-                self.player.ennemis = self.ennemis.tab
-                self.walls.update()
+        self.player_group.update(self.window)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+        if self.player.alive:
+            self.player.ennemis = self.ennemis.tab
+            self.walls.update()
 
-                particule_copy = [particle for particle in self.particles if particle.radius > 0]
-                self.particles = particule_copy
-
-
-                self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
-
-                particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
-                self.player.particles = particule_copy
+            particule_copy = [particle for particle in self.particles if particle.radius > 0]
+            self.particles = particule_copy
 
 
-                for particle in self.player.particles:
-                    particle.update()
+            self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
+
+            particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
+            self.player.particles = particule_copy
+
+
+            for particle in self.player.particles:
+                particle.update()
                 for particle in self.ennemis.particle_list:
                     particle.update()
 
 
-                if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                    self.level+=1
-                    self.level_text.change_text("niveau " + str(self.level))
-                    self.player.respawn_function()
-                    self.respawn()
-
+            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                self.level+=1
+                self.level_text.change_text("niveau " + str(self.level))
+                self.player.respawn_function()
+                self.respawn()
+            
                 if self.test2:
                     if pygame.time.get_ticks() - self.test > 75 and pygame.time.get_ticks() - self.test < 1000:
                         pygame.time.delay(1000)
+            
+        else:
+            self.respawn()
+            self.test = pygame.time.get_ticks()
 
-            else:
-                self.respawn()
-                self.test = pygame.time.get_ticks()
+        self.score_text.change_text(str(self.score))
 
-            self.score_text.change_text(str(self.score))
 
     def decompter (self):
         ret=[0 for i in range(6)]
@@ -201,50 +221,43 @@ class Game:
                 self.test = pygame.time.get_ticks()
                 self.test2 = True
         else:
-            self.game_over_class.game_over_loop()
-
             # on update le meilleur score
             if self.high_score < self.score:
                 with open("score.txt", "w") as fichier:
                     fichier.write(str(self.score))
+                    
+            self.continuer = False
+            self.game_over.run()
+
+
 
     def draw(self):
-        if not self.in_menu:
-            self.window.blit(self.background_img, (0, 0))
+        self.window.blit(self.background_img, (0, 0))
 
-            for i in range(self.player.nb_life):
-                # on affiche un vaisseau pour chaque vie du personnage
-                self.window.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
+        for i in range(self.player.nb_life):
+            # on affiche un vaisseau pour chaque vie du personnage
+            self.window.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
 
-            for wall in self.walls.sprites():
-                if wall.displayed:
-                    wall.draw(self.window)
+        for wall in self.walls.sprites():
+            if wall.displayed:
+                wall.draw(self.window)
 
-            self.player.player_anim.draw(self.window)
-            if self.player.alive:
-                self.player_group.draw(self.window)
+        self.player.player_anim.draw(self.window)
+        if self.player.alive:
+            self.player_group.draw(self.window)
+            
+        self.ennemis.draw()
+        self.player.projectiles.draw(self.window)
 
-            self.ennemis.draw()
-            self.player.projectiles.draw(self.window)
+        self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
 
-            self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
+        for particle in self.player.particles:
+            pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+        for particle in self.ennemis.particle_list:
+            pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
 
-            for particle in self.player.particles:
-                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
-            for particle in self.ennemis.particle_list:
-                pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+        pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
 
-            pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
-
-        if self.game_over:
-            self.window.blit(self.game_over_image, (0, 0))
-
-
-    def menu_loop(self):
-        pass
-        #if self.menu.menu_actions():
-            #pygame.mixer.music.unload()
-            #self.in_menu = False
 
     def game_loop(self):
         keys = pygame.key.get_pressed()
@@ -257,18 +270,81 @@ class Game:
             pygame.mixer.music.play(fade_ms=1000)
 
     def run(self):
-        continuer = True
-        self.spawn(self.levels[self.level-1])
-        while continuer:
+        while self.continuer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
             
             self.game_loop()
-
-            self.draw()
+            print("test")
+            if self.continuer:
+                self.draw()
 
             pygame.display.flip()
 
             self.clock.tick(60)
+            
+
+class GameOver:
+    def __init__(self, window, clock):
+        self.window = window
+        self.clock = clock
+
+        self.rejouer = Text("Rejouer", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 70
+
+        self.menu = Text("Menu", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 70
+
+        self.text_group = pygame.sprite.Group(self.rejouer, self.menu)
+
+        self.select_sound = pygame.mixer.Sound("sound/select.wav")
+
+        self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
+
+        pygame.mixer.music.load(MENU_MUSIC)
+
+        
+        
+    def run(self):
+        continuer = True
+        pressed = False
+        while continuer:
+            self.window.blit(self.menu_image, (0, 0))
+            pressed = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]:
+                        pressed = True
+                    
+            self.rejouer.color = "white"
+            self.rejouer.change_text("Rejouer", False)
+            self.menu.color = "white"
+            self.menu.change_text("Menu", False)
+            
+            # print(pygame.mouse.get_pressed())
+            
+                    
+            if self.rejouer.rect.collidepoint(pygame.mouse.get_pos()):
+                self.rejouer.color = "orange"
+                self.rejouer.change_text("Rejouer", False)
+                if pressed:
+                    continuer = False
+
+            elif self.menu.rect.collidepoint(pygame.mouse.get_pos()):
+                self.menu.color = "orange"
+                self.menu.change_text("Menu", False)
+                if pressed:
+                    continuer = False
+            
+            self.text_group.draw(self.window)
+            pygame.display.update()
+
+
+            self.clock.tick(60)
+
