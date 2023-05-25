@@ -60,9 +60,9 @@ class Anim(pygame.sprite.Sprite):
                 self.frame += 1
                 self.timer = pygame.time.get_ticks()
 
-            if self.frame > self.frame_number:
-                self.frame = -1
-                self.show = False # on n'affiche plus l'animation
+                if self.frame > self.frame_number:
+                    self.frame = 0
+                    self.show = False # on n'affiche plus l'animation
         else:
             self.frame = -1 # on passe à -1 pour n'afficher que du noir et donc ne rien afficher à l'écran
 

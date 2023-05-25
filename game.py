@@ -17,15 +17,16 @@ class Game:
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
+        self.sound_volume = 1
+
         self.continuer = True
 
         self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png", "image/background/Space Background2.png", "image/background/Space Background3.png", "image/background/Space Background4.png", "image/background/Space Background5.png"]
 
         self.background_img = pygame.image.load(random.choice(self.backgrounds))
-        # self.background_img = pygame.image.load(self.backgrounds[-1])
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
         # permet d'obtenir un arrière plan en parti transparent
-        #self.background.fill((255, 255, 255, 220), special_flags=BLEND_RGBA_MULT)
+        # self.background_img.fill((255, 255, 255, 150), special_flags=BLEND_RGBA_MULT)
 
         # on créer une image pour le nombre de vies tourné vers la droite
         self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), - 90)
@@ -86,9 +87,28 @@ class Game:
         self.game_over = GameOver(self.window, self.clock)
 
         self.time_after_death = 0
-        self.respawn_after_dying = False
+        self.respawn_with_pause = False
 
         pygame.mixer.music.set_volume(0.4)
+
+    def pause(self):
+        continuer = True
+
+        pause_text = Text("Pause", 80, 0, 0, "orange")
+        pause_text.rect.center = SIZE[0]//2, SIZE[1]//2
+
+        while continuer:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                if event.type == pygame.KEYDOWN:
+                    if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                        continuer = False
+
+            self.window.blit(pause_text.image, pause_text.rect)
+            pygame.display.flip()
     
     
     def reset_game(self):
@@ -169,18 +189,16 @@ class Game:
                 particle.update()
                 for particle in self.ennemis.particle_list:
                     particle.update()
-
             
-            self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
-            
-            if self.respawn_after_dying:
+            if self.respawn_with_pause:
                 if pygame.time.get_ticks() - self.time_after_death > 75 and pygame.time.get_ticks() - self.time_after_death < 1000:
                     pygame.time.delay(1000)
             
         else:
-            print("tset")
-            self.respawn()
             self.time_after_death = pygame.time.get_ticks() # on appelle cette ligne qu'une seule fois après la mort du joueur
+
+        
+        self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
         self.score_text.change_text(str(self.score))
 
@@ -205,21 +223,24 @@ class Game:
 
     def respawn(self):
         if self.player.nb_life >= 0:
+            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                self.level+=1
+                self.level_text.change_text("niveau " + str(self.level))
+                self.ennemis = Ennemy_list()
+                self.spawn(self.levels[self.level-1])
+                self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+
             if self.player.respawn:
-                if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                    self.level+=1
-                    self.level_text.change_text("niveau " + str(self.level))
-                    self.ennemis = Ennemy_list()
-                    self.spawn(self.levels[self.level-1])
-                else:
-                    tempo_level=self.decompter()
-                    self.ennemis = Ennemy_list()
-                    self.spawn(tempo_level)
+                self.player.respawn_function() # on fait réaparaitre le joueur
+                tempo_level=self.decompter()
+                self.ennemis = Ennemy_list()
+                self.spawn(tempo_level)
+
                 self.player.respawn = False
-                self.player.alive = True
-                self.player.projectiles = pygame.sprite.Group()
+                self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
+                self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
                 self.time_after_death = pygame.time.get_ticks()
-                self.respawn_after_dying = True
+                self.respawn_with_pause = True
         else:
             # on update le meilleur score
             if self.high_score < self.score:
@@ -275,6 +296,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                    
+                if event.type == pygame.KEYDOWN:
+                    if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                        self.pause()
             
             self.game_loop()
             if self.game_over.restart:
