@@ -48,10 +48,11 @@ class Projectiles(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x, self.y))
         self.hitbox.center = self.rect.center
 
+    # devait servir à tirer des roquettes guidées mais elles ne sont pas fonctionnelles
+
+    """
     def rotation(self, xa, ya, xb, yb):
-        """
-        renvoie en degrés la rotation nescaissaire a l'objet (xa,ya) pour être tourné vers (xb,yb)
-        """
+        # renvoie en degrés la rotation nescaissaire a l'objet (xa,ya) pour être tourné vers (xb,yb)
         ret = degrees(acos((xb - xa) / ((xb - xa) ** 2 + (yb - ya) ** 2) ** (1 / 2)))
         if asin((yb - ya) / ((xb - xa) ** 2 + (yb - ya) ** 2) ** (1 / 2)) < 0:
             ret = -ret
@@ -91,3 +92,4 @@ class Projectiles(pygame.sprite.Sprite):
             else:
                 self.bullet_anim.angle -= 3
                 self.direction -= 3
+    """

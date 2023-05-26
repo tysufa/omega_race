@@ -164,32 +164,11 @@ class Player(pygame.sprite.Sprite):
                 for anim in self.player_anim.sprites():
                     anim.rotate("L")
 
-
-            if keys[pygame.K_a]:
-                if not self.reloading:
-                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, window, True))  # on ajoute un nouveau projectile
-                    self.shooting_sound.play()
-                    self.reloading = True  # on passe en rechargement
-                    self.time = pygame.time.get_ticks()
-
             # on update les coordonnées
             self.x += self.velocity.x * self.speed
             self.y -= self.velocity.y * self.speed
 
         else:
-            if pygame.time.get_ticks() - self.death_timer > RESPAWN_TIME:
-                self.x = random.randint(WALL_DISTANCE, SIZE[
-                    0] - WALL_DISTANCE)  # même si l'on touche le mur on sera téléporté à l'intérieur de la fenetre de jeu
-                self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
-                self.hitbox.center = self.x, self.y
-                while self.hitbox.colliderect(self.rect_centre):  # on ne veut pas respawn dans le rectangle au centre
-                    self.x = random.randint(WALL_DISTANCE, SIZE[0] - WALL_DISTANCE)
-                    self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
-                    self.hitbox.center = self.x, self.y
-
-                self.velocity.x = 0
-                self.velocity.y = 0
-                self.respawn = True
             if pygame.time.get_ticks() - self.death_timer >= RESPAWN_TIME:
                 self.respawn_function()
 

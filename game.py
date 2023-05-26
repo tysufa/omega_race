@@ -43,13 +43,13 @@ class Game:
         text1 = Text("score", 24, self.center_square.right - 5, self.center_square.top, "white")
         self.score_text = Text(str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
         text3 = Text("high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
-        text4 = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
+        self.high_score_text = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
                      "white")
 
         self.level_text = Text("niveau 1", 24, self.center_square.center[0], self.center_square.top + 5, "white")
 
         # on créer un groupe qui contient les sprites de text
-        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, text4, self.level_text)
+        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, self.high_score_text, self.level_text)
 
         ##### walls ######
         top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
@@ -123,6 +123,8 @@ class Game:
         with open("score.txt", "r") as fichier:
             self.high_score = int(fichier.readline())
 
+        self.high_score_text.change_text(str(self.high_score))
+
         self.ennemis = Ennemy_list()
 
         self.level=1
@@ -130,11 +132,12 @@ class Game:
 
         self.player.nb_life = LIFE_NB
 
-        self.spawn(self.levels[(self.level-1)%10])
 
+        self.player.respawn_function()
         self.player.alive = True
         self.player.explosion_anim.show = False
-        self.player.respawn_function()
+
+        self.spawn(self.levels[(self.level-1)%10])
 
 
     def wall_collisions(self):
@@ -203,6 +206,11 @@ class Game:
 
         self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
+
+        if self.game_over.restart:
+            self.reset_game()
+            self.game_over.restart = False
+
         self.score_text.change_text(str(self.score))
 
 
@@ -231,38 +239,12 @@ class Game:
         if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
             self.level+=1
             self.level_text.change_text("niveau " + str(self.level))
-            self.ennemis = Ennemy_list()
+            self.ennemis = Ennemy_list() # permet de supprimer les tirs de la liste des ennemis
             self.spawn(self.levels[self.level-1])
-            self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+            self.player.respawn_function()
 
         if self.player.respawn:
-            self.player.respawn_function() # on fait réaparaitre le joueur
-            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                self.ennemis = Ennemy_list()
-                while self.level>10*(self.loop+1):
-                    self.loop+=1
-                level=self.levels[(self.level-1)%10]
-                if self.loop>0:
-                    for i in range(len(level)):
-                        level[i]+=self.levels[10+(self.level-1)%10][i]*self.loop
-                self.spawn(level)
-            else:
-                tempo_level=self.decompter()
-                self.ennemis = Ennemy_list()
-                self.spawn(tempo_level)
-
-            tempo_level=self.decompter()
-            self.ennemis = Ennemy_list()
-            self.spawn(tempo_level)
-            self.player.respawn = False
-            self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
-            self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
-            self.time_after_death = pygame.time.get_ticks()
-            self.respawn_with_pause = True
-
             if self.player.nb_life < 0:
-                if not self.player.respawn:
-                    print("test")
 
                 # on update le meilleur score
                 if self.high_score < self.score:
@@ -272,6 +254,30 @@ class Game:
 
                 self.continuer = False
                 self.game_over.run()
+
+            else:
+                if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                    self.ennemis = Ennemy_list()
+                    while self.level>10*(self.loop+1):
+                        self.loop+=1
+                    level=self.levels[(self.level-1)%10]
+                    if self.loop>0:
+                        for i in range(len(level)):
+                            level[i]+=self.levels[10+(self.level-1)%10][i]*self.loop
+                    self.spawn(level)
+                else:
+                    tempo_level=self.decompter()
+                    self.ennemis = Ennemy_list()
+                    self.spawn(tempo_level)
+
+                tempo_level=self.decompter()
+                self.ennemis = Ennemy_list()
+                self.spawn(tempo_level)
+                self.player.respawn = False
+                self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
+                self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
+                self.time_after_death = pygame.time.get_ticks()
+                self.respawn_with_pause = True
 
 
 
@@ -323,9 +329,6 @@ class Game:
                         self.pause()
 
             self.game_loop()
-            if self.game_over.restart:
-                self.reset_game()
-                self.game_over.restart = False
 
             if self.continuer: # évite un clignement à l'écran quand on revient au menu après un game over
                 self.draw()
