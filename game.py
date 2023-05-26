@@ -131,9 +131,11 @@ class Game:
         self.player.nb_life = LIFE_NB
 
 
+
         self.player.alive = True
         self.player.explosion_anim.show = False
         self.player.respawn_function()
+
         self.spawn(self.levels[(self.level-1)%10])
 
 
