@@ -65,7 +65,17 @@
                     </p>
             <h2>Les niveaux</h2>
                 <h3>Un fichier qui fait tout</h3>
+                    <p>
+                        Les niveaux du jeu sont gérés via un fichier csv. Il y a une variable level, qui contient le nombre entier du niveau ou est le joueur.
+                        Au début du programe, on lit le fichier, et on stoque le tableur dans une matrice.
+                        Quand un niveau est fini, on lit la ligne suivante de la matrice, et on fait apparaitre les ennemis indiqués par la ligne.
+                        Dans le cas où le joueur meurt, on stoque dans une variable temporaire la liste des ennemis encore en vie, et une fois la séquence de mort du joueur terminée, et sa réaparition faite, on fait réaparaitre les ennemis stoqués.
+                    </p>
                 <h3>Out of range: différentes solutions</h3>
+                    <p>
+                        Initialement, lorsque le joueur dépassait un certain niveau, il sortait du tableau et le programme plantait.
+                        Affin de résoudre ce problème, Léonard avait temporairement créé un niveau final composé de 200 chargeurs, empèchant le joueur de progresser au delà. 
+                    </p>
             <h2>Le site web</h2>
         <p>
             Pour revenir à la page principale, <a href="index.html">cliquez ici</a><br>

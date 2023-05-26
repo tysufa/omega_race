@@ -132,10 +132,11 @@ class Game:
 
         self.player.nb_life = LIFE_NB
 
-
         self.player.respawn_function()
         self.player.alive = True
         self.player.explosion_anim.show = False
+
+        self.spawn(self.levels[(self.level-1)%10])
 
         self.spawn(self.levels[(self.level-1)%10])
 
@@ -239,22 +240,18 @@ class Game:
         if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
             self.level+=1
             self.level_text.change_text("niveau " + str(self.level))
-            self.ennemis = Ennemy_list() # permet de supprimer les tirs de la liste des ennemis
-            self.spawn(self.levels[self.level-1])
-            self.player.respawn_function()
+            self.player.respawn_function() # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
 
         if self.player.respawn:
             if self.player.nb_life < 0:
-
                 # on update le meilleur score
                 if self.high_score < self.score:
                     with open("score.txt", "w") as fichier:
                         fichier.write(str(self.score))
-                self.game_over.score = self.score
+                self.game_over.score = self.score # on change le score à afficher dans game over
 
                 self.continuer = False
                 self.game_over.run()
-
             else:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.ennemis = Ennemy_list()
@@ -270,9 +267,6 @@ class Game:
                     self.ennemis = Ennemy_list()
                     self.spawn(tempo_level)
 
-                tempo_level=self.decompter()
-                self.ennemis = Ennemy_list()
-                self.spawn(tempo_level)
                 self.player.respawn = False
                 self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
                 self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
@@ -365,8 +359,8 @@ class GameOver:
         self.restart = False
 
         pygame.mixer.music.load(MENU_MUSIC)
-        
-        
+
+
     def run(self):
         continuer = True
         pressed = False
