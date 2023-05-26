@@ -67,6 +67,7 @@ class Game:
         #### Levels ####
         self.level=1
         self.levels=[]
+        self.loop=0 #nombre de fois que le joueur a fait le tour des niveaux
         import csv
         with open("levels.csv", "r") as fichier:
             ligne = csv.reader(fichier, delimiter=',', quotechar='|')
@@ -83,7 +84,7 @@ class Game:
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
-        
+
         self.game_over = GameOver(self.window, self.clock)
 
         self.time_after_death = 0
@@ -102,15 +103,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                
+
                 if event.type == pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                         continuer = False
 
             self.window.blit(pause_text.image, pause_text.rect)
             pygame.display.flip()
-    
-    
+
+
     def reset_game(self):
         self.playing_music = True
 
@@ -126,14 +127,15 @@ class Game:
 
         self.level=1
         self.level_text.change_text("Niveau " + str(self.level))
-        
+
         self.player.nb_life = LIFE_NB
+
+        self.spawn(self.levels[(self.level-1)%10])
+
         self.player.alive = True
         self.player.explosion_anim.show = False
         self.player.respawn_function()
-        
-        self.spawn(self.levels[self.level-1])
-        
+
 
     def wall_collisions(self):
         for wall in self.walls:
@@ -158,6 +160,8 @@ class Game:
                     self.ennemis.tab.append(Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
                 elif i==5:
                     self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
+                elif i==6:
+                    self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
                 spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
                 self.center_square.width + self.ennemis.tab[-1].hitbox.width,
                 self.center_square.height + self.ennemis.tab[-1].hitbox.height))
@@ -189,29 +193,31 @@ class Game:
                 particle.update()
                 for particle in self.ennemis.particle_list:
                     particle.update()
-            
+
             if self.respawn_with_pause:
                 if pygame.time.get_ticks() - self.time_after_death > 75 and pygame.time.get_ticks() - self.time_after_death < 1000:
                     pygame.time.delay(1000)
-            
+
         else:
             self.time_after_death = pygame.time.get_ticks() # on appelle cette ligne qu'une seule fois après la mort du joueur
 
-        
         self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
         self.score_text.change_text(str(self.score))
 
 
     def decompter (self):
-        ret=[0 for i in range(6)]
+        ret=[0 for i in range(7)]
         for en in self.ennemis.tab :
             if type(en)==Mine:
                 ret[0]+=1
             if type(en)==Asteroid:
                 ret[1]+=1
             if type(en)==Chargeur:
-                ret[2]+=1
+                if en.shield:
+                    ret[6]+=1
+                else:
+                    ret[2]+=1
             if type(en)==Tourelle:
                 if en.shield:
                     ret[5]+=1
@@ -222,33 +228,50 @@ class Game:
         return ret
 
     def respawn(self):
-        if self.player.nb_life >= 0:
-            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                self.level+=1
-                self.level_text.change_text("niveau " + str(self.level))
-                self.ennemis = Ennemy_list()
-                self.spawn(self.levels[self.level-1])
-                self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+        if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+            self.level+=1
+            self.level_text.change_text("niveau " + str(self.level))
+            self.ennemis = Ennemy_list()
+            self.spawn(self.levels[self.level-1])
+            self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
 
-            if self.player.respawn:
-                self.player.respawn_function() # on fait réaparaitre le joueur
+        if self.player.respawn:
+            self.player.respawn_function() # on fait réaparaitre le joueur
+            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+                self.ennemis = Ennemy_list()
+                while self.level>10*(self.loop+1):
+                    self.loop+=1
+                level=self.levels[(self.level-1)%10]
+                if self.loop>0:
+                    for i in range(len(level)):
+                        level[i]+=self.levels[10+(self.level-1)%10][i]*self.loop
+                self.spawn(level)
+            else:
                 tempo_level=self.decompter()
                 self.ennemis = Ennemy_list()
                 self.spawn(tempo_level)
 
-                self.player.respawn = False
-                self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
-                self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
-                self.time_after_death = pygame.time.get_ticks()
-                self.respawn_with_pause = True
-        else:
-            # on update le meilleur score
-            if self.high_score < self.score:
-                with open("score.txt", "w") as fichier:
-                    fichier.write(str(self.score))
-                    
-            self.continuer = False
-            self.game_over.run()
+            tempo_level=self.decompter()
+            self.ennemis = Ennemy_list()
+            self.spawn(tempo_level)
+            self.player.respawn = False
+            self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
+            self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
+            self.time_after_death = pygame.time.get_ticks()
+            self.respawn_with_pause = True
+
+            if self.player.nb_life < 0:
+                if not self.player.respawn:
+                    print("test")
+
+                # on update le meilleur score
+                if self.high_score < self.score:
+                    with open("score.txt", "w") as fichier:
+                        fichier.write(str(self.score))
+                self.game_over.score = self.score
+
+                self.continuer = False
+                self.game_over.run()
 
 
 
@@ -266,7 +289,7 @@ class Game:
         self.player.player_anim.draw(self.window)
         if self.player.alive:
             self.player_group.draw(self.window)
-            
+
         self.ennemis.draw()
         self.player.projectiles.draw(self.window)
 
@@ -295,41 +318,47 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                    
                 if event.type == pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                         self.pause()
-            
+
             self.game_loop()
             if self.game_over.restart:
                 self.reset_game()
                 self.game_over.restart = False
-                
+
             if self.continuer: # évite un clignement à l'écran quand on revient au menu après un game over
                 self.draw()
 
             pygame.display.flip()
 
             self.clock.tick(60)
-            
+
 
 class GameOver:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
+        self.score = 0
+
+        self.game_over_text = Text("Game Over", 90, SIZE[0] // 2, SIZE[1] // 2, "red")
+        self.game_over_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 250
+
+        self.score_text = Text("Score : " + str(self.score), 60, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
 
         self.rejouer = Text("Rejouer", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 70
+        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 50
 
         self.menu = Text("Menu", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 70
+        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 150
 
-        self.text_group = pygame.sprite.Group(self.rejouer, self.menu)
+        self.text_group = pygame.sprite.Group(self.rejouer, self.menu, self.game_over_text, self.score_text)
 
         self.select_sound = pygame.mixer.Sound("sound/select.wav")
 
         self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
-        
+
         self.restart = False
 
         pygame.mixer.music.load(MENU_MUSIC)
@@ -338,6 +367,8 @@ class GameOver:
     def run(self):
         continuer = True
         pressed = False
+        self.score_text.change_text("Score : " + str(self.score), False)
+        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
             pressed = False
@@ -345,17 +376,15 @@ class GameOver:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
-                    
+
             self.rejouer.color = "white"
             self.rejouer.change_text("Rejouer", False)
             self.menu.color = "white"
             self.menu.change_text("Menu", False)
-            
-                    
             if self.rejouer.rect.collidepoint(pygame.mouse.get_pos()):
                 self.rejouer.color = "orange"
                 self.rejouer.change_text("Rejouer", False)
@@ -370,7 +399,7 @@ class GameOver:
                 if pressed:
                     self.select_sound.play()
                     continuer = False
-            
+
             self.text_group.draw(self.window)
             pygame.display.update()
 

@@ -10,7 +10,7 @@ pygame.init()
 class Menu:
     def __init__(self):
         self.window = pygame.display.set_mode(SIZE)
-        
+
         self.music_volume = 100
         self.sound_volume = 100
 
@@ -99,7 +99,7 @@ class Menu:
 
             pygame.draw.rect(self.window, "#5a5a5a", sound_rod, 0, 4)
             pygame.draw.rect(self.window, "white", sound_rod_border, 3)
-            
+
             self.option_text_group.draw(self.window)
             pygame.display.flip()
 
@@ -113,7 +113,6 @@ class Menu:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                        
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
@@ -135,21 +134,20 @@ class Menu:
                     self.select_sound.play()
                     self.game.reset_game()
                     self.game.run()
-
             elif self.cartes_text.rect.collidepoint(pygame.mouse.get_pos()):
                 self.cartes_text.color = "orange"
                 self.cartes_text.change_text("Cartes", False)
                 if pressed:
                     self.select_sound.play()
-                    
+
             elif self.option_text.rect.collidepoint(pygame.mouse.get_pos()):
                 self.option_text.color = "orange"
                 self.option_text.change_text("Options", False)
                 if pressed:
                     self.select_sound.play()
                     self.option()
-                
-            
+
+
             self.menu_text_group.draw(self.window)
             pygame.display.update()
 
