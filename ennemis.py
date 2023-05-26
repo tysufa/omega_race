@@ -158,7 +158,7 @@ class Ennemi:
 class Mine(Ennemi):  # La mine est un cercle blanc immobile.
     def __init__(self, x, y, WINDOW, rect):
         super().__init__(x, y, WINDOW, rect, "image/mine/mine1.png",False,False,(30,30))
-        self.score_value=15
+        self.score_value=50
 
         self.anim= Anim(self.x, self.y, 1, (32, 32), 400,
                                    "image/mine/mines2.png", True)

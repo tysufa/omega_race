@@ -32,11 +32,14 @@ class Menu:
         self.sound_text = Text("Sons :", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
         self.sound_text.rect.center = SIZE[0]//2 - 200, 400
 
+        self.reset_high_score_text = Text("Reset high score", 50, SIZE[0] // 2, SIZE[1] // 2, "#b93535")
+        self.reset_high_score_text.rect.center = SIZE[0] // 2, 550
+
         self.percentage_music_text = Text(str(int(self.music_volume)) + "%", 50, SIZE[0] // 2 + 200 + 70, 200-25, "white")
         self.percentage_sound_text = Text(str(int(self.music_volume)) + "%", 50, SIZE[0] // 2 + 200 + 70, 400-25, "white")
 
         self.menu_text_group = pygame.sprite.Group(self.title, self.jouer, self.option_text)
-        self.option_text_group = pygame.sprite.Group(self.title, self.music_text, self.sound_text, self.percentage_music_text, self.percentage_sound_text)
+        self.option_text_group = pygame.sprite.Group(self.title, self.music_text, self.sound_text, self.percentage_music_text, self.percentage_sound_text, self.reset_high_score_text)
 
         self.select_sound = pygame.mixer.Sound("sound/select.wav")
 
@@ -94,6 +97,19 @@ class Menu:
                     self.select_sound.set_volume(self.sound_volume/100)
                     self.percentage_sound_text.change_text(str(int(self.sound_volume)) + "%")
 
+                if self.reset_high_score_text.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.select_sound.play()
+                    with open("score.txt", "w") as fichier:
+                        fichier.write("0")
+                    self.game.high_score = 0
+
+            self.reset_high_score_text.color = "#b93535"
+            self.reset_high_score_text.change_text("Reset high score", False)
+
+            if self.reset_high_score_text.rect.collidepoint(pygame.mouse.get_pos()):
+                self.reset_high_score_text.color = "#ff2b2b"
+                self.reset_high_score_text.change_text("Reset high score", False)
+  
 
             pygame.draw.rect(self.window, "#5a5a5a", music_rod, 0, 4)
             pygame.draw.rect(self.window, "white", music_rod_border, 3)
