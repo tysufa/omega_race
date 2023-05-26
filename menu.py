@@ -24,7 +24,7 @@ class Menu:
         self.cartes_text.rect.center = SIZE[0] // 2, 400
 
         self.option_text = Text("options", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.option_text.rect.center = SIZE[0] // 2, 500
+        self.option_text.rect.center = SIZE[0] // 2, 450
 
         self.music_text = Text("Musique :", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
         self.music_text.rect.center = SIZE[0]//2 - 200, 200
@@ -35,7 +35,7 @@ class Menu:
         self.percentage_music_text = Text(str(int(self.music_volume)) + "%", 50, SIZE[0] // 2 + 200 + 70, 200-25, "white")
         self.percentage_sound_text = Text(str(int(self.music_volume)) + "%", 50, SIZE[0] // 2 + 200 + 70, 400-25, "white")
 
-        self.menu_text_group = pygame.sprite.Group(self.title, self.jouer, self.cartes_text, self.option_text)
+        self.menu_text_group = pygame.sprite.Group(self.title, self.jouer, self.option_text)
         self.option_text_group = pygame.sprite.Group(self.title, self.music_text, self.sound_text, self.percentage_music_text, self.percentage_sound_text)
 
         self.select_sound = pygame.mixer.Sound("sound/select.wav")
@@ -43,6 +43,7 @@ class Menu:
         self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
 
         pygame.mixer.music.load(MENU_MUSIC)
+        self.music = "menu"
 
         self.clock = pygame.time.Clock()
 
@@ -120,8 +121,8 @@ class Menu:
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
-            self.cartes_text.color = "white"
-            self.cartes_text.change_text("Cartes", False)
+            # self.cartes_text.color = "white"
+            # self.cartes_text.change_text("Cartes", False)
             self.option_text.color = "white"
             self.option_text.change_text("Options", False)
 
@@ -130,15 +131,15 @@ class Menu:
                 self.jouer.color = "orange"
                 self.jouer.change_text("Jouer", False)
                 if pressed:
-                    pygame.mixer.music.unload()
+                    if self.music == "menu":
+                        pygame.mixer.music.unload()
+                        pygame.mixer.music.load(GAME_MUSIC)
+                        pygame.mixer.music.play(loops=-1, fade_ms=1000)
+                        self.music = "jeu"
+
                     self.select_sound.play()
                     self.game.reset_game()
                     self.game.run()
-            elif self.cartes_text.rect.collidepoint(pygame.mouse.get_pos()):
-                self.cartes_text.color = "orange"
-                self.cartes_text.change_text("Cartes", False)
-                if pressed:
-                    self.select_sound.play()
 
             elif self.option_text.rect.collidepoint(pygame.mouse.get_pos()):
                 self.option_text.color = "orange"
@@ -146,6 +147,15 @@ class Menu:
                 if pressed:
                     self.select_sound.play()
                     self.option()
+
+            """        
+            elif self.cartes_text.rect.collidepoint(pygame.mouse.get_pos()):
+                self.cartes_text.color = "orange"
+                self.cartes_text.change_text("Cartes", False)
+                if pressed:
+                    self.select_sound.play()
+            """
+
 
 
             self.menu_text_group.draw(self.window)
