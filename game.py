@@ -233,8 +233,6 @@ class Game:
             if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                 self.level+=1
                 self.level_text.change_text("niveau " + str(self.level))
-                self.ennemis = Ennemy_list()
-                self.spawn(self.levels[self.level-1])
                 self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
 
             if self.player.respawn:
@@ -252,10 +250,6 @@ class Game:
                     tempo_level=self.decompter()
                     self.ennemis = Ennemy_list()
                     self.spawn(tempo_level)
-
-                tempo_level=self.decompter()
-                self.ennemis = Ennemy_list()
-                self.spawn(tempo_level)
                 self.player.respawn = False
                 self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
                 self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur

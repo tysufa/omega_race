@@ -421,7 +421,7 @@ class Tourelle(Ennemi):
 
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
-        if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y) :
+        if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
             liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
             self.clock=randint(TOURELLE_NEW_CLOCK[0],TOURELLE_NEW_CLOCK[1])
         self.clock+=-1
