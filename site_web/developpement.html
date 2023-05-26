@@ -21,11 +21,11 @@
                 <h3>Les asteroides: la trigonomètrie en panique</h3>
                     <p>
                         Les asteroides ne sont pas sensé être des ennemis compliqués. Ils ont une vitesse fixe, une rotation de leur image et une orientation a 360°. Leur mouvement consiste a apliquer le cos et le sin de leur orientation a leur x et y respectivement. Le problème survient au niveau du rebond sur les murs : 
+                    </p>
                         <ul>
                             <li>Pour un rebond sur l'axe vertical, la trigonomètrie est de notre coté: il suffit de mettre un moins devant notre orientation et celà inverse le sin et par la même notre vélocité y.</li>
                             <li>En revanche, concernant l'axe horizontal, les chôses se compliquent. A l'origine, les astéroides utilisaient une variable senscos, qui valait 1 ou -1, qui changeait en cas de colision horizontale et qui multipliait la vélocité x. Maintenant que Léonard à relu son cours de trigonométrie, senscos n'existe plus et on applique rotation=180-rotation affin d'inverser le cos et la vélocité x.</li>
                         </ul>
-                    </p>
                 <h3>Les chargeurs: trois états</h3>
                     <p>
                         Léonard tenait à créer un ennemi qui foncerait sur le joueur. Ce n'était en soit pas compliqué du tout : il n'avait qu'a récuperer le code de ses tourelles pour que les chargeurs s'orientent vers le joueur, et le code des asteroides pour quils avancent dans la direction où ils regardent.
@@ -67,14 +67,20 @@
                 <h3>Un fichier qui fait tout</h3>
                     <p>
                         Les niveaux du jeu sont gérés via un fichier csv. Il y a une variable level, qui contient le nombre entier du niveau ou est le joueur.
-                        Au début du programe, on lit le fichier, et on stoque le tableur dans une matrice.
+                        <br><br>Au début du programe, on lit le fichier, et on stoque le tableur dans une matrice.
                         Quand un niveau est fini, on lit la ligne suivante de la matrice, et on fait apparaitre les ennemis indiqués par la ligne.
-                        Dans le cas où le joueur meurt, on stoque dans une variable temporaire la liste des ennemis encore en vie, et une fois la séquence de mort du joueur terminée, et sa réaparition faite, on fait réaparaitre les ennemis stoqués.
+                        <br><br>Dans le cas où le joueur meurt, on stoque dans une variable temporaire la liste des ennemis encore en vie, et une fois la séquence de mort du joueur terminée, et sa réaparition faite, on fait réaparaitre les ennemis stoqués.
                     </p>
                 <h3>Out of range: différentes solutions</h3>
                     <p>
                         Initialement, lorsque le joueur dépassait un certain niveau, il sortait du tableau et le programme plantait.
-                        Affin de résoudre ce problème, Léonard avait temporairement créé un niveau final composé de 200 chargeurs, empèchant le joueur de progresser au delà. 
+                        Affin de résoudre ce problème, Léonard avait temporairement créé un niveau final composé de 200 chargeurs, empèchant le joueur de progresser au delà.
+                        <br><br>Ceci n'étant évidement pas une solution à long terme, il à ensuite été proposé de tout simplement étirer le tableur pour avoir 100 niveaux avec une augmentation des ennemis à chaque niveau, mais celà posait 2 problèmes:
+                        Les niveaux n'étaient plus conçus à la main et à la place un simple "+1 a chaque type d'ennemi"
+                        Et, si jamais le joueur parvenait (par miracle hein parce que 80 chargeurs et 70 tourelles + 70 autres avec un bouclier c'est un défi quand même) à finir le niveau 100, il serait simplement récompensé par un plantage.
+                        <br><br>Finalement, la solution mise en place fut celle ci:<br><br>
+                        Au delà du niveau 10, on revient au niveau 1 (on charge le niveau[level modulo 10]) et on ajoute un certain nombre d'ennemis
+                        <br><br> Par exemple, pour le niveau 22, on charge la ligne 2 soit le niveau 2 auquel on ajoute 2 fois la ligne 12 qui est ce qu'il faut rajouter au niveau 2 à chaque dizaine de niveau.
                     </p>
             <h2>Le site web</h2>
         <p>
