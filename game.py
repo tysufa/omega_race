@@ -13,7 +13,7 @@ class Game:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
-        self.playing_music = False
+        self.playing_music = True
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
@@ -112,7 +112,7 @@ class Game:
     
     
     def reset_game(self):
-        self.playing_music = False
+        self.playing_music = True
 
         self.continuer = True
 
@@ -281,7 +281,6 @@ class Game:
 
 
     def game_loop(self):
-        keys = pygame.key.get_pressed()
 
         self.update()
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
@@ -334,7 +333,6 @@ class GameOver:
         self.restart = False
 
         pygame.mixer.music.load(MENU_MUSIC)
-
         
         
     def run(self):

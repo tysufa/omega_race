@@ -48,6 +48,8 @@ class Menu:
 
         self.game = Game(self.window, self.clock)
 
+        pygame.mixer.music.play()
+
 
     def option(self):
         continuer = True
@@ -59,6 +61,7 @@ class Menu:
         sound_rod = pygame.rect.Rect(SIZE[0]//2 - 50, 400-25//2, 200, 25)
         sound_rod_border = pygame.rect.Rect(SIZE[0]//2 - 50, 400-25//2, 200, 25)
         sound_rod.width = self.sound_volume*2
+
 
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
@@ -128,6 +131,7 @@ class Menu:
                 self.jouer.color = "orange"
                 self.jouer.change_text("Jouer", False)
                 if pressed:
+                    pygame.mixer.music.unload()
                     self.select_sound.play()
                     self.game.reset_game()
                     self.game.run()
