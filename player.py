@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
 
         self.alive = True
         self.nb_life = LIFE_NB
-        self.respawn = False
+        self.respawn = False # sert dans game pour faire respawn les niveaux et le joueur
 
         self.engine_anim = Anim(self.x, self.y, 11, (64, 64), 50,
                                 "image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False)
@@ -64,6 +64,12 @@ class Player(pygame.sprite.Sprite):
             SIZE[1] - WALL_DISTANCE * 2))  # on créer un rectangle qui prend toute la fenetre
 
         self.particles = []
+
+    def set_sound(self, sound_volume):
+        self.shooting_sound.set_volume(0.15 * sound_volume)
+        self.explosion_sound.set_volume(0.3 * sound_volume)
+        self.bouncing_sound.set_volume(1 * sound_volume)
+        self.dissapearing_sound.set_volume(0.05 * sound_volume)
 
     def dispawn_projectile(self, projectile):
         self.particles = create_particle_list(15, projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5)
