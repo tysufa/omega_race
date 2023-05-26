@@ -13,7 +13,6 @@ class Game:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
-        self.playing_music = True
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
@@ -90,7 +89,6 @@ class Game:
         self.time_after_death = 0
         self.respawn_with_pause = False
 
-        pygame.mixer.music.set_volume(0.4)
 
     def pause(self):
         continuer = True
@@ -113,7 +111,6 @@ class Game:
 
 
     def reset_game(self):
-        self.playing_music = True
 
         self.continuer = True
 
@@ -135,8 +132,6 @@ class Game:
         self.player.respawn_function()
         self.player.alive = True
         self.player.explosion_anim.show = False
-
-        self.spawn(self.levels[(self.level-1)%10])
 
         self.spawn(self.levels[(self.level-1)%10])
 
@@ -308,9 +303,6 @@ class Game:
         self.update()
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
 
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.load(GAME_MUSIC)
-            pygame.mixer.music.play(fade_ms=1000)
 
     def run(self):
         while self.continuer:

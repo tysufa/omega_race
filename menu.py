@@ -133,6 +133,8 @@ class Menu:
                 if pressed:
                     if self.music == "menu":
                         pygame.mixer.music.unload()
+                        pygame.mixer.music.load(GAME_MUSIC)
+                        pygame.mixer.music.play(loops=-1, fade_ms=1000)
                         self.music = "jeu"
 
                     self.select_sound.play()
