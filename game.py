@@ -13,7 +13,7 @@ class Game:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
-        self.playing_music = False
+        self.playing_music = True
         self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
@@ -113,7 +113,7 @@ class Game:
 
 
     def reset_game(self):
-        self.playing_music = False
+        self.playing_music = True
 
         self.continuer = True
 
@@ -130,11 +130,11 @@ class Game:
 
         self.player.nb_life = LIFE_NB
 
-        self.spawn(self.levels[(self.level-1)%10])
 
         self.player.alive = True
         self.player.explosion_anim.show = False
         self.player.respawn_function()
+        self.spawn(self.levels[(self.level-1)%10])
 
 
     def wall_collisions(self):
@@ -201,7 +201,6 @@ class Game:
         else:
             self.time_after_death = pygame.time.get_ticks() # on appelle cette ligne qu'une seule fois après la mort du joueur
 
-
         self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
         self.score_text.change_text(str(self.score))
@@ -229,14 +228,22 @@ class Game:
         return ret
 
     def respawn(self):
-        if self.player.nb_life >= 0:
-            if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                self.level+=1
-                self.level_text.change_text("niveau " + str(self.level))
-                self.player.respawn = True # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+        if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
+            self.level+=1
+            self.level_text.change_text("niveau " + str(self.level))
+            self.player.respawn_function() # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
 
-            if self.player.respawn:
-                self.player.respawn_function() # on fait réaparaitre le joueur
+        if self.player.respawn:
+            if self.player.nb_life < 0:
+                # on update le meilleur score
+                if self.high_score < self.score:
+                    with open("score.txt", "w") as fichier:
+                        fichier.write(str(self.score))
+                self.game_over.score = self.score
+
+                self.continuer = False
+                self.game_over.run()
+            else:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.ennemis = Ennemy_list()
                     while self.level>10*(self.loop+1):
@@ -255,14 +262,6 @@ class Game:
                 self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
                 self.time_after_death = pygame.time.get_ticks()
                 self.respawn_with_pause = True
-        else:
-            # on update le meilleur score
-            if self.high_score < self.score:
-                with open("score.txt", "w") as fichier:
-                    fichier.write(str(self.score))
-
-            self.continuer = False
-            self.game_over.run()
 
 
 
@@ -295,7 +294,6 @@ class Game:
 
 
     def game_loop(self):
-        keys = pygame.key.get_pressed()
 
         self.update()
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
@@ -331,14 +329,21 @@ class GameOver:
     def __init__(self, window, clock):
         self.window = window
         self.clock = clock
+        self.score = 0
+
+        self.game_over_text = Text("Game Over", 90, SIZE[0] // 2, SIZE[1] // 2, "red")
+        self.game_over_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 250
+
+        self.score_text = Text("Score : " + str(self.score), 60, SIZE[0] // 2, SIZE[1] // 2, "white")
+        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
 
         self.rejouer = Text("Rejouer", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 70
+        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 50
 
         self.menu = Text("Menu", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 70
+        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 150
 
-        self.text_group = pygame.sprite.Group(self.rejouer, self.menu)
+        self.text_group = pygame.sprite.Group(self.rejouer, self.menu, self.game_over_text, self.score_text)
 
         self.select_sound = pygame.mixer.Sound("sound/select.wav")
 
@@ -349,10 +354,11 @@ class GameOver:
         pygame.mixer.music.load(MENU_MUSIC)
 
 
-
     def run(self):
         continuer = True
         pressed = False
+        self.score_text.change_text("Score : " + str(self.score), False)
+        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
             pressed = False

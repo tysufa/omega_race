@@ -69,7 +69,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                     self.tempo = pygame.time.get_ticks()
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
-                if self.tab[i].killbox.colliderect(player.hitbox):  # si ils touchent le joueur, on tue ce dernier.
+                if self.tab[i].killbox.colliderect(player.hitbox) and player.alive:  # si ils touchent le joueur, on tue ce dernier.
                     player.die()
                 if type(self.tab[i])==Miner:
                     if self.tab[i].mines<1:
