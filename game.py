@@ -66,6 +66,7 @@ class Game:
         #### Levels ####
         self.level=1
         self.levels=[]
+        self.loop=0 #nombre de fois que le joueur a fait le tour des niveaux
         import csv
         with open("levels.csv", "r") as fichier:
             ligne = csv.reader(fichier, delimiter=',', quotechar='|')
@@ -82,15 +83,15 @@ class Game:
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
-        
+
         self.game_over = GameOver(self.window, self.clock)
 
         self.test = 0
         self.test2 = False
 
         pygame.mixer.music.set_volume(0.4)
-    
-    
+
+
     def start_game(self):
         self.playing_music = False
 
@@ -106,13 +107,13 @@ class Game:
 
         self.level=1
         self.level_text.change_text("Niveau " + str(self.level))
-        
+
         self.player.nb_life = LIFE_NB
-        
-        self.spawn(self.levels[self.level-1])
-        
+
+        self.spawn(self.levels[(self.level-1)%10])
+
         self.run()
-        
+
 
     def wall_collisions(self):
         for wall in self.walls:
@@ -137,6 +138,8 @@ class Game:
                     self.ennemis.tab.append(Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
                 elif i==5:
                     self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
+                elif i==6:
+                    self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
                 spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
                 self.center_square.width + self.ennemis.tab[-1].hitbox.width,
                 self.center_square.height + self.ennemis.tab[-1].hitbox.height))
@@ -175,11 +178,11 @@ class Game:
                 self.level_text.change_text("niveau " + str(self.level))
                 self.player.respawn_function()
                 self.respawn()
-            
+
                 if self.test2:
                     if pygame.time.get_ticks() - self.test > 75 and pygame.time.get_ticks() - self.test < 1000:
                         pygame.time.delay(1000)
-            
+
         else:
             self.respawn()
             self.test = pygame.time.get_ticks()
@@ -188,14 +191,17 @@ class Game:
 
 
     def decompter (self):
-        ret=[0 for i in range(6)]
+        ret=[0 for i in range(7)]
         for en in self.ennemis.tab :
             if type(en)==Mine:
                 ret[0]+=1
             if type(en)==Asteroid:
                 ret[1]+=1
             if type(en)==Chargeur:
-                ret[2]+=1
+                if en.shield:
+                    ret[6]+=1
+                else:
+                    ret[2]+=1
             if type(en)==Tourelle:
                 if en.shield:
                     ret[5]+=1
@@ -210,7 +216,13 @@ class Game:
             if self.player.respawn:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.ennemis = Ennemy_list()
-                    self.spawn(self.levels[self.level-1])
+                    while self.level>10*(self.loop+1):
+                        self.loop+=1
+                    level=self.levels[(self.level-1)%10]
+                    if self.loop>0:
+                        for i in range(len(level)):
+                            level[i]+=self.levels[10+(self.level-1)%10][i]*self.loop
+                    self.spawn(level)
                 else:
                     tempo_level=self.decompter()
                     self.ennemis = Ennemy_list()
@@ -225,7 +237,7 @@ class Game:
             if self.high_score < self.score:
                 with open("score.txt", "w") as fichier:
                     fichier.write(str(self.score))
-                    
+
             self.continuer = False
             self.game_over.run()
 
@@ -245,7 +257,7 @@ class Game:
         self.player.player_anim.draw(self.window)
         if self.player.alive:
             self.player_group.draw(self.window)
-            
+
         self.ennemis.draw()
         self.player.projectiles.draw(self.window)
 
@@ -275,16 +287,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-            
+
             self.game_loop()
-            print("test")
             if self.continuer:
                 self.draw()
 
             pygame.display.flip()
 
             self.clock.tick(60)
-            
+
 
 class GameOver:
     def __init__(self, window, clock):
@@ -305,8 +316,8 @@ class GameOver:
 
         pygame.mixer.music.load(MENU_MUSIC)
 
-        
-        
+
+
     def run(self):
         continuer = True
         pressed = False
@@ -317,19 +328,19 @@ class GameOver:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
-                    
+
             self.rejouer.color = "white"
             self.rejouer.change_text("Rejouer", False)
             self.menu.color = "white"
             self.menu.change_text("Menu", False)
-            
+
             # print(pygame.mouse.get_pressed())
-            
-                    
+
+
             if self.rejouer.rect.collidepoint(pygame.mouse.get_pos()):
                 self.rejouer.color = "orange"
                 self.rejouer.change_text("Rejouer", False)
@@ -341,7 +352,7 @@ class GameOver:
                 self.menu.change_text("Menu", False)
                 if pressed:
                     continuer = False
-            
+
             self.text_group.draw(self.window)
             pygame.display.update()
 

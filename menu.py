@@ -48,13 +48,11 @@ class Menu:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         continuer = False
-                        
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
-                        
-            if pressed:
-                print("test")
+
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
@@ -76,8 +74,8 @@ class Menu:
             elif self.option.rect.collidepoint(pygame.mouse.get_pos()):
                 self.option.color = "orange"
                 self.option.change_text("Options", False)
-                
-            
+
+
             self.text_group.draw(self.window)
             pygame.display.update()
 
