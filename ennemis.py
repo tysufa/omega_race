@@ -43,6 +43,7 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.particle_list = []
         self.tempo = pygame.time.get_ticks()
         self.only_bullet = False
+        self.screenshake = 0
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -62,6 +63,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                 elif self.tab[i].colide(proj.rect) and self.tab[i].alive:  # si l'ennemi est en colision avec le projectile
                     self.particle_list = create_particle_list(15, proj.rect.x, proj.rect.y, randint(4, 6), 2, 2, 0.3, 0.5)
                     self.tab[i].alive = False
+                    self.screenshake = 10 # on secoue l'écran pendant 10 frames
                     if not self.tab[i].is_bullet:
                         self.explosion_sound.play()
                         score += self.tab[i].score_value
@@ -92,6 +94,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
                 self.tab[i].death_anim()
+
 
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 

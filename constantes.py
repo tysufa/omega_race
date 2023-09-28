@@ -2,7 +2,6 @@ FONT = "Comic Sans MS"
 SIZE = (1080, 720)
 WALL_DISTANCE = 10 # écart entre les murs et les bords de l'écran
 BACKGROUND_IMAGE = "image/background/Space Background3.png"
-GAME_FONT = "Comic Sans MS"
 GAME_MUSIC = "music/Race to Mars.mp3"
 MENU_MUSIC = "music/Checking Manifest.mp3"
 TITLE = "Omega Race"

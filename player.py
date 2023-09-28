@@ -147,7 +147,7 @@ class Player(pygame.sprite.Sprite):
                 self.move()  # on se déplace
                 self.engine_anim.show = True  # on veut afficher l'animation des réacteurs
 
-            if keys[pygame.K_z]:
+            if keys[pygame.K_z] or keys[pygame.K_SPACE]:
                 if not self.reloading:
                     self.projectiles.add(Projectiles(self.x, self.y, self.angle, window))  # on ajoute un nouveau projectile
                     self.shooting_sound.play()
