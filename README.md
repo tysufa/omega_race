@@ -199,16 +199,16 @@ Project Link: [https://github.com/tysufa/omega_race](https://github.com/tysufa/o
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/tysufa/qfa.svg?style=for-the-badge
-[contributors-url]: https://github.com/tysufa/qfa/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/tysufa/qfa.svg?style=for-the-badge
-[forks-url]: https://github.com/tysufa/qfa/network/members
-[stars-shield]: https://img.shields.io/github/stars/tysufa/qfa.svg?style=for-the-badge
-[stars-url]: https://github.com/tysufa/qfa/stargazers
-[issues-shield]: https://img.shields.io/github/issues/tysufa/qfa.svg?style=for-the-badge
-[issues-url]: https://github.com/tysufa/qfa/issues
-[license-shield]: https://img.shields.io/github/license/tysufa/qfa.svg?style=for-the-badge
-[license-url]: https://github.com/tysufa/qfa/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/tysufa/omega_race.svg?style=for-the-badge
+[contributors-url]: https://github.com/tysufa/omega_race/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/tysufa/omega_race.svg?style=for-the-badge
+[forks-url]: https://github.com/tysufa/omega_race/network/members
+[stars-shield]: https://img.shields.io/github/stars/tysufa/omega_race.svg?style=for-the-badge
+[stars-url]: https://github.com/tysufa/omega_race/stargazers
+[issues-shield]: https://img.shields.io/github/issues/tysufa/omega_race.svg?style=for-the-badge
+[issues-url]: https://github.com/tysufa/omega_race/issues
+[license-shield]: https://img.shields.io/github/license/tysufa/omega_race.svg?style=for-the-badge
+[license-url]: https://github.com/tysufa/omega_race/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
