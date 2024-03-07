@@ -32,7 +32,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/tysufa/qfa">
-    <img src="images/logo.jpgg" alt="Logo" width="80" height="80">
+    <img src="images/logo.jpg" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">OMEGA RACE</h3>
