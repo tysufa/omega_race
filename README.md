@@ -108,7 +108,10 @@ To get a local copy up and running follow these simple example steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 * Download [python](https://www.python.org/)
-* TODO: add instructions for pygame/use pyenv so that there is no need for it
+* Download pipenv
+  ```sh
+  pip install pipenv
+  ```
 
 ### Installation
 1. Clone the repo
@@ -117,6 +120,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 2. Start
    ```sh
+   pipenv shell
    python3 main.py
    ```
 
