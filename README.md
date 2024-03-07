@@ -1,3 +1,4 @@
+
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 <!--
@@ -34,10 +35,10 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">QFA</h3>
+<h3 align="center">OMEGA RACE</h3>
 
   <p align="center">
-    The best programming language
+    A retro game revisited for a school project
     <br />
     <a href="https://github.com/tysufa/qfa"><strong>Explore the docs »</strong></a>
     <br />
@@ -85,14 +86,14 @@
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 
-This is a programming language that I am creating for fun and to learn how a programming language really work.
+This is a retro game that we remade from scratch with a more recent look
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 ### Built With
-* ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
+[![Python](https://camo.githubusercontent.com/0562f16a4ae7e35dae6087bf8b7805fb7e664a9e7e20ae6d163d94e56b94f32d/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f707974686f6e2d3336373041303f7374796c653d666f722d7468652d6261646765266c6f676f3d707974686f6e266c6f676f436f6c6f723d666664643534)](https://camo.githubusercontent.com/0562f16a4ae7e35dae6087bf8b7805fb7e664a9e7e20ae6d163d94e56b94f32d/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f707974686f6e2d3336373041303f7374796c653d666f722d7468652d6261646765266c6f676f3d707974686f6e266c6f676f436f6c6f723d666664643534)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,22 +102,22 @@ This is a programming language that I am creating for fun and to learn how a pro
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* Download go at [https://go.dev/doc/install](https://go.dev/doc/install)
+* Download [python](https://www.python.org/)
+* TODO: add instructions for pygame/use pyenv so that there is no need for it
 
 ### Installation
 1. Clone the repo
    ```sh
-   git clone https://github.com/tysufa/qfa.git
+   git clone https://github.com/tysufa/omega_race.git
    ```
 2. Start
    ```sh
-   go run main.go
+   python3 main.py
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -127,51 +128,7 @@ This is an example of how to list things you need to use the software and how to
 
 ## Usage
 
-### end of statement
-every statement ends with a semicolon
-```
-statement;
-```
-
-### declarations
-Use the keyword let
-```
-let variable = value;
-```
-### types
-suported types are limited to integers and booleans at the moment
-```
-let variable1 = 10;
-let variable2 = 123456789;
-let variable3 = true;
-let variable4 = false;
-```
-### functions
-you can declare a function with the fn keyword and return a value with return
-```
-fn(x, y){
-  return x + y;
-};
-```
-and you can stock it like you would with a variable
-```
-let add = fn(x, y){
-  return x + y;
-};
-```
-### if statements
-you can do an if else statement like you would with any language
-```
-if (10 == 9){
-  expression;
-}
-else{
-  expression;
-}
-```
-
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+Once the game is lauched you can turn with <Left/Right> arrows, move forward with <Up\> and shoot with <Z\> or <space\>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -180,12 +137,12 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Lexer
-	- Extand the lexer
-		- [ ] Strings
-		- [ ] floats
-- [ ] Parser
-- [ ] Evaluator
+- [x] finish the main game
+- [ ] main menu
+	- [x] make a main menu
+	- [ ] add transitions to main menu
+- [ ] Add a boss fight
+- [ ] add upgrades for the spaceship
 
 See the [open issues](https://github.com/tysufa/qfa/issues) for a full list of proposed features (and known issues).
 
@@ -225,7 +182,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - philemon.penot@gmail.com
 
-Project Link: [https://github.com/tysufa/qfa](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/tysufa/omega_race](https://github.com/tysufa/omega_race)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -234,7 +191,7 @@ Project Link: [https://github.com/tysufa/qfa](https://github.com/github_username
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []() Huge thanks to Thorsten Ball and his [book](https://interpreterbook.com/) wich has been the main source of inspiration for this project
+* Thanks to [NuageRoue](https://github.com/NuageRoue) for the feedbacks on the game
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
