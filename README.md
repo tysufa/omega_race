@@ -109,7 +109,7 @@ To get a local copy up and running follow these simple example steps.
 This is an example of how to list things you need to use the software and how to install them.
 * Download [git](https://git-scm.com/downloads) (to clone the repo)
 * Download [python](https://www.python.org/)
-* Download pipenv
+* Download pipenv if you can't install it via pip install the package (python-pipenv) _`sudo apt install python-pipenv` on a debian distro for example"_
   ```sh
   pip install pipenv
   ```
