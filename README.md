@@ -107,6 +107,7 @@ To get a local copy up and running follow these simple example steps.
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
+* Download [git](https://git-scm.com/downloads) (to clone the repo)
 * Download [python](https://www.python.org/)
 * Download pipenv
   ```sh
@@ -118,7 +119,7 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    git clone https://github.com/tysufa/omega_race.git
    ```
-2. Go in the folder
+2. Go in the directory
    ```sh
    cd omega_race
    ```
