@@ -118,7 +118,11 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    git clone https://github.com/tysufa/omega_race.git
    ```
-2. Start
+2. Go in the folder
+   ```sh
+   cd omega_race
+   ```
+3. Start
    ```sh
    pipenv shell
    python3 main.py
