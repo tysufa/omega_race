@@ -108,12 +108,12 @@ To get a local copy up and running follow these simple example steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 * Download [git](https://git-scm.com/downloads) (to clone the repo)
-* Download [python](https://www.python.org/)
-* Download pipenv
+* Download [python](https://www.python.org/) (be sure that you add it to your path when installing)
+* Download pygame
   ```sh
-  pip install pipenv
+  pip install pygame
   ```
-  if this command doesn't work try installing the package python-pipenv `sudo apt install python-pipenv` on debian for example
+  if this command doesn't work try installing the package python-pipenv `sudo apt install python-pygame` on debian for example
 
 ### Installation
 1. Clone the repo
@@ -126,9 +126,9 @@ This is an example of how to list things you need to use the software and how to
    ```
 3. Start
    ```sh
-   pipenv shell
-   python3 main.py
+   python main.py
    ```
+   or go in the directory omega_race in your file manager and double click on main.py
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
