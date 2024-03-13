@@ -1,34 +1,42 @@
 import pygame
 from text import Text
-from constantes import *
+from constantes import SIZE, MENU_MUSIC 
 import sys
 from game import Game
-from random import randint
 
 pygame.init()
-
 
 class Menu:
     def __init__(self):
         self.window = pygame.display.set_mode(SIZE)
 
+        # list of all elements initial locations
+        self.positions = {
+            "title": (SIZE[0]//2, 100),
+            "jouer": (SIZE[0]//2, 300),
+            "cartes_text": (SIZE[0]//2, 400),
+            "option_text": (SIZE[0]//2, 450),
+            "music_text": (SIZE[0]//2 + 400, 200),
+            "sound_text": (SIZE[0]//2 + 400, 400),
+        }
+
         self.title = Text("OMEGA RACE", 80, SIZE[0]//2, SIZE[1]//2, "white")
-        self.title.rect.center = SIZE[0]//2, 100
+        self.title.rect.center = self.positions["title"]
 
         self.jouer = Text("Jouer", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.jouer.rect.center = SIZE[0] // 2, 300
+        self.jouer.rect.center = self.positions["jouer"]
 
         self.cartes_text = Text("cartes", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.cartes_text.rect.center = SIZE[0] // 2, 400
+        self.cartes_text.rect.center = self.positions["cartes_text"]
 
         self.option_text = Text("options", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.option_text.rect.center = SIZE[0] // 2, 450
+        self.option_text.rect.center = self.positions["option_text"]
 
         self.music_text = Text("Musique :", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.music_text.rect.center = SIZE[0]//2 - 200 + 400, 200
+        self.music_text.rect.center = self.positions["music_text"]
 
         self.sound_text = Text("Sons :", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.sound_text.rect.center = SIZE[0]//2 - 200 + 400, 400
+        self.sound_text.rect.center = self.positions["sound_text"]
 
         self.reset_high_score_text = Text("Reset high score", 50, SIZE[0] // 2, SIZE[1] // 2, "#b93535")
         self.reset_high_score_text.rect.center = SIZE[0] // 2 + 400, 550
@@ -68,6 +76,11 @@ class Menu:
         first_click = True
         clicked_reset = False
 
+        # reset location every time for the animation
+        self.sound_text.rect.center = self.positions["sound_text"]
+        self.music_text.rect.center = self.positions["music_text"]
+
+        # initial locations 
         reset_popup_text = Text("Vous etes sur ?", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
         reset_popup_yes_text = Text("Oui", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
         reset_popup_no_text = Text("Non", 50, SIZE[0] // 2, SIZE[1] // 2, "white")
@@ -91,11 +104,10 @@ class Menu:
 
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
+
+            # menu apparition animations
             if self.music_text.rect.center[0] > SIZE[0]//2 - 200:
-                if self.music_text.rect.center[0] > SIZE[0]//2 - 50:
-                    self.music_text.rect.x -= 2
-                else:
-                    self.music_text.rect.x -= 1
+                self.music_text.rect.x -= 2
 
             if self.sound_text.rect.center[0] > SIZE[0]//2 - 200:
                 self.sound_text.rect.x -= 2
