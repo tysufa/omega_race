@@ -5,6 +5,5 @@ __pycache__/
 .idea
 
 *.txt
-/saves/*.txt
 
 *.bak
