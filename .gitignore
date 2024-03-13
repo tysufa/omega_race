@@ -5,6 +5,6 @@ __pycache__/
 .idea
 
 *.txt
-musique_sound_volume.txt
+saves/musique_sound_volume.txt
 
 *.bak
