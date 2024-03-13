@@ -285,6 +285,10 @@ class Game:
             self.level += 1
             self.level_text.change_text("niveau " + str(self.level))
             self.player.respawn_function()  # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+            up=LISTE_UPGRADES[randint(0,len(LISTE_UPGRADES)-1)]
+            print("Upgrade choisie : "+up)
+            self.ennemis.upgrades["tir_vitesse+"]=True
+            self.ennemis.gestion_upgrades()
 
         if self.player.respawn:
             if self.player.nb_life < 0:

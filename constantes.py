@@ -32,16 +32,26 @@ ROCKETSHIP_SCORE = 500
 
 ###Ennemis###
 
+###Upgrades :###
+LISTE_UPGRADES=["tourelle_cadence+","tourelle_grace-","tir_vitesse+"]
+
 ###Asteroid###
+#constantes :
 ASTEROID_VITESSE=1
 ASTEROIDE_SCORE = 100
-###Tir###
-TIR_VITESSE=4
+#variables :
 
+###Tir###
+#constantes :
+#variables :
+TIR_VITESSE_UPGRADE_MULTIPLIER=1.5
 ###Rocket###
 ROCKET_VITESSE=5
 ROCKET_ROTATION=4
 ROCKET_ROTATION_DECAY=0.99
+#constantes :
+#variables :
+
 
 ###Chargeur###
 CHARGEUR_ROTATION_SPEED=1.5
@@ -51,21 +61,31 @@ CHARGEUR_ACCELERATION=0.1
 CHARGEUR_DECELERATION=0.1
 CHARGEUR_ANGLE_ACCELERATION = 20 #determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 CHARGEUR_SCORE = 300
+#constantes :
+#variables :
+
 
 ###Tourelle###
-TOURELLE_INITIAL_CLOCK=(200,300)#fourchette du timer initial aléatoire pour le premier tir
-TOURELLE_NEW_CLOCK=(150,250)#fourchette du timer aléatoire pour les tirs suivants
+#constantes :
 TOURELLE_SCORE = 400
+TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER=0.60
+TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER=0.75
+#variables :
+TOURELLE_INITIAL_CLOCK=[200,300]#fourchette du timer initial aléatoire pour le premier tir
+TOURELLE_NEW_CLOCK=[150,250]#fourchette du timer aléatoire pour les tirs suivants
 
 ###Miner###
 MINER_CLOCK=(200,300)
 MINER_SPEED=2
 MINER_MINES=5
 MINER_SCORE=400
+#constantes :
+#variables :
+
 
 ###Rocketship###
-ROCKETSHIP_INITIAL_CLOCK=(400,500)#fourchette du timer initial aléatoire pour le premier tir
-ROCKETSHIP_NEW_CLOCK=(250,400)#fourchette du timer aléatoire pour les tirs suivants
+ROCKETSHIP_INITIAL_CLOCK=[400,500]#fourchette du timer initial aléatoire pour le premier tir
+ROCKETSHIP_NEW_CLOCK=[250,400]#fourchette du timer aléatoire pour les tirs suivants
 ROCKETSHIP_SCORE = 500
 ROCKETSHIP_ROTATION_SPEED=1.5
 ROCKETSHIP_MIN_SPEED=0.7
@@ -74,3 +94,5 @@ ROCKETSHIP_ACCELERATION=0.1
 ROCKETSHIP_DECELERATION=0.1
 ROCKETSHIP_ANGLE_ACCELERATION = 20 #determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 ROCKETSHIP_NB_TIRS=1
+#constantes :
+#variables :
