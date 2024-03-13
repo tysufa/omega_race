@@ -6,7 +6,6 @@ from text import Text
 from wall import Wall
 from random import randint
 from constantes import *
-import csv
 import sys
 
 
