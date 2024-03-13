@@ -4,7 +4,7 @@ pygame.init()
 
 
 class Text(pygame.sprite.Sprite):
-    def __init__(self, text, size, x, y, color, font="Abaddon Light.ttf"):
+    def __init__(self, text, size, x, y, color, font="ressources/Abaddon Light.ttf"):
         super().__init__()
         self.font = font
         self.text = text

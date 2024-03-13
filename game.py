@@ -9,18 +9,21 @@ from constantes import *
 import csv
 import sys
 
+
 class Game:
     def __init__(self, window, clock):
         self.window = window
+        self.screen_surface = pygame.surface.Surface(SIZE)
         self.clock = clock
-        self.window = pygame.display.set_mode(SIZE)
         pygame.display.set_caption(TITLE)
 
         self.sound_volume = 1
 
         self.continuer = True
 
-        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png", "image/background/Space Background2.png", "image/background/Space Background3.png", "image/background/Space Background4.png", "image/background/Space Background5.png"]
+        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png",
+                            "image/background/Space Background2.png", "image/background/Space Background3.png",
+                            "image/background/Space Background4.png", "image/background/Space Background5.png"]
 
         self.background_img = pygame.image.load(random.choice(self.backgrounds))
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
@@ -35,7 +38,7 @@ class Game:
         self.center_square.center = (SIZE[0] // 2, SIZE[1] // 2)  # on place le carré au centre de l'écran
 
         self.score = 0
-        with open("score.txt", "r") as fichier:
+        with open("saves/score.txt", "r") as fichier:
             self.high_score = int(fichier.readline())
 
         # les 4 textes à afficher pour score et high score
@@ -43,7 +46,7 @@ class Game:
         self.score_text = Text(str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
         text3 = Text("high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
         self.high_score_text = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
-                     "white")
+                                    "white")
 
         self.level_text = Text("niveau 1", 24, self.center_square.center[0], self.center_square.top + 5, "white")
 
@@ -64,19 +67,19 @@ class Game:
         self.starting_ennemis_number = 1
 
         #### Levels ####
-        self.level=1
-        self.levels=[]
-        self.loop=0 #nombre de fois que le joueur a fait le tour des niveaux
+        self.level = 1
+        self.levels = []
+        self.loop = 0  # nombre de fois que le joueur a fait le tour des niveaux
         import csv
-        with open("levels.csv", "r") as fichier:
+        with open("saves/levels.csv", "r") as fichier:
             ligne = csv.reader(fichier, delimiter=',', quotechar='|')
-            for case in ligne :
+            for case in ligne:
                 self.levels.append(case)
         self.levels.pop(0)
         for i in range(len(self.levels)):
             self.levels[i].pop(0)
             for j in range(len(self.levels[i])):
-                self.levels[i][j]=int(self.levels[i][j])
+                self.levels[i][j] = int(self.levels[i][j])
         ####
         self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square,
                              self.ennemis.tab)
@@ -89,12 +92,14 @@ class Game:
         self.time_after_death = 0
         self.respawn_with_pause = False
 
+        self.screen_shake_offset = [0, 0]
+        self.screenshake = 0
 
     def pause(self):
         continuer = True
 
         pause_text = Text("Pause", 80, 0, 0, "orange")
-        pause_text.rect.center = SIZE[0]//2, SIZE[1]//2
+        pause_text.rect.center = SIZE[0] // 2, SIZE[1] // 2
 
         while continuer:
             for event in pygame.event.get():
@@ -106,9 +111,37 @@ class Game:
                     if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                         continuer = False
 
-            self.window.blit(pause_text.image, pause_text.rect)
+            self.screen_surface.blit(pause_text.image, pause_text.rect)
+            self.window.blit(self.screen_surface, self.screen_shake_offset)  # on affiche la surface sur la fenetre
             pygame.display.flip()
 
+    def start_of_level(self):
+        continuer = True
+
+        pause_text = Text("appuyez sur une ", 30, 0, 0, "orange")
+        pause_text_2 = Text("touche pour jouer", 30, 0, 0, "orange")
+        pause_text.rect.center = SIZE[0] // 2, SIZE[1] // 2
+        pause_text_2.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 30
+
+        if pygame.time.get_ticks() - self.time_after_death > 100:
+            while continuer:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.KEYDOWN:
+                        continuer = False
+
+                keys = pygame.key.get_pressed()
+
+                if pygame.time.get_ticks() - self.time_after_death > 500 and (keys[pygame.K_UP] or keys[pygame.K_z] or keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_SPACE]):
+                    continuer = False
+
+                self.screen_surface.blit(pause_text.image, pause_text.rect)
+                self.screen_surface.blit(pause_text_2.image, pause_text_2.rect)
+                pygame.display.flip()
+
+            self.respawn_with_pause = False
 
     def reset_game(self):
 
@@ -117,14 +150,15 @@ class Game:
         self.background_img = pygame.image.load(random.choice(self.backgrounds))
 
         self.score = 0
-        with open("score.txt", "r") as fichier:
+        with open("saves/score.txt", "r") as fichier:
             self.high_score = int(fichier.readline())
 
         self.high_score_text.change_text(str(self.high_score))
 
         self.ennemis = Ennemy_list()
 
-        self.level=1
+        self.level = 1
+
         self.level_text.change_text("Niveau " + str(self.level))
 
         self.player.nb_life = LIFE_NB
@@ -133,47 +167,63 @@ class Game:
         self.player.alive = True
         self.player.explosion_anim.show = False
 
-        self.spawn(self.levels[(self.level-1)%10])
+        self.spawn(self.levels[(self.level - 1) % 10])
 
+        pygame.mixer.music.unload()
+        pygame.mixer.music.load(GAME_MUSIC)
+        pygame.mixer.music.play(loops=-1, fade_ms=1000)
 
     def wall_collisions(self):
         for wall in self.walls:
             if self.player.hitbox.colliderect(wall.rect):
                 wall.show()
 
-    def spawn(self,level):#self.levels[self.level-1]
+    def spawn(self, level):  # self.levels[self.level-1]
         spawnbox = pygame.rect.Rect((self.player.x, self.player.y), PLAYER_SAFE_SPAWN_ZONE)
         spawnbox.center = self.player.hitbox.center
-        for i in range (len(level)):
-            ennemis_apparus=0
+        for i in range(len(level)):
+            ennemis_apparus = 0
             while ennemis_apparus < level[i]:
-                if i==0:
-                    self.ennemis.tab.append(Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-                elif i==1:
-                    self.ennemis.tab.append(Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-                elif i==2:
-                    self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-                elif i==3:
-                    self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-                elif i==4:
-                    self.ennemis.tab.append(Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square))
-                elif i==5:
-                    self.ennemis.tab.append(Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
-                elif i==6:
-                    self.ennemis.tab.append(Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.window, self.center_square,True))
+                if i == 0:
+                    self.ennemis.tab.append(
+                        Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                elif i == 1:
+                    self.ennemis.tab.append(
+                        Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                elif i == 2:
+                    self.ennemis.tab.append(
+                        Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                elif i == 3:
+                    self.ennemis.tab.append(
+                        Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                elif i == 4:
+                    self.ennemis.tab.append(
+                        Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                elif i == 5:
+                    self.ennemis.tab.append(
+                        Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square,
+                                 True))
+                elif i == 6:
+                    self.ennemis.tab.append(
+                        Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square,
+                                 True))
+                elif i == 7:
+                    self.ennemis.tab.append(
+                        Rocketship(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
                 spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-                self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-                self.center_square.height + self.ennemis.tab[-1].hitbox.height))
+                    self.center_square.width + self.ennemis.tab[-1].hitbox.width,
+                    self.center_square.height + self.ennemis.tab[-1].hitbox.height))
                 spawncenter.center = self.center_square.center
                 if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
                     self.ennemis.tab[-1].alive = False
                     self.ennemis.tab.pop(-1)
                 else:
-                    ennemis_apparus+=1
-
+                    ennemis_apparus += 1
 
     def update(self):
-        self.player_group.update(self.window)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+
+        self.player_group.update(
+            self.screen_surface)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
         if self.player.alive:
             self.player.ennemis = self.ennemis.tab
             self.walls.update()
@@ -181,12 +231,10 @@ class Game:
             particule_copy = [particle for particle in self.particles if particle.radius > 0]
             self.particles = particule_copy
 
-
             self.score = self.ennemis.update(self.player, self.player.projectiles, self.score)
 
             particule_copy = [particle for particle in self.player.particles if particle.radius > 0]
             self.player.particles = particule_copy
-
 
             for particle in self.player.particles:
                 particle.update()
@@ -194,14 +242,14 @@ class Game:
                     particle.update()
 
             if self.respawn_with_pause:
-                if pygame.time.get_ticks() - self.time_after_death > 75 and pygame.time.get_ticks() - self.time_after_death < 1000:
-                    pygame.time.delay(1000)
+                self.start_of_level()
+
+            self.screenshake_func() # permet de vérifier si l'on doit faire un screenshake et de l'activer si oui
 
         else:
-            self.time_after_death = pygame.time.get_ticks() # on appelle cette ligne qu'une seule fois après la mort du joueur
+            self.time_after_death = pygame.time.get_ticks()  # on appelle cette ligne qu'une seule fois après la mort du joueur
 
-        self.respawn() # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
-
+        self.respawn()  # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
         if self.game_over.restart:
             self.reset_game()
@@ -209,100 +257,116 @@ class Game:
 
         self.score_text.change_text(str(self.score))
 
-
-    def decompter (self):
-        ret=[0 for i in range(7)]
-        for en in self.ennemis.tab :
-            if type(en)==Mine:
-                ret[0]+=1
-            if type(en)==Asteroid:
-                ret[1]+=1
-            if type(en)==Chargeur:
+    def decompter(self):
+        ret = [0 for i in range(8)]
+        for en in self.ennemis.tab:
+            if type(en) == Mine:
+                ret[0] += 1
+            if type(en) == Asteroid:
+                ret[1] += 1
+            if type(en) == Chargeur:
                 if en.shield:
-                    ret[6]+=1
+                    ret[6] += 1
                 else:
-                    ret[2]+=1
-            if type(en)==Tourelle:
+                    ret[2] += 1
+            if type(en) == Tourelle:
                 if en.shield:
-                    ret[5]+=1
+                    ret[5] += 1
                 else:
-                    ret[3]+=1
-            if type(en)==Miner:
-                ret[4]+=1
+                    ret[3] += 1
+            if type(en) == Miner:
+                ret[4] += 1
+            if type(en)==Rocketship:
+                ret[7] += 1
         return ret
 
     def respawn(self):
         if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-            self.level+=1
+            self.level += 1
             self.level_text.change_text("niveau " + str(self.level))
-            self.player.respawn_function() # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
+            self.player.respawn_function()  # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
 
         if self.player.respawn:
             if self.player.nb_life < 0:
                 # on update le meilleur score
                 if self.high_score < self.score:
-                    with open("score.txt", "w") as fichier:
+                    with open("saves/score.txt", "w") as fichier:
                         fichier.write(str(self.score))
-                self.game_over.score = self.score # on change le score à afficher dans game over
+                self.game_over.score = self.score  # on change le score à afficher dans game over
 
                 self.continuer = False
+
+                pygame.mixer.music.unload()
+                pygame.mixer.music.load(MENU_MUSIC)
+                pygame.mixer.music.play(loops=-1, fade_ms=1000)
                 self.game_over.run()
             else:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
                     self.ennemis = Ennemy_list()
-                    while self.level>10*(self.loop+1):
-                        self.loop+=1
-                    level=self.levels[(self.level-1)%10]
-                    if self.loop>0:
+                    while self.level > 10 * (self.loop + 1):
+                        self.loop += 1
+                    level = self.levels[(self.level - 1) % 10]
+                    if self.loop > 0:
                         for i in range(len(level)):
-                            level[i]+=self.levels[10+(self.level-1)%10][i]*self.loop
+                            level[i] += self.levels[10 + (self.level - 1) % 10][i] * self.loop
                     self.spawn(level)
                 else:
-                    tempo_level=self.decompter()
+                    tempo_level = self.decompter()
                     self.ennemis = Ennemy_list()
                     self.spawn(tempo_level)
 
                 self.player.respawn = False
-                self.player.alive = True # si le joueur était mort après son respawn il est à nouveau vivant
-                self.player.projectiles = pygame.sprite.Group() # on enlève tous les projectiles du joueur
+                self.player.alive = True  # si le joueur était mort après son respawn il est à nouveau vivant
+                self.player.projectiles = pygame.sprite.Group()  # on enlève tous les projectiles du joueur
                 self.time_after_death = pygame.time.get_ticks()
                 self.respawn_with_pause = True
 
-
-
     def draw(self):
-        self.window.blit(self.background_img, (0, 0))
+        self.screen_surface.blit(self.background_img, (0, 0))
 
         for i in range(self.player.nb_life):
             # on affiche un vaisseau pour chaque vie du personnage
-            self.window.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
+            self.screen_surface.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
 
         for wall in self.walls.sprites():
             if wall.displayed:
-                wall.draw(self.window)
+                wall.draw(self.screen_surface)
 
-        self.player.player_anim.draw(self.window)
+        self.player.player_anim.draw(self.screen_surface)
         if self.player.alive:
-            self.player_group.draw(self.window)
+            self.player_group.draw(self.screen_surface)
 
         self.ennemis.draw()
-        self.player.projectiles.draw(self.window)
+        self.player.projectiles.draw(self.screen_surface)
 
-        self.text_group.draw(self.window)  # on affiche l'ensemble des sprites Text dans text_group
+        self.text_group.draw(self.screen_surface)  # on affiche l'ensemble des sprites Text dans text_group
 
         for particle in self.player.particles:
-            pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+            pygame.draw.circle(self.screen_surface, "white", (particle.x, particle.y), particle.radius)
         for particle in self.ennemis.particle_list:
-            pygame.draw.circle(self.window, "white", (particle.x, particle.y), particle.radius)
+            pygame.draw.circle(self.screen_surface, "white", (particle.x, particle.y), particle.radius)
 
-        pygame.draw.rect(self.window, "white", self.center_square, 2)  # rectangle du milieu
+        pygame.draw.rect(self.screen_surface, "white", self.center_square, 2)  # rectangle du milieu
 
+        self.window.blit(self.screen_surface, self.screen_shake_offset) # on affiche la surface sur la fenetre
 
     def game_loop(self):
 
         self.update()
+        if self.high_score < self.score:
+            with open("saves/score.txt", "w") as fichier:
+                fichier.write(str(self.score))
+
         self.wall_collisions()  # sert uniquement pour l'affichage des murs
 
+    def screenshake_func(self):
+        self.screenshake = self.ennemis.screenshake
+        # self.screenshake = self.player.screenshake # récupère le temps du screenshake pour le moment ou le joueur meurt
+        if self.screenshake > 0:
+            self.screenshake -= 1
+            self.ennemis.screenshake -= 1
+            self.screen_shake_offset[0] = randint(0, 4) - 2
+            self.screen_shake_offset[1] = randint(0, 3) - 2
 
     def run(self):
         while self.continuer:
@@ -313,10 +377,12 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                         self.pause()
+                    if pygame.key.get_pressed()[pygame.K_SPACE]:
+                        self.screenshake = 10
 
             self.game_loop()
 
-            if self.continuer: # évite un clignement à l'écran quand on revient au menu après un game over
+            if self.continuer:  # évite un clignement à l'écran quand on revient au menu après un game over
                 self.draw()
 
             pygame.display.flip()
@@ -351,7 +417,6 @@ class GameOver:
         self.restart = False
 
         pygame.mixer.music.load(MENU_MUSIC)
-
 
     def run(self):
         continuer = True
@@ -392,6 +457,4 @@ class GameOver:
             self.text_group.draw(self.window)
             pygame.display.update()
 
-
             self.clock.tick(60)
-
