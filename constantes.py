@@ -46,9 +46,11 @@ ASTEROIDE_SCORE = 100
 # variables :
 
 ###Tir###
-# constantes :
-# variables :
-TIR_VITESSE_UPGRADE_MULTIPLIER = 1.5
+#constantes :
+#variables :
+TIR_VITESSE_UPGRADE_MULTIPLIER=1.5
+TIR_VITESSE=4
+
 ###Rocket###
 ROCKET_VITESSE = 5
 ROCKET_ROTATION = 4

@@ -6,7 +6,8 @@ from constantes import *
 from animation import Anim
 from particles import create_particle_list
 
-
+print(TOURELLE_INITIAL_CLOCK)
+print(ASTEROID_VITESSE)
 # size : 720, 480
 def rotate(xa, ya, xb, yb):
     """
@@ -113,8 +114,9 @@ class Ennemy_list:  # liste des ennemis en jeu
             TOURELLE_INITIAL_CLOCK[1]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
             self.upgrades["tourelle_grace-"]=False
         if self.upgrades["tir_vitesse+"]:
+            global TIR_VITESSE
             TIR_VITESSE*=TIR_VITESSE_UPGRADE_MULTIPLIER#le code refuse d'acceder à la constante TIR_VITESSE
-            self.upgrades["tourelle_grace-"]=False
+            self.upgrades["tir_vitesse+"]=False
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
