@@ -44,6 +44,9 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.tempo = pygame.time.get_ticks()
         self.only_bullet = False
         self.screenshake = 0
+        self.upgrades={}
+        for up in LISTE_UPGRADES :
+            self.upgrades[up]=False
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -99,6 +102,19 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.tab = tmp.copy()  # on transforme le tableau en sa copie vidée des ennemis morts.
 
         return score
+
+    def gestion_upgrades(self):
+        if self.upgrades["tourelle_cadence+"]:
+            TOURELLE_NEW_CLOCK[0]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
+            TOURELLE_NEW_CLOCK[1]*=TOURELLE_NEW_UPGRADE_MULTIPLIER
+            self.upgrades["tourelle_cadence+"]=False
+        if self.upgrades["tourelle_grace-"]:
+            TOURELLE_INITIAL_CLOCK[0]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
+            TOURELLE_INITIAL_CLOCK[1]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
+            self.upgrades["tourelle_grace-"]=False
+        if self.upgrades["tir_vitesse+"]:
+            TIR_VITESSE*=TIR_VITESSE_UPGRADE_MULTIPLIER#le code refuse d'acceder à la constante TIR_VITESSE
+            self.upgrades["tourelle_grace-"]=False
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
@@ -435,7 +451,7 @@ class Tourelle(Ennemi):
     def __init__(self, x, y, WINDOW,rect,shield=False):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(32,32))
         self.rotation = 0
-        self.clock=randint(TOURELLE_INITIAL_CLOCK[0],TOURELLE_INITIAL_CLOCK[1])
+        self.clock=randint(round(TOURELLE_INITIAL_CLOCK[0]),round(TOURELLE_INITIAL_CLOCK[1]))
         self.score_value = TOURELLE_SCORE
 
         self.base_image = pygame.transform.scale(self.base_image, (80, 80))
@@ -469,7 +485,7 @@ class Tourelle(Ennemi):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
             liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
-            self.clock=randint(TOURELLE_NEW_CLOCK[0],TOURELLE_NEW_CLOCK[1])
+            self.clock=randint(round(TOURELLE_NEW_CLOCK[0]),round(TOURELLE_NEW_CLOCK[1]))
         self.clock+=-1
         return liste
 
