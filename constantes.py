@@ -37,7 +37,7 @@ ROCKETSHIP_SCORE = 500
 ###Ennemis###
 
 ###Upgrades :###
-LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+"]
+LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","chargeur_rotation+","tourelle_rocket"]
 
 ###Asteroid###
 # constantes :
@@ -59,15 +59,16 @@ ROCKET_ROTATION_DECAY = 0.99
 # variables :
 
 ###Chargeur###
+# constantes :
+CHARGEUR_SCORE = 300
+CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER = 1.1
+# variables :
 CHARGEUR_ROTATION_SPEED = 1.5
 CHARGEUR_MIN_SPEED = 0.7
 CHARGEUR_MAX_SPEED = 3
 CHARGEUR_ACCELERATION = 0.1
 CHARGEUR_DECELERATION = 0.1
 CHARGEUR_ANGLE_ACCELERATION = 20  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
-CHARGEUR_SCORE = 300
-# constantes :
-# variables :
 
 
 ###Tourelle###

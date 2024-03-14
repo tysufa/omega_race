@@ -84,7 +84,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.particle_list = create_particle_list(50, self.tab[i].x, self.tab[i].y, randint(9, 12), 3, 3, 0.5, 0.8)
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
                     if self.tab[i].needcord:
-                        tmp=self.tab[i].move(player.x, player.y,tmp)
+                        tmp=self.tab[i].move(player.x, player.y,tmp,self.upgrades["tourelle_rocket"])
                     else:
                         tmp=self.tab[i].move(tmp)
                 else:
@@ -105,9 +105,10 @@ class Ennemy_list:  # liste des ennemis en jeu
         return score
 
     def gestion_upgrades(self):
+        #print(self.upgrades["tourelle_rocket"])
         if self.upgrades["tourelle_cadence+"]:
             TOURELLE_NEW_CLOCK[0]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
-            TOURELLE_NEW_CLOCK[1]*=TOURELLE_NEW_UPGRADE_MULTIPLIER
+            TOURELLE_NEW_CLOCK[1]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
             self.upgrades["tourelle_cadence+"]=False
         if self.upgrades["tourelle_grace-"]:
             TOURELLE_INITIAL_CLOCK[0]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
@@ -115,8 +116,12 @@ class Ennemy_list:  # liste des ennemis en jeu
             self.upgrades["tourelle_grace-"]=False
         if self.upgrades["tir_vitesse+"]:
             global TIR_VITESSE
-            TIR_VITESSE*=TIR_VITESSE_UPGRADE_MULTIPLIER#le code refuse d'acceder à la constante TIR_VITESSE
+            TIR_VITESSE*=TIR_VITESSE_UPGRADE_MULTIPLIER
             self.upgrades["tir_vitesse+"]=False
+        if self.upgrades["chargeur_rotation+"]:
+            global CHARGEUR_ROTATION_SPEED
+            CHARGEUR_ROTATION_SPEED*=CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER
+            self.upgrades["chargeur_rotation+"]=False
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
@@ -483,10 +488,14 @@ class Tourelle(Ennemi):
         self.shield_anim.update()
         self.window.blit(self.shield_anim.image, self.image_rect)
 
-    def move(self,x,y,liste):
+    def move(self,x,y,liste,tourelle_rocket):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
-            liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+            #print(tourelle_rocket)
+            if (tourelle_rocket):
+                liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation))
+            else:
+                liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
             self.clock=randint(round(TOURELLE_NEW_CLOCK[0]),round(TOURELLE_NEW_CLOCK[1]))
         self.clock+=-1
         return liste
