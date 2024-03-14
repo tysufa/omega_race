@@ -1,4 +1,5 @@
 import pygame
+import os
 from text import Text
 from constantes import SIZE, MENU_MUSIC, ANIMATION_SPEED
 import sys
@@ -60,7 +61,13 @@ class Menu:
 
         self.game = Game(self.window, self.clock)
 
-        with open("saves/music_sound_volume.txt") as volume_file:
+        if not os.path.exists("saves/music_sound_volume.txt"):
+            with open("saves/music_sound_volume.txt", "w") as fichier:
+                fichier.write("100.0" + "\n" + "100.0")
+
+        with open(
+            "saves/music_sound_volume.txt",
+        ) as volume_file:
             music_volume = volume_file.readline()
             self.music_volume = float(music_volume)
             pygame.mixer.music.set_volume(self.music_volume / 100)
