@@ -10,6 +10,7 @@ PLAYER_SAFE_SPAWN_ZONE = (600, 600)
 
 ##### Menu ####
 ANIMATION_SPEED = 1.5
+ANIMATION_STARTING_OFFSET = 1000
 
 ##### Player #####
 MAX_PLAYER_SPEED = 9
@@ -39,7 +40,13 @@ ROCKETSHIP_SCORE = 500
 ###Constantes###
 
 ###Upgrades :###
-LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","chargeur_rotation+","tourelle_rocket"]
+LISTE_UPGRADES = [
+    "tourelle_cadence+",
+    "tourelle_grace-",
+    "tir_vitesse+",
+    "chargeur_rotation+",
+    "tourelle_rocket",
+]
 
 ###Asteroid###
 # constantes :
@@ -47,8 +54,8 @@ ASTEROID_VITESSE = 1
 ASTEROIDE_SCORE = 100
 
 ###Tir###
-TIR_VITESSE_UPGRADE_MULTIPLIER=1.5
-TIR_VITESSE=4.0
+TIR_VITESSE_UPGRADE_MULTIPLIER = 1.5
+TIR_VITESSE = 4.0
 
 ###Rocket###
 ROCKET_VITESSE = 5
@@ -75,7 +82,10 @@ TOURELLE_INITIAL_CLOCK = [
     200.0,
     300.0,
 ]  # fourchette du timer initial aléatoire pour le premier tir
-TOURELLE_NEW_CLOCK = [150.0, 250.0]  # fourchette du timer aléatoire pour les tirs suivants
+TOURELLE_NEW_CLOCK = [
+    150.0,
+    250.0,
+]  # fourchette du timer aléatoire pour les tirs suivants
 
 ###Miner###
 
@@ -106,8 +116,10 @@ ROCKETSHIP_NB_TIRS = 1
 
 ###Variables###
 
-VARIABLES={}
-def reset ():
+VARIABLES = {}
+
+
+def reset():
     global VARIABLES
     VARIABLES["TIR_VITESSE"] = TIR_VITESSE
     VARIABLES["TOURELLE_INITIAL_CLOCK"] = TOURELLE_INITIAL_CLOCK.copy()
