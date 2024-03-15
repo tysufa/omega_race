@@ -62,8 +62,10 @@ class Game:
 
         self.particles = []
 
+        #### Ennemies ####
         self.ennemis = Ennemy_list()
         self.starting_ennemis_number = 1
+        reset()
 
         #### Levels ####
         self.level = 1
@@ -154,9 +156,11 @@ class Game:
 
         self.high_score_text.change_text(str(self.high_score))
 
+        reset()
         self.ennemis = Ennemy_list()
 
         self.level = 1
+
 
         self.level_text.change_text("Niveau " + str(self.level))
 
@@ -284,7 +288,7 @@ class Game:
             self.level += 1
             self.level_text.change_text("niveau " + str(self.level))
             self.player.respawn_function()  # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
-            up=LISTE_UPGRADES[randint(0,len(LISTE_UPGRADES)-2)]
+            up=LISTE_UPGRADES[randint(0,len(LISTE_UPGRADES)-1)]
             print("Upgrade choisie : "+up)
             self.ennemis.upgrades[up]=True
             self.ennemis.gestion_upgrades()
@@ -305,7 +309,7 @@ class Game:
                 self.game_over.run()
             else:
                 if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
-                    self.ennemis = Ennemy_list()
+                    self.ennemis = Ennemy_list(self.ennemis.upgrades)
                     while self.level > 10 * (self.loop + 1):
                         self.loop += 1
                     level = self.levels[(self.level - 1) % 10]
@@ -315,7 +319,7 @@ class Game:
                     self.spawn(level)
                 else:
                     tempo_level = self.decompter()
-                    self.ennemis = Ennemy_list()
+                    self.ennemis = Ennemy_list(self.ennemis.upgrades)
                     self.spawn(tempo_level)
 
                 self.player.respawn = False

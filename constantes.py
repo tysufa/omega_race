@@ -36,6 +36,8 @@ ROCKETSHIP_SCORE = 500
 
 ###Ennemis###
 
+###Constantes###
+
 ###Upgrades :###
 LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","chargeur_rotation+","tourelle_rocket"]
 
@@ -43,45 +45,37 @@ LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","charge
 # constantes :
 ASTEROID_VITESSE = 1
 ASTEROIDE_SCORE = 100
-# variables :
 
 ###Tir###
-#constantes :
-#variables :
 TIR_VITESSE_UPGRADE_MULTIPLIER=1.5
-TIR_VITESSE=4
+TIR_VITESSE=4.0
 
 ###Rocket###
 ROCKET_VITESSE = 5
 ROCKET_ROTATION = 4
 ROCKET_ROTATION_DECAY = 0.99
-# constantes :
-# variables :
 
 ###Chargeur###
-# constantes :
 CHARGEUR_SCORE = 300
 CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER = 1.1
-# variables :
+CHARGEUR_ANGLE_ACCELERATION_UPGRADE_MULTIPLIER = 1.2
 CHARGEUR_ROTATION_SPEED = 1.5
 CHARGEUR_MIN_SPEED = 0.7
 CHARGEUR_MAX_SPEED = 3
 CHARGEUR_ACCELERATION = 0.1
 CHARGEUR_DECELERATION = 0.1
-CHARGEUR_ANGLE_ACCELERATION = 20  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
+CHARGEUR_ANGLE_ACCELERATION = 20.0  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 
 
 ###Tourelle###
-# constantes :
 TOURELLE_SCORE = 400
 TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER = 0.60
 TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER = 0.75
-# variables :
 TOURELLE_INITIAL_CLOCK = [
-    200,
-    300,
+    200.0,
+    300.0,
 ]  # fourchette du timer initial aléatoire pour le premier tir
-TOURELLE_NEW_CLOCK = [150, 250]  # fourchette du timer aléatoire pour les tirs suivants
+TOURELLE_NEW_CLOCK = [150.0, 250.0]  # fourchette du timer aléatoire pour les tirs suivants
 
 ###Miner###
 
@@ -89,8 +83,6 @@ MINER_CLOCK = (200, 300)
 MINER_SPEED = 2
 MINER_MINES = 5
 MINER_SCORE = 400
-# constantes :
-# variables :
 
 
 ###Rocketship###
@@ -110,5 +102,15 @@ ROCKETSHIP_ACCELERATION = 0.1
 ROCKETSHIP_DECELERATION = 0.1
 ROCKETSHIP_ANGLE_ACCELERATION = 20  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 ROCKETSHIP_NB_TIRS = 1
-# constantes :
-# variables :
+
+
+###Variables###
+
+VARIABLES={}
+def reset ():
+    global VARIABLES
+    VARIABLES["TIR_VITESSE"] = TIR_VITESSE
+    VARIABLES["TOURELLE_INITIAL_CLOCK"] = TOURELLE_INITIAL_CLOCK.copy()
+    VARIABLES["TOURELLE_NEW_CLOCK"] = TOURELLE_NEW_CLOCK.copy()
+    VARIABLES["CHARGEUR_ROTATION_SPEED"] = CHARGEUR_ROTATION_SPEED
+    VARIABLES["CHARGEUR_ANGLE_ACCELERATION"] = CHARGEUR_ANGLE_ACCELERATION

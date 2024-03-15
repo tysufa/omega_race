@@ -6,8 +6,6 @@ from constantes import *
 from animation import Anim
 from particles import create_particle_list
 
-print(TOURELLE_INITIAL_CLOCK)
-print(ASTEROID_VITESSE)
 # size : 720, 480
 def rotate(xa, ya, xb, yb):
     """
@@ -37,7 +35,7 @@ def modulo_rot(rot):
 
 
 class Ennemy_list:  # liste des ennemis en jeu
-    def __init__(self):
+    def __init__(self,upgrades={}):
         self.tab = []
         self.explosion_sound = pygame.mixer.Sound("sound/explosion.wav")
         self.explosion_sound.set_volume(0.15)
@@ -45,9 +43,10 @@ class Ennemy_list:  # liste des ennemis en jeu
         self.tempo = pygame.time.get_ticks()
         self.only_bullet = False
         self.screenshake = 0
-        self.upgrades={}
-        for up in LISTE_UPGRADES :
-            self.upgrades[up]=False
+        self.upgrades=upgrades
+        if(self.upgrades=={}):
+            for up in LISTE_UPGRADES :
+                self.upgrades[up]=False
 
     def update(self, player, projectiles_list, score):
         tmp = self.tab.copy()  # on copie self.ennemy_list pour pas retirer des éléments de la liste pendant qu'on bosse dessus
@@ -105,22 +104,21 @@ class Ennemy_list:  # liste des ennemis en jeu
         return score
 
     def gestion_upgrades(self):
-        #print(self.upgrades["tourelle_rocket"])
+        global VARIABLES
         if self.upgrades["tourelle_cadence+"]:
-            TOURELLE_NEW_CLOCK[0]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
-            TOURELLE_NEW_CLOCK[1]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
+            VARIABLES["TOURELLE_NEW_CLOCK"][0]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
+            VARIABLES["TOURELLE_NEW_CLOCK"][1]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
             self.upgrades["tourelle_cadence+"]=False
         if self.upgrades["tourelle_grace-"]:
-            TOURELLE_INITIAL_CLOCK[0]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
-            TOURELLE_INITIAL_CLOCK[1]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
+            VARIABLES["TOURELLE_INITIAL_CLOCK"][0]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
+            VARIABLES["TOURELLE_INITIAL_CLOCK"][1]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
             self.upgrades["tourelle_grace-"]=False
         if self.upgrades["tir_vitesse+"]:
-            global TIR_VITESSE
-            TIR_VITESSE*=TIR_VITESSE_UPGRADE_MULTIPLIER
+            VARIABLES["TIR_VITESSE"]*=TIR_VITESSE_UPGRADE_MULTIPLIER
             self.upgrades["tir_vitesse+"]=False
         if self.upgrades["chargeur_rotation+"]:
-            global CHARGEUR_ROTATION_SPEED
-            CHARGEUR_ROTATION_SPEED*=CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER
+            VARIABLES["CHARGEUR_ROTATION_SPEED"]*=CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER
+            VARIABLES["CHARGEUR_ANGLE_ACCELERATION"]*=CHARGEUR_ANGLE_ACCELERATION_UPGRADE_MULTIPLIER
             self.upgrades["chargeur_rotation+"]=False
 
     def draw(self):
@@ -277,8 +275,8 @@ class Tir(Ennemi):
         self.killbox.center = self.image_rect.center
 
     def move(self):
-        self.x+=TIR_VITESSE*(cos(radians(self.rotation)))
-        self.y+=TIR_VITESSE*(sin(radians(self.rotation)))
+        self.x+=VARIABLES["TIR_VITESSE"]*(cos(radians(self.rotation)))
+        self.y+=VARIABLES["TIR_VITESSE"]*(sin(radians(self.rotation)))
         if super().colhor() or super().colmurhor() or super().colver() or super().colmurver():
             self.alive=False
         self.image_rect.center=(self.x,self.y)
@@ -430,11 +428,11 @@ class Chargeur(Ennemi):
         calcul_dirrection = modulo_rot(objectif - self.rotation)
         #pour tourner dans le bon sens:
         if calcul_dirrection > 0 and calcul_dirrection < 180:
-            self.rotation += +CHARGEUR_ROTATION_SPEED
+            self.rotation += +VARIABLES["CHARGEUR_ROTATION_SPEED"]
         else:
-            self.rotation += -CHARGEUR_ROTATION_SPEED
+            self.rotation += -VARIABLES["CHARGEUR_ROTATION_SPEED"]
         #pour accelerer si l'objectif est en vue et ralentir sinon:
-        if calcul_dirrection < CHARGEUR_ANGLE_ACCELERATION or calcul_dirrection > 360-CHARGEUR_ANGLE_ACCELERATION:
+        if calcul_dirrection < VARIABLES["CHARGEUR_ANGLE_ACCELERATION"] or calcul_dirrection > 360-VARIABLES["CHARGEUR_ANGLE_ACCELERATION"]:
             self.vitesse +=CHARGEUR_ACCELERATION
         else:
             self.vitesse +=-CHARGEUR_DECELERATION
@@ -458,7 +456,7 @@ class Tourelle(Ennemi):
     def __init__(self, x, y, WINDOW,rect,shield=False):
         super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Turret - Base.png",True,True,(32,32))
         self.rotation = 0
-        self.clock=randint(round(TOURELLE_INITIAL_CLOCK[0]),round(TOURELLE_INITIAL_CLOCK[1]))
+        self.clock=randint(round(VARIABLES["TOURELLE_INITIAL_CLOCK"][0]),round(VARIABLES["TOURELLE_INITIAL_CLOCK"][1]))
         self.score_value = TOURELLE_SCORE
 
         self.base_image = pygame.transform.scale(self.base_image, (80, 80))
@@ -491,12 +489,12 @@ class Tourelle(Ennemi):
     def move(self,x,y,liste,tourelle_rocket):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
-            #print(tourelle_rocket)
+            #(tourelle_rocket)
             if (tourelle_rocket):
                 liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation))
             else:
                 liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
-            self.clock=randint(round(TOURELLE_NEW_CLOCK[0]),round(TOURELLE_NEW_CLOCK[1]))
+            self.clock=randint(round(VARIABLES["TOURELLE_NEW_CLOCK"][0]),round(VARIABLES["TOURELLE_NEW_CLOCK"][1]))
         self.clock+=-1
         return liste
 
