@@ -83,7 +83,7 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.particle_list = create_particle_list(50, self.tab[i].x, self.tab[i].y, randint(9, 12), 3, 3, 0.5, 0.8)
                 if self.tab[i].needlist:  # les ennemis de type Chargeur sont un cas particulier, car ils ont besoin des coordonées du joueur.
                     if self.tab[i].needcord:
-                        tmp=self.tab[i].move(player.x, player.y,tmp,self.upgrades["tourelle_rocket"])
+                        tmp=self.tab[i].move(player.x, player.y,tmp)
                     else:
                         tmp=self.tab[i].move(tmp)
                 else:
@@ -93,6 +93,9 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
+                if type(self.tab[i])==Mine:
+                    for i in range(VARIABLES["MINE_TIRS"]):
+                            liste.append(Rocket(self.x,self.y, self.window, self.centre,(360/VARIABLES["MINE_TIRS"])*i))
                 if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
@@ -120,6 +123,10 @@ class Ennemy_list:  # liste des ennemis en jeu
             VARIABLES["CHARGEUR_ROTATION_SPEED"]*=CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER
             VARIABLES["CHARGEUR_ANGLE_ACCELERATION"]*=CHARGEUR_ANGLE_ACCELERATION_UPGRADE_MULTIPLIER
             self.upgrades["chargeur_rotation+"]=False
+        if (VARIABLES["TOURELLE_TIR"] == "tir" and self.upgrades["tourelle_rocket"]):
+            VARIABLES["TOURELLE_TIR"] = "rocket"
+        if (VARIABLES["MINE_TIRS"] == "tir" and self.upgrades["mine_shrapnel"]):
+            VARIABLES["MINE_TIRS"] = 5
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
@@ -205,7 +212,7 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
     def move(self):
         pass
 
-    def death_anim(self):#ce serait bie d'uniformiser les self.angle et self.rotation pour en faire une méthode du super
+    def death_anim(self):#ce serait bien d'uniformiser les self.angle et self.rotation pour en faire une méthode du super
         self.explosion_anim.update()
         self.explosion_anim.angle =randint(0,360)
         self.explosion_anim.show = True
@@ -486,11 +493,10 @@ class Tourelle(Ennemi):
         self.shield_anim.update()
         self.window.blit(self.shield_anim.image, self.image_rect)
 
-    def move(self,x,y,liste,tourelle_rocket):
+    def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
-            #(tourelle_rocket)
-            if (tourelle_rocket):
+            if (VARIABLES["TOURELLE_TIR"]=="rocket"):
                 liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation))
             else:
                 liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))

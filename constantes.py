@@ -39,7 +39,7 @@ ROCKETSHIP_SCORE = 500
 ###Constantes###
 
 ###Upgrades :###
-LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","chargeur_rotation+","tourelle_rocket"]
+LISTE_UPGRADES = ["tourelle_cadence+", "tourelle_grace-", "tir_vitesse+","chargeur_rotation+","tourelle_rocket","mine_shrapnel"]
 
 ###Asteroid###
 # constantes :
@@ -114,3 +114,5 @@ def reset ():
     VARIABLES["TOURELLE_NEW_CLOCK"] = TOURELLE_NEW_CLOCK.copy()
     VARIABLES["CHARGEUR_ROTATION_SPEED"] = CHARGEUR_ROTATION_SPEED
     VARIABLES["CHARGEUR_ANGLE_ACCELERATION"] = CHARGEUR_ANGLE_ACCELERATION
+    VARIABLES["TOURELLE_TIR"] = "tir"
+    VARIABLES["MINE_TIRS"] = 0
