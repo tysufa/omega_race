@@ -178,7 +178,8 @@ Don't forget to give the project a star! Thanks again!
 
 
 
-<!-- LICENSE -->
+<!-- LICENSE
+-->
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
@@ -218,7 +219,7 @@ Project Link: [https://github.com/tysufa/omega_race](https://github.com/tysufa/o
 [issues-shield]: https://img.shields.io/github/issues/tysufa/omega_race.svg?style=for-the-badge
 [issues-url]: https://github.com/tysufa/omega_race/issues
 [license-shield]: https://img.shields.io/github/license/tysufa/omega_race.svg?style=for-the-badge
-[license-url]: https://github.com/tysufa/omega_race/blob/master/LICENSE.txt
+[license-url]: https://github.com/tysufa/omega_race/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: image/screenshot.png
