@@ -392,11 +392,16 @@ class Game:
                         for i in range(len(level)):
                             level[i] += self.levels[10 + (self.level - 1) % 10][i] * self.loop
 
-                    print("upgrade 1 : ")
-                    print("upgrade 2 : ")
-                    print("upgrade 3 : ")
+                    ### tu peux enlever mon code et mettre ton choix d'upgrade à la place ce code etait juste là pour vérifier si ça marche
+                    ### aussi met pas ton code autre part parce que toute la logique d'upgrade je vais la mettre dans une méthode qu'on appelera ici et flemme de chercher ton code
+                    print("upgrade 1 : vitesse vaisseau")
+                    print("upgrade 2 : vie supp")
+                    print("upgrade 3 : chépa")
                     choix = int(input("choix upgrade : "))
-                    print(choix)
+                    if choix == 1:
+                        self.player.max_velocity += 5
+                    elif choix == 2:
+                        self.player.nb_life += 1
                     self.spawn(level)
                 else:
                     tempo_level = self.decompter()
@@ -514,13 +519,13 @@ class GameOver:
 
     # TODO: apparemment toute cette méthode ne sert à rien vu qu'elle n'est jamais appelé, il faut vérifier qu'elle sert à quelque chose et sinon la supprimer
     # c'est probablement l'ancien menu avant de l'avoir mis dans son fichier dédié
+    # ok j'ai fait aucun effort c'est le menu de game over que j'ai pas mis dans un fichier menu
     def run(self):
         continuer = True
         pressed = False
         self.score_text.change_text("Score : " + str(self.score), False)
         self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
         while continuer:
-            print("test1")
             self.window.blit(self.menu_image, (0, 0))
             pressed = False
             for event in pygame.event.get():
