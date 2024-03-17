@@ -20,9 +20,14 @@ class Game:
 
         self.continuer = True
 
-        self.backgrounds = ["image/background/Space Background(3).png", "image/background/Space Background.png",
-                            "image/background/Space Background2.png", "image/background/Space Background3.png",
-                            "image/background/Space Background4.png", "image/background/Space Background5.png"]
+        self.backgrounds = [
+            "image/background/Space Background(3).png",
+            "image/background/Space Background.png",
+            "image/background/Space Background2.png",
+            "image/background/Space Background3.png",
+            "image/background/Space Background4.png",
+            "image/background/Space Background5.png",
+        ]
 
         self.background_img = pygame.image.load(random.choice(self.backgrounds))
         # 255 = 1.0 donc on garde la couleur de base de l'image et on mutliplie simplement le canal alpha : 1 * (160/255)
@@ -30,7 +35,7 @@ class Game:
         # self.background_img.fill((255, 255, 255, 150), special_flags=BLEND_RGBA_MULT)
 
         # on créer une image pour le nombre de vies tourné vers la droite
-        self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), - 90)
+        self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), -90)
 
         # on fait le carré principale en fonction de la taille de la fenetre
         self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
@@ -44,13 +49,18 @@ class Game:
         text1 = Text("score", 24, self.center_square.right - 5, self.center_square.top, "white")
         self.score_text = Text(str(self.score), 24, self.center_square.right - 5, text1.rect.bottom, "white")
         text3 = Text("high score", 24, self.center_square.right - 5, self.score_text.rect.bottom, "white")
-        self.high_score_text = Text(str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom,
-                                    "white")
+        self.high_score_text = Text(
+            str(self.high_score), 24, self.center_square.right - 5, text3.rect.bottom, "white"
+        )
 
-        self.level_text = Text("niveau 1", 24, self.center_square.center[0], self.center_square.top + 5, "white")
+        self.level_text = Text(
+            "niveau 1", 24, self.center_square.center[0], self.center_square.top + 5, "white"
+        )
 
         # on créer un groupe qui contient les sprites de text
-        self.text_group = pygame.sprite.Group(text1, self.score_text, text3, self.high_score_text, self.level_text)
+        self.text_group = pygame.sprite.Group(
+            text1, self.score_text, text3, self.high_score_text, self.level_text
+        )
 
         ##### walls ######
         top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
@@ -72,8 +82,9 @@ class Game:
         self.levels = []
         self.loop = 0  # nombre de fois que le joueur a fait le tour des niveaux
         import csv
+
         with open("saves/levels.csv", "r") as fichier:
-            ligne = csv.reader(fichier, delimiter=',', quotechar='|')
+            ligne = csv.reader(fichier, delimiter=",", quotechar="|")
             for case in ligne:
                 self.levels.append(case)
         self.levels.pop(0)
@@ -82,8 +93,9 @@ class Game:
             for j in range(len(self.levels[i])):
                 self.levels[i][j] = int(self.levels[i][j])
         ####
-        self.player = Player(PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square,
-                             self.ennemis.tab)
+        self.player = Player(
+            PLAYER_INITIAL_POSITION[0], PLAYER_INITIAL_POSITION[1], self.center_square, self.ennemis.tab
+        )
 
         self.player_group = pygame.sprite.Group()  # on creer une instance du joueur
         self.player_group.add(self.player)
@@ -113,7 +125,9 @@ class Game:
                         continuer = False
 
             self.screen_surface.blit(pause_text.image, pause_text.rect)
-            self.window.blit(self.screen_surface, self.screen_shake_offset)  # on affiche la surface sur la fenetre
+            self.window.blit(
+                self.screen_surface, self.screen_shake_offset
+            )  # on affiche la surface sur la fenetre
             pygame.display.flip()
 
     def start_of_level(self):
@@ -135,11 +149,20 @@ class Game:
 
                 keys = pygame.key.get_pressed()
 
-                if pygame.time.get_ticks() - self.time_after_death > 500 and (keys[pygame.K_UP] or keys[pygame.K_z] or keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_SPACE]):
+                if pygame.time.get_ticks() - self.time_after_death > 500 and (
+                    keys[pygame.K_UP]
+                    or keys[pygame.K_z]
+                    or keys[pygame.K_RIGHT]
+                    or keys[pygame.K_LEFT]
+                    or keys[pygame.K_SPACE]
+                ):
                     continuer = False
 
                 self.screen_surface.blit(pause_text.image, pause_text.rect)
                 self.screen_surface.blit(pause_text_2.image, pause_text_2.rect)
+                self.window.blit(
+                    self.screen_surface, self.screen_shake_offset
+                )  # on affiche la surface sur la fenetre
                 pygame.display.flip()
 
             self.respawn_with_pause = False
@@ -161,13 +184,12 @@ class Game:
 
         self.level = 1
 
-
         self.level_text.change_text("Niveau " + str(self.level))
 
         self.player.nb_life = LIFE_NB
 
         self.player.respawn_function()
-        self.player.alive = True
+        self.player.player_alive = True
         self.player.explosion_anim.show = False
 
         self.spawn(self.levels[(self.level - 1) % 10])
@@ -189,33 +211,85 @@ class Game:
             while ennemis_apparus < level[i]:
                 if i == 0:
                     self.ennemis.tab.append(
-                        Mine(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                        Mine(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 elif i == 1:
                     self.ennemis.tab.append(
-                        Asteroid(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                        Asteroid(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 elif i == 2:
                     self.ennemis.tab.append(
-                        Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                        Chargeur(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 elif i == 3:
                     self.ennemis.tab.append(
-                        Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                        Tourelle(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 elif i == 4:
                     self.ennemis.tab.append(
-                        Miner(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
+                        Miner(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 elif i == 5:
                     self.ennemis.tab.append(
-                        Tourelle(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square,
-                                 True))
+                        Tourelle(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                            True,
+                        )
+                    )
                 elif i == 6:
                     self.ennemis.tab.append(
-                        Chargeur(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square,
-                                 True))
+                        Chargeur(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                            True,
+                        )
+                    )
                 elif i == 7:
                     self.ennemis.tab.append(
-                        Rocketship(randint(40, SIZE[0] - 40), randint(40, SIZE[1] - 40), self.screen_surface, self.center_square))
-                spawncenter = pygame.rect.Rect((self.center_square.x, self.center_square.y), (
-                    self.center_square.width + self.ennemis.tab[-1].hitbox.width,
-                    self.center_square.height + self.ennemis.tab[-1].hitbox.height))
+                        Rocketship(
+                            randint(40, SIZE[0] - 40),
+                            randint(40, SIZE[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
+                spawncenter = pygame.rect.Rect(
+                    (self.center_square.x, self.center_square.y),
+                    (
+                        self.center_square.width + self.ennemis.tab[-1].hitbox.width,
+                        self.center_square.height + self.ennemis.tab[-1].hitbox.height,
+                    ),
+                )
                 spawncenter.center = self.center_square.center
                 if self.ennemis.tab[-1].colide(spawnbox) or self.ennemis.tab[-1].colide(spawncenter):
                     self.ennemis.tab[-1].alive = False
@@ -226,8 +300,9 @@ class Game:
     def update(self):
 
         self.player_group.update(
-            self.screen_surface)  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
-        if self.player.alive:
+            self.screen_surface
+        )  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+        if self.player.player_alive:
             self.player.ennemis = self.ennemis.tab
             self.walls.update()
 
@@ -247,10 +322,12 @@ class Game:
             if self.respawn_with_pause:
                 self.start_of_level()
 
-            self.screenshake_func() # permet de vérifier si l'on doit faire un screenshake et de l'activer si oui
+            self.screenshake_func()  # permet de vérifier si l'on doit faire un screenshake et de l'activer si oui
 
         else:
-            self.time_after_death = pygame.time.get_ticks()  # on appelle cette ligne qu'une seule fois après la mort du joueur
+            self.time_after_death = (
+                pygame.time.get_ticks()
+            )  # on appelle cette ligne qu'une seule fois après la mort du joueur
 
         self.respawn()  # le joueur ne respawn que si il est mort ou qu'on passe au niveau suivant
 
@@ -279,7 +356,7 @@ class Game:
                     ret[3] += 1
             if type(en) == Miner:
                 ret[4] += 1
-            if type(en)==Rocketship:
+            if type(en) == Rocketship:
                 ret[7] += 1
         return ret
 
@@ -288,9 +365,9 @@ class Game:
             self.level += 1
             self.level_text.change_text("niveau " + str(self.level))
             self.player.respawn_function()  # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
-            up=LISTE_UPGRADES[randint(0,len(LISTE_UPGRADES)-1)]
-            print("Upgrade choisie : "+up)
-            self.ennemis.upgrades[up]=True
+            up = LISTE_UPGRADES[randint(0, len(LISTE_UPGRADES) - 1)]
+            print("Upgrade choisie : " + up)
+            self.ennemis.upgrades[up] = True
             self.ennemis.gestion_upgrades()
 
         if self.player.respawn:
@@ -323,7 +400,9 @@ class Game:
                     self.spawn(tempo_level)
 
                 self.player.respawn = False
-                self.player.alive = True  # si le joueur était mort après son respawn il est à nouveau vivant
+                self.player.player_alive = (
+                    True  # si le joueur était mort après son respawn il est à nouveau vivant
+                )
                 self.player.projectiles = pygame.sprite.Group()  # on enlève tous les projectiles du joueur
                 self.time_after_death = pygame.time.get_ticks()
                 self.respawn_with_pause = True
@@ -333,14 +412,16 @@ class Game:
 
         for i in range(self.player.nb_life):
             # on affiche un vaisseau pour chaque vie du personnage
-            self.screen_surface.blit(self.player_image, (self.center_square.left, self.center_square.top + i * 50))
+            self.screen_surface.blit(
+                self.player_image, (self.center_square.left, self.center_square.top + i * 50)
+            )
 
         for wall in self.walls.sprites():
             if wall.displayed:
                 wall.draw(self.screen_surface)
 
         self.player.player_anim.draw(self.screen_surface)
-        if self.player.alive:
+        if self.player.player_alive:
             self.player_group.draw(self.screen_surface)
 
         self.ennemis.draw()
@@ -355,7 +436,9 @@ class Game:
 
         pygame.draw.rect(self.screen_surface, "white", self.center_square, 2)  # rectangle du milieu
 
-        self.window.blit(self.screen_surface, self.screen_shake_offset) # on affiche la surface sur la fenetre
+        self.window.blit(
+            self.screen_surface, self.screen_shake_offset
+        )  # on affiche la surface sur la fenetre
 
     def game_loop(self):
 

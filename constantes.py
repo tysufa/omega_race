@@ -9,7 +9,7 @@ TITLE = "Omega Race"
 PLAYER_SAFE_SPAWN_ZONE = (600, 600)
 
 ##### Menu ####
-ANIMATION_SPEED = 1.5
+ANIMATION_SPEED = 2
 ANIMATION_STARTING_OFFSET = 1000
 
 ##### Player #####
@@ -20,9 +20,7 @@ HITBOX_SIZE = (44, 44)
 ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
 PLAYER_INITIAL_POSITION = (130, 160)
-RESPAWN_TIME = (
-    50 * 9
-)  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
+RESPAWN_TIME = 50 * 9  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 2
 
 FIRE_RATE = 550  # temps en millisecodes was 550
