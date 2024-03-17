@@ -298,10 +298,8 @@ class Game:
                     ennemis_apparus += 1
 
     def update(self):
-
-        self.player_group.update(
-            self.screen_surface
-        )  # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+        # on continue à l'update pour savoir quand il doit respawn (on fait le calcul dans player)
+        self.player_group.update(self.screen_surface)
         if self.player.player_alive:
             self.player.ennemis = self.ennemis.tab
             self.walls.update()
@@ -338,7 +336,7 @@ class Game:
         self.score_text.change_text(str(self.score))
 
     def decompter(self):
-        ret = [0 for i in range(8)]
+        ret = [0 for _ in range(8)]
         for en in self.ennemis.tab:
             if type(en) == Mine:
                 ret[0] += 1
@@ -393,6 +391,12 @@ class Game:
                     if self.loop > 0:
                         for i in range(len(level)):
                             level[i] += self.levels[10 + (self.level - 1) % 10][i] * self.loop
+
+                    print("upgrade 1 : ")
+                    print("upgrade 2 : ")
+                    print("upgrade 3 : ")
+                    choix = int(input("choix upgrade : "))
+                    print(choix)
                     self.spawn(level)
                 else:
                     tempo_level = self.decompter()
@@ -400,9 +404,9 @@ class Game:
                     self.spawn(tempo_level)
 
                 self.player.respawn = False
-                self.player.player_alive = (
-                    True  # si le joueur était mort après son respawn il est à nouveau vivant
-                )
+                # si le joueur était mort après son respawn il est à nouveau vivant
+                self.player.player_alive = True
+
                 self.player.projectiles = pygame.sprite.Group()  # on enlève tous les projectiles du joueur
                 self.time_after_death = pygame.time.get_ticks()
                 self.respawn_with_pause = True
@@ -508,12 +512,15 @@ class GameOver:
 
         pygame.mixer.music.load(MENU_MUSIC)
 
+    # TODO: apparemment toute cette méthode ne sert à rien vu qu'elle n'est jamais appelé, il faut vérifier qu'elle sert à quelque chose et sinon la supprimer
+    # c'est probablement l'ancien menu avant de l'avoir mis dans son fichier dédié
     def run(self):
         continuer = True
         pressed = False
         self.score_text.change_text("Score : " + str(self.score), False)
         self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
         while continuer:
+            print("test1")
             self.window.blit(self.menu_image, (0, 0))
             pressed = False
             for event in pygame.event.get():
