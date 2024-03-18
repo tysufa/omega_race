@@ -1,7 +1,7 @@
 import pygame
 import os
 from text import Text
-from constantes import SIZE, MENU_MUSIC, ANIMATION_SPEED
+from constantes import SIZE, MENU_MUSIC, ANIMATION_SPEED, ANIMATION_STARTING_OFFSET
 import sys
 from game import Game
 
@@ -18,11 +18,27 @@ class Menu:
             "jouer": (SIZE[0] // 2, 300),
             "cartes_text": (SIZE[0] // 2, 400),
             "option_text": (SIZE[0] // 2, 450),
-            "music_text": (SIZE[0] // 2 + 400, 200),
-            "sound_text": (SIZE[0] // 2 + 400, 400),
-            "reset_high_score_text": (SIZE[0] // 2 + 400, 550),
-            "percentage_music_text": (SIZE[0] // 2 + 200 + 70 + 400, 200 - 25),
-            "percentage_sound_text": (SIZE[0] // 2 + 200 + 70 + 400, 400 - 25),
+            "music_text": (SIZE[0] // 2 - 200 + ANIMATION_STARTING_OFFSET, 200),
+            "sound_text": (SIZE[0] // 2 - 200 + ANIMATION_STARTING_OFFSET, 400),
+            "reset_high_score_text": (SIZE[0] // 2 + ANIMATION_STARTING_OFFSET, 550),
+            "percentage_music_text": (
+                SIZE[0] // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                200 - 25,
+            ),
+            "percentage_sound_text": (
+                SIZE[0] // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                400 - 25,
+            ),
+            "music_rod": (SIZE[0] // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
+            "music_rod_border": (
+                SIZE[0] // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                200 - 25 // 2,
+            ),
+            "sound_rod": (SIZE[0] // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
+            "sound_rod_border": (
+                SIZE[0] // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                400 - 25 // 2,
+            ),
         }
 
         self.title = Text("OMEGA RACE", 80, SIZE[0] // 2, SIZE[1] // 2, "white")
@@ -119,6 +135,14 @@ class Menu:
         self.percentage_music_text.change_text(self.percentage_music_text.text)
         self.percentage_sound_text.x = self.positions["percentage_sound_text"][0]
         self.percentage_sound_text.change_text(self.percentage_sound_text.text)
+        music_rod = pygame.rect.Rect(self.positions["music_rod"], (200, 25))
+        music_rod_border = pygame.rect.Rect(
+            self.positions["music_rod_border"], (200, 25)
+        )
+        sound_rod = pygame.rect.Rect((self.positions["sound_rod"]), (200, 25))
+        sound_rod_border = pygame.rect.Rect(
+            self.positions["sound_rod_border"], (200, 25)
+        )
 
         # initial locations
         reset_popup_text = Text(
@@ -138,22 +162,24 @@ class Menu:
             reset_popup_text, reset_popup_yes_text, reset_popup_no_text
         )
 
-        music_rod = pygame.rect.Rect(SIZE[0] // 2 - 50 + 400, 200 - 25 // 2, 200, 25)
-        music_rod_border = pygame.rect.Rect(SIZE[0] // 2 - 50, 200 - 25 // 2, 200, 25)
         music_rod.width = self.music_volume * 2
 
-        sound_rod = pygame.rect.Rect(SIZE[0] // 2 - 50, 400 - 25 // 2, 200, 25)
-        sound_rod_border = pygame.rect.Rect(SIZE[0] // 2 - 50, 400 - 25 // 2, 200, 25)
         sound_rod.width = self.sound_volume * 2
 
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
 
             # menu apparition animations
-            if self.music_text.rect.center[0] > SIZE[0] // 2 - 200:
+            if (
+                self.music_text.rect.center[0]
+                > self.positions["music_text"][0] - ANIMATION_STARTING_OFFSET
+            ):
                 self.music_text.rect.x -= ANIMATION_SPEED
 
-            if self.sound_text.rect.center[0] > SIZE[0] // 2 - 200:
+            if (
+                self.sound_text.rect.center[0]
+                > self.positions["sound_text"][0] - ANIMATION_STARTING_OFFSET
+            ):
                 self.sound_text.rect.x -= ANIMATION_SPEED
 
             if self.reset_high_score_text.rect.center[0] > SIZE[0] // 2:
@@ -161,19 +187,40 @@ class Menu:
 
             if (
                 self.percentage_music_text.x
-                > self.positions["percentage_music_text"][0] - 400
+                > self.positions["percentage_music_text"][0] - ANIMATION_STARTING_OFFSET
             ):
                 self.percentage_music_text.x -= ANIMATION_SPEED
                 self.percentage_music_text.change_text(self.percentage_music_text.text)
             if (
                 self.percentage_sound_text.x
-                > self.positions["percentage_sound_text"][0] - 400
+                > self.positions["percentage_sound_text"][0] - ANIMATION_STARTING_OFFSET
             ):
                 self.percentage_sound_text.x -= ANIMATION_SPEED
                 self.percentage_sound_text.change_text(self.percentage_sound_text.text)
 
-            if music_rod.left > SIZE[0] // 2 - 50:
-                music_rod.x -= 2
+            if (
+                music_rod.left
+                > self.positions["music_rod"][0] - ANIMATION_STARTING_OFFSET
+            ):
+                music_rod.x -= ANIMATION_SPEED
+
+            if (
+                music_rod_border.left
+                > self.positions["music_rod_border"][0] - ANIMATION_STARTING_OFFSET
+            ):
+                music_rod_border.x -= ANIMATION_SPEED
+
+            if (
+                sound_rod.left
+                > self.positions["sound_rod"][0] - ANIMATION_STARTING_OFFSET
+            ):
+                sound_rod.x -= ANIMATION_SPEED
+
+            if (
+                sound_rod_border.left
+                > self.positions["sound_rod_border"][0] - ANIMATION_STARTING_OFFSET
+            ):
+                sound_rod_border.x -= ANIMATION_SPEED
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
