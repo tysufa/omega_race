@@ -44,24 +44,35 @@ class Player(pygame.sprite.Sprite):
 
         self.hitbox = pygame.rect.Rect((self.x, self.y), HITBOX_SIZE)  # pour une taille de hitbox constante
 
-        self.alive = True
+        self.player_alive = True
         self.nb_life = LIFE_NB
-        self.respawn = False # sert dans game pour faire respawn les niveaux et le joueur
+        self.respawn = False  # sert dans game pour faire respawn les niveaux et le joueur
 
-        self.engine_anim = Anim(self.x, self.y, 11, (64, 64), 50,
-                                "image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False)
-        self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
-                                   "image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png", True)
+        self.engine_anim = Anim(
+            self.x, self.y, 11, (64, 64), 50, "image/Kla'ed/Engine/Kla'ed - Frigate - Engine.png", False
+        )
+        self.explosion_anim = Anim(
+            self.x,
+            self.y,
+            8,
+            (64, 64),
+            50,
+            "image/Kla'ed/Destruction/Kla'ed - Frigate - Destruction.png",
+            True,
+        )
 
-        self.player_anim = pygame.sprite.Group(self.engine_anim,
-                                               self.explosion_anim)  # on créer un groupe contenant les animations du joueur
+        self.player_anim = pygame.sprite.Group(
+            self.engine_anim, self.explosion_anim
+        )  # on créer un groupe contenant les animations du joueur
 
-        self.projectiles = pygame.sprite.Group()  # le groupe qui contiendra les projectiles à l'écran du joueur
+        self.projectiles = (
+            pygame.sprite.Group()
+        )  # le groupe qui contiendra les projectiles à l'écran du joueur
         self.reloading = False  # sert à tester si on peut tirer à nouveau ou non
 
-        self.rect_ecran = pygame.rect.Rect((WALL_DISTANCE, WALL_DISTANCE), (
-            SIZE[0] - WALL_DISTANCE * 2,
-            SIZE[1] - WALL_DISTANCE * 2))  # on créer un rectangle qui prend toute la fenetre
+        self.rect_ecran = pygame.rect.Rect(
+            (WALL_DISTANCE, WALL_DISTANCE), (SIZE[0] - WALL_DISTANCE * 2, SIZE[1] - WALL_DISTANCE * 2)
+        )  # on créer un rectangle qui prend toute la fenetre
 
         self.particles = []
 
@@ -72,7 +83,9 @@ class Player(pygame.sprite.Sprite):
         self.dissapearing_sound.set_volume(0.05 * sound_volume)
 
     def dispawn_projectile(self, projectile):
-        self.particles = create_particle_list(15, projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5)
+        self.particles = create_particle_list(
+            15, projectile.rect.x, projectile.rect.y, random.randint(6, 8), 2, 2, 0.3, 0.5
+        )
         projectile.remove(self.projectiles)
         self.dissapearing_sound.play()
 
@@ -89,19 +102,21 @@ class Player(pygame.sprite.Sprite):
 
     def die(self):
         self.nb_life -= 1
-        self.alive = False
+        self.player_alive = False
         self.explosion_anim.show = True
         self.engine_anim.show = False
         self.death_timer = pygame.time.get_ticks()
         self.explosion_sound.play()
 
     def respawn_function(self):
-        self.x = random.randint(WALL_DISTANCE, SIZE[0] - WALL_DISTANCE)  # même si l'on touche le mur on sera téléporté à l'intérieur de la fenetre de jeu
+        self.x = random.randint(
+            WALL_DISTANCE, SIZE[0] - WALL_DISTANCE
+        )  # même si l'on touche le mur on sera téléporté à l'intérieur de la fenetre de jeu
         self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
         self.hitbox.center = self.x, self.y
-        while self.hitbox.colliderect(self.rect_centre): # on ne veut pas respawn dans le rectangle au centre
-            self.x = random.randint(WALL_DISTANCE, SIZE[0]-WALL_DISTANCE)
-            self.y = random.randint(WALL_DISTANCE, SIZE[1]-WALL_DISTANCE)
+        while self.hitbox.colliderect(self.rect_centre):  # on ne veut pas respawn dans le rectangle au centre
+            self.x = random.randint(WALL_DISTANCE, SIZE[0] - WALL_DISTANCE)
+            self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
             self.hitbox.center = self.x, self.y
 
         self.velocity.x = 0
@@ -112,8 +127,8 @@ class Player(pygame.sprite.Sprite):
         angle_x = cos(radians(self.angle))
         angle_y = sin(radians(self.angle))
         # la prochaine velocité
-        new_velocity_x = (self.velocity.x + cos(radians(self.angle)))
-        new_velocity_y = (self.velocity.y + sin(radians(self.angle)))
+        new_velocity_x = self.velocity.x + cos(radians(self.angle))
+        new_velocity_y = self.velocity.y + sin(radians(self.angle))
 
         # on change la vélicité que si elle ne dépasse pas le maximum
         if angle_x < 0:
@@ -142,14 +157,16 @@ class Player(pygame.sprite.Sprite):
             if not anim.stay:  # si on ne doit pas laisser cette animation jusqu'à la fin :
                 anim.show = False  # on cache l'animation
 
-        if self.alive:
+        if self.player_alive:
             if keys[pygame.K_UP]:
                 self.move()  # on se déplace
                 self.engine_anim.show = True  # on veut afficher l'animation des réacteurs
 
             if keys[pygame.K_z] or keys[pygame.K_SPACE]:
                 if not self.reloading:
-                    self.projectiles.add(Projectiles(self.x, self.y, self.angle, window))  # on ajoute un nouveau projectile
+                    self.projectiles.add(
+                        Projectiles(self.x, self.y, self.angle, window)
+                    )  # on ajoute un nouveau projectile
                     self.shooting_sound.play()
                     self.reloading = True  # on passe en rechargement
                     self.time = pygame.time.get_ticks()
@@ -201,16 +218,17 @@ class Player(pygame.sprite.Sprite):
             elif projectile.rect.left < WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
 
-
-
-
         bounced = False
 
         # si le haut du vaisseau dépasse le haut de l'écran
         if self.hitbox.top < WALL_DISTANCE:
             self.hitbox.top = WALL_DISTANCE + 1  # on se replace 1 pixel en dessous
-            self.y = self.hitbox.center[1]  # on update aussi la coordonnée y car on a seulement modifié hitbox
-            self.velocity.y *= -self.velocity_lost  # on inverse la direction pour rebondir et on perd de la vitesse
+            self.y = self.hitbox.center[
+                1
+            ]  # on update aussi la coordonnée y car on a seulement modifié hitbox
+            self.velocity.y *= (
+                -self.velocity_lost
+            )  # on inverse la direction pour rebondir et on perd de la vitesse
             bounced = True
 
         if self.hitbox.bottom > SIZE[1] - WALL_DISTANCE:

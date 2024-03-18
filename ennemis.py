@@ -194,6 +194,8 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
         self.anim= Anim(self.x, self.y, 1, (32, 32), 400,
                                    "image/mine/mines2.png", True)
 
+        self.is_bullet = VARIABLES["MINE_AUTO_CLEAN"]
+
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
                                    "image/Nautolan/Destruction/Nautolan Ship - Bomber.png", True)

@@ -20,9 +20,7 @@ HITBOX_SIZE = (44, 44)
 ROTATION_SPEED = 5
 PLAYER_IMAGE = "image/Kla'ed/Base/Kla'ed - Frigate - Base.png"
 PLAYER_INITIAL_POSITION = (130, 160)
-RESPAWN_TIME = (
-    50 * 9
-)  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
+RESPAWN_TIME = 50 * 9  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 2
 
 FIRE_RATE = 550  # temps en millisecodes was 550
@@ -129,3 +127,4 @@ def reset():
     VARIABLES["CHARGEUR_ANGLE_ACCELERATION"] = CHARGEUR_ANGLE_ACCELERATION
     VARIABLES["TOURELLE_TIR"] = "tir"
     VARIABLES["MINE_TIRS"] = 0
+    VARIABLES["MINE_AUTO_CLEAN"]=False
