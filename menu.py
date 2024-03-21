@@ -10,7 +10,7 @@ pygame.init()
 
 class Menu:
     def __init__(self):
-        self.window = pygame.display.set_mode(SIZE)
+        self.window = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
 
         # list of all elements initial locations
         self.positions = {
@@ -266,6 +266,9 @@ class Menu:
                 option_text_group.draw(self.window)
             pygame.display.flip()
 
+    def resizeAssets(self):
+        pass
+
     def run(self):
         continuer = True
         pressed = False
@@ -279,6 +282,9 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
+
+                if event.type == pygame.WINDOWRESIZED:
+                    self.resizeAssets()
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
