@@ -266,6 +266,9 @@ class Menu:
                 option_text_group.draw(self.window)
             pygame.display.flip()
 
+    def resizeAssets(self):
+        pass
+
     def run(self):
         continuer = True
         pressed = False
@@ -281,6 +284,8 @@ class Menu:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
 
+                if event.type == pygame.WINDOWRESIZED:
+                    self.resizeAssets()
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)

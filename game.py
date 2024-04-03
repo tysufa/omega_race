@@ -358,15 +358,32 @@ class Game:
                 ret[7] += 1
         return ret
 
+    def choose_upgrades(self):
+        ###Gestion upgrade ennemis
+        for i in range(len(LISTE_UPGRADES)):
+            print("upgrade " + str(i) + " : " + LISTE_UPGRADES[i])
+        choix = int(input("choix upgrade : "))
+        while self.ennemis.upgrades[LISTE_UPGRADES[choix]]:
+            choix = int(input("Upgrade non cumulable. \nchoix upgrade : "))
+        self.ennemis.upgrades[LISTE_UPGRADES[choix]] = True
+        self.ennemis.gestion_upgrades()
+
+        print("upgrade 1 : vitesse vaisseau")
+        print("upgrade 2 : vie supp")
+        print("upgrade 3 : netoyage automatique")
+        choix = int(input("choix upgrade : "))
+        if choix == 1:
+            self.player.max_velocity += 5
+        elif choix == 2:
+            self.player.nb_life += 1
+        elif choix == 3:
+            VARIABLES["MINE_AUTO_CLEAN"] = True
+
     def respawn(self):
         if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
             self.level += 1
             self.level_text.change_text("niveau " + str(self.level))
             self.player.respawn_function()  # le joueur doit respawn pour ne pas être à la même position qu'au niveau précédent
-            up = LISTE_UPGRADES[randint(0, len(LISTE_UPGRADES) - 1)]
-            print("Upgrade choisie : " + up)
-            self.ennemis.upgrades[up] = True
-            self.ennemis.gestion_upgrades()
 
         if self.player.respawn:
             if self.player.nb_life < 0:
@@ -392,16 +409,8 @@ class Game:
                         for i in range(len(level)):
                             level[i] += self.levels[10 + (self.level - 1) % 10][i] * self.loop
 
-                    ### tu peux enlever mon code et mettre ton choix d'upgrade à la place ce code etait juste là pour vérifier si ça marche
-                    ### aussi met pas ton code autre part parce que toute la logique d'upgrade je vais la mettre dans une méthode qu'on appelera ici et flemme de chercher ton code
-                    print("upgrade 1 : vitesse vaisseau")
-                    print("upgrade 2 : vie supp")
-                    print("upgrade 3 : chépa")
-                    choix = int(input("choix upgrade : "))
-                    if choix == 1:
-                        self.player.max_velocity += 5
-                    elif choix == 2:
-                        self.player.nb_life += 1
+                    # si le niveau est finis car il n'y a plus d'ennemis, alors on choisis une upgrade, puis on fait respawn le niveau
+                    self.choose_upgrades()
                     self.spawn(level)
                 else:
                     tempo_level = self.decompter()
