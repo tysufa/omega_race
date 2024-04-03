@@ -10,11 +10,11 @@ pygame.init()
 
 class Menu:
     def __init__(self):
-        self.window = pygame.display.set_mode(SIZE)
+        self.window = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
 
         # list of all elements initial locations
         self.positions = {
-            "title": (SIZE[0] // 2, 100),
+            "title": (self.window.get_width() // 2, 100),
             "jouer": (SIZE[0] // 2, 300),
             "cartes_text": (SIZE[0] // 2, 400),
             "option_text": (SIZE[0] // 2, 450),
@@ -270,6 +270,7 @@ class Menu:
         continuer = True
         pressed = False
         while continuer:
+            print(self.positions["title"])
             self.window.blit(self.menu_image, (0, 0))
             pressed = False
             for event in pygame.event.get():
@@ -279,6 +280,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         pressed = True
+
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
