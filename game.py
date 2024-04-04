@@ -12,7 +12,7 @@ import sys
 class Game:
     def __init__(self, window, clock):
         self.window = window
-        self.screen_surface = pygame.surface.Surface(SIZE)
+        self.screen_surface = pygame.surface.Surface(self.window.get_size())
         self.clock = clock
         pygame.display.set_caption(TITLE)
 
@@ -38,8 +38,13 @@ class Game:
         self.player_image = pygame.transform.rotate(pygame.image.load(PLAYER_IMAGE).convert_alpha(), -90)
 
         # on fait le carré principale en fonction de la taille de la fenetre
-        self.center_square = pygame.rect.Rect((0, 0, SIZE[0] // 3, SIZE[1] // 3))
-        self.center_square.center = (SIZE[0] // 2, SIZE[1] // 2)  # on place le carré au centre de l'écran
+        self.center_square = pygame.rect.Rect(
+            (0, 0, self.window.get_size()[0] // 3, self.window.get_size()[1] // 3)
+        )
+        self.center_square.center = (
+            self.window.get_size()[0] // 2,
+            self.window.get_size()[1] // 2,
+        )  # on place le carré au centre de l'écran
 
         self.score = 0
         with open("saves/score.txt", "r") as fichier:
@@ -63,10 +68,28 @@ class Game:
         )
 
         ##### walls ######
-        top_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
-        right_wall = Wall(SIZE[0] - WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE * 2, 1, "white")
-        down_wall = Wall(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE, SIZE[0] - WALL_DISTANCE * 2, 1, 1, "white")
-        left_wall = Wall(WALL_DISTANCE, WALL_DISTANCE, 1, SIZE[1] - WALL_DISTANCE * 2, 1, "white")
+        top_wall = Wall(
+            WALL_DISTANCE, WALL_DISTANCE, self.window.get_size()[0] - WALL_DISTANCE * 2, 1, 1, "white"
+        )
+        right_wall = Wall(
+            self.window.get_size()[0] - WALL_DISTANCE,
+            WALL_DISTANCE,
+            1,
+            self.window.get_size()[1] - WALL_DISTANCE * 2,
+            1,
+            "white",
+        )
+        down_wall = Wall(
+            WALL_DISTANCE,
+            self.window.get_size()[1] - WALL_DISTANCE,
+            self.window.get_size()[0] - WALL_DISTANCE * 2,
+            1,
+            1,
+            "white",
+        )
+        left_wall = Wall(
+            WALL_DISTANCE, WALL_DISTANCE, 1, self.window.get_size()[1] - WALL_DISTANCE * 2, 1, "white"
+        )
 
         self.walls = pygame.sprite.Group(top_wall, right_wall, down_wall, left_wall)
 
@@ -112,7 +135,7 @@ class Game:
         continuer = True
 
         pause_text = Text("Pause", 80, 0, 0, "orange")
-        pause_text.rect.center = SIZE[0] // 2, SIZE[1] // 2
+        pause_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
 
         while continuer:
             for event in pygame.event.get():
@@ -135,8 +158,8 @@ class Game:
 
         pause_text = Text("appuyez sur une ", 30, 0, 0, "orange")
         pause_text_2 = Text("touche pour jouer", 30, 0, 0, "orange")
-        pause_text.rect.center = SIZE[0] // 2, SIZE[1] // 2
-        pause_text_2.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 30
+        pause_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
+        pause_text_2.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 30
 
         if pygame.time.get_ticks() - self.time_after_death > 100:
             while continuer:
@@ -212,8 +235,8 @@ class Game:
                 if i == 0:
                     self.ennemis.tab.append(
                         Mine(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -221,8 +244,8 @@ class Game:
                 elif i == 1:
                     self.ennemis.tab.append(
                         Asteroid(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -230,8 +253,8 @@ class Game:
                 elif i == 2:
                     self.ennemis.tab.append(
                         Chargeur(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -239,8 +262,8 @@ class Game:
                 elif i == 3:
                     self.ennemis.tab.append(
                         Tourelle(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -248,8 +271,8 @@ class Game:
                 elif i == 4:
                     self.ennemis.tab.append(
                         Miner(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -257,8 +280,8 @@ class Game:
                 elif i == 5:
                     self.ennemis.tab.append(
                         Tourelle(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                             True,
@@ -267,8 +290,8 @@ class Game:
                 elif i == 6:
                     self.ennemis.tab.append(
                         Chargeur(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                             True,
@@ -277,8 +300,8 @@ class Game:
                 elif i == 7:
                     self.ennemis.tab.append(
                         Rocketship(
-                            randint(40, SIZE[0] - 40),
-                            randint(40, SIZE[1] - 40),
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
                             self.center_square,
                         )
@@ -478,6 +501,7 @@ class Game:
 
     def run(self):
         while self.continuer:
+            print(self.window.get_size())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -504,17 +528,27 @@ class GameOver:
         self.clock = clock
         self.score = 0
 
-        self.game_over_text = Text("Game Over", 90, SIZE[0] // 2, SIZE[1] // 2, "red")
-        self.game_over_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 250
+        self.game_over_text = Text(
+            "Game Over", 90, self.window.get_size()[0] // 2, self.window.get_size()[1] // 2, "red"
+        )
+        self.game_over_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 - 250
 
-        self.score_text = Text("Score : " + str(self.score), 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
+        self.score_text = Text(
+            "Score : " + str(self.score),
+            60,
+            self.window.get_size()[0] // 2,
+            self.window.get_size()[1] // 2,
+            "white",
+        )
+        self.score_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 - 100
 
-        self.rejouer = Text("Rejouer", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.rejouer.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 50
+        self.rejouer = Text(
+            "Rejouer", 60, self.window.get_size()[0] // 2, self.window.get_size()[1] // 2, "white"
+        )
+        self.rejouer.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 50
 
-        self.menu = Text("Menu", 60, SIZE[0] // 2, SIZE[1] // 2, "white")
-        self.menu.rect.center = SIZE[0] // 2, SIZE[1] // 2 + 150
+        self.menu = Text("Menu", 60, self.window.get_size()[0] // 2, self.window.get_size()[1] // 2, "white")
+        self.menu.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 150
 
         self.text_group = pygame.sprite.Group(self.rejouer, self.menu, self.game_over_text, self.score_text)
 
@@ -533,7 +567,7 @@ class GameOver:
         continuer = True
         pressed = False
         self.score_text.change_text("Score : " + str(self.score), False)
-        self.score_text.rect.center = SIZE[0] // 2, SIZE[1] // 2 - 100
+        self.score_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 - 100
         while continuer:
             self.window.blit(self.menu_image, (0, 0))
             pressed = False

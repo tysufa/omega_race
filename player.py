@@ -13,6 +13,8 @@ pygame.init()
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, rect_centre, ennemis):
         super().__init__()
+        self.height = SIZE[1]
+        self.width = SIZE[0]
         self.base_image = pygame.image.load(PLAYER_IMAGE).convert_alpha()
         # on tourne l'image vers la droite
         self.base_image = pygame.transform.rotozoom(self.base_image, -90, 1)

@@ -14,7 +14,7 @@ class Menu:
 
         # list of all elements initial locations
         self.positions = {
-            "title": (self.window.get_width() // 2, self.window.get_height()//7),
+            "title": (self.window.get_width() // 2, self.window.get_height() // 7),
             "jouer": (self.window.get_width() // 2, 300),
             "cartes_text": (self.window.get_width() // 2, 400),
             "option_text": (self.window.get_width() // 2, 450),
@@ -25,11 +25,20 @@ class Menu:
                 self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
                 200 - 25,
             ),
-            "percentage_sound_text": (self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET, 400 - 25),
+            "percentage_sound_text": (
+                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                400 - 25,
+            ),
             "music_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
-            "music_rod_border": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
+            "music_rod_border": (
+                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                200 - 25 // 2,
+            ),
             "sound_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
-            "sound_rod_border": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
+            "sound_rod_border": (
+                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                400 - 25 // 2,
+            ),
         }
 
         self.title = Text("OMEGA RACE", 80, SIZE[0] // 2, SIZE[1] // 2, "white")
@@ -192,7 +201,6 @@ class Menu:
                 if event.type == pygame.WINDOWRESIZED:
                     self.resizeAssets(True)
 
-
             if pygame.mouse.get_pressed()[0]:
                 mouse_pos = pygame.mouse.get_pos()
                 if music_rod_border.collidepoint(mouse_pos):
@@ -274,11 +282,9 @@ class Menu:
         # on charge les images à nouveau pour éviter des déformations à cause des rescale en boucle
         self.menu_image = pygame.image.load("image/background/menu_background.png").convert_alpha()
 
-
         self.menu_image = pygame.transform.scale(self.menu_image, self.window.get_size())
 
-        if inOptions:
-            ANIMATION_STARTING_OFFSET = 0
+        ANIMATION_STARTING_OFFSET = 200
 
         self.positions = {
             "title": (self.window.get_width() // 2, 100),
@@ -292,11 +298,20 @@ class Menu:
                 self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
                 200 - 25,
             ),
-            "percentage_sound_text": (self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET, 400 - 25),
+            "percentage_sound_text": (
+                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                400 - 25,
+            ),
             "music_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
-            "music_rod_border": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
+            "music_rod_border": (
+                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                200 - 25 // 2,
+            ),
             "sound_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
-            "sound_rod_border": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
+            "sound_rod_border": (
+                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                400 - 25 // 2,
+            ),
         }
 
         self.title.rect.center = self.positions["title"]
@@ -304,8 +319,10 @@ class Menu:
         self.option_text.rect.center = self.positions["option_text"]
         self.music_text.rect.center = self.positions["music_text"]
 
-
-
+        if inOptions:
+            ANIMATION_STARTING_OFFSET = 200
+        else:
+            ANIMATION_STARTING_OFFSET = 1000
 
     def run(self):
         continuer = True
@@ -323,6 +340,8 @@ class Menu:
 
                 if event.type == pygame.WINDOWRESIZED:
                     self.resizeAssets(False)
+                    self.game = Game(self.window, self.clock)
+                    self.game.player.width = self.window.get_width()
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
