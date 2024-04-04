@@ -342,6 +342,7 @@ class Menu:
                     self.resizeAssets(False)
                     self.game = Game(self.window, self.clock)
                     self.game.player.width = self.window.get_width()
+                    self.game.player.height = self.window.get_height()
 
             self.jouer.color = "white"
             self.jouer.change_text("Jouer", False)
