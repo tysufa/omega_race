@@ -194,7 +194,7 @@ class Game:
 
         self.continuer = True
 
-        self.background_img = pygame.image.load(random.choice(self.backgrounds))
+        self.background_img = pygame.transform.scale(pygame.image.load(random.choice(self.backgrounds)), self.window.get_size())
 
         self.score = 0
         with open("saves/score.txt", "r") as fichier:
@@ -501,7 +501,6 @@ class Game:
 
     def run(self):
         while self.continuer:
-            print(self.window.get_size())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

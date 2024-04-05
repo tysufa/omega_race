@@ -324,6 +324,10 @@ class Menu:
         else:
             ANIMATION_STARTING_OFFSET = 1000
 
+
+        ### Resize of Game assets
+        self.game = Game(self.window, self.clock)
+
     def run(self):
         continuer = True
         pressed = False
@@ -340,7 +344,6 @@ class Menu:
 
                 if event.type == pygame.WINDOWRESIZED:
                     self.resizeAssets(False)
-                    self.game = Game(self.window, self.clock)
                     self.game.player.width = self.window.get_width()
                     self.game.player.height = self.window.get_height()
 
