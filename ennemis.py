@@ -94,8 +94,8 @@ class Ennemy_list:  # liste des ennemis en jeu
 
             else:  # si l'ennemi n'est pas vivant :
                 if type(self.tab[i])==Mine:
-                    for i in range(VARIABLES["MINE_TIRS"]):
-                            liste.append(Rocket(self.x,self.y, self.window, self.centre,(360/VARIABLES["MINE_TIRS"])*i))
+                    for j in range(VARIABLES["MINE_TIRS"]):
+                            tmp.append(Tir(self.tab[i].x,self.tab[i].y, self.tab[i].window, self.tab[i].centre,(360/VARIABLES["MINE_TIRS"])*j))
                 if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
@@ -123,9 +123,9 @@ class Ennemy_list:  # liste des ennemis en jeu
             VARIABLES["CHARGEUR_ROTATION_SPEED"]*=CHARGEUR_ROTATION_SPEED_UPGRADE_MULTIPLIER
             VARIABLES["CHARGEUR_ANGLE_ACCELERATION"]*=CHARGEUR_ANGLE_ACCELERATION_UPGRADE_MULTIPLIER
             self.upgrades["chargeur_rotation+"]=False
-        if (VARIABLES["TOURELLE_TIR"] == "tir" and self.upgrades["tourelle_rocket"]):
+        if (self.upgrades["tourelle_rocket"]):
             VARIABLES["TOURELLE_TIR"] = "rocket"
-        if (VARIABLES["MINE_TIRS"] == "tir" and self.upgrades["mine_shrapnel"]):
+        if (self.upgrades["mine_shrapnel"]):
             VARIABLES["MINE_TIRS"] = 5
 
     def draw(self):

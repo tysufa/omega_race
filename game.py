@@ -396,6 +396,7 @@ class Game:
                     choix = int(input("choix upgrade : "))
                     while (self.ennemis.upgrades[LISTE_UPGRADES[choix]]):
                         choix = int(input("Upgrade non cumulable. \nchoix upgrade : "))
+                        print(VARIABLES["MINE_TIRS"])
                     self.ennemis.upgrades[LISTE_UPGRADES[choix]]=True
                     self.ennemis.gestion_upgrades()
                     ### aussi met pas ton code autre part parce que toute la logique d'upgrade je vais la mettre dans une méthode qu'on appelera ici et flemme de chercher ton code

@@ -45,6 +45,7 @@ LISTE_UPGRADES = [
     "tir_vitesse+",
     "chargeur_rotation+",
     "tourelle_rocket",
+    "mine_shrapnel",
 ]
 
 ###Asteroid###
