@@ -12,31 +12,33 @@ class Menu:
     def __init__(self):
         self.window = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
 
+        self.animationStartingOffset = ANIMATION_STARTING_OFFSET
+
         # list of all elements initial locations
         self.positions = {
             "title": (self.window.get_width() // 2, self.window.get_height() // 7),
             "jouer": (self.window.get_width() // 2, 300),
             "cartes_text": (self.window.get_width() // 2, 400),
             "option_text": (self.window.get_width() // 2, 450),
-            "music_text": (self.window.get_width() // 2 - 200 + ANIMATION_STARTING_OFFSET, 200),
-            "sound_text": (self.window.get_width() // 2 - 200 + ANIMATION_STARTING_OFFSET, 400),
-            "reset_high_score_text": (self.window.get_width() // 2 + ANIMATION_STARTING_OFFSET, 550),
+            "music_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 200),
+            "sound_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 400),
+            "reset_high_score_text": (self.window.get_width() // 2 + self.animationStartingOffset, 550),
             "percentage_music_text": (
-                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
                 200 - 25,
             ),
             "percentage_sound_text": (
-                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
                 400 - 25,
             ),
-            "music_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
+            "music_rod": (self.window.get_width() // 2 - 50 + self.animationStartingOffset, 200 - 25 // 2),
             "music_rod_border": (
-                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 - 50 + self.animationStartingOffset,
                 200 - 25 // 2,
             ),
-            "sound_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
+            "sound_rod": (self.window.get_width() // 2 - 50 + self.animationStartingOffset, 400 - 25 // 2),
             "sound_rod_border": (
-                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 - 50 + self.animationStartingOffset,
                 400 - 25 // 2,
             ),
         }
@@ -119,10 +121,10 @@ class Menu:
         self.percentage_sound_text.change_text(self.percentage_sound_text.text)
 
     def menu_elements_animation(self):
-        if self.music_text.rect.center[0] > self.positions["music_text"][0] - ANIMATION_STARTING_OFFSET:
+        if self.music_text.rect.center[0] > self.positions["music_text"][0] - self.animationStartingOffset:
             self.music_text.rect.x -= ANIMATION_SPEED
 
-        if self.sound_text.rect.center[0] > self.positions["sound_text"][0] - ANIMATION_STARTING_OFFSET:
+        if self.sound_text.rect.center[0] > self.positions["sound_text"][0] - self.animationStartingOffset:
             self.sound_text.rect.x -= ANIMATION_SPEED
 
         if self.reset_high_score_text.rect.center[0] > SIZE[0] // 2:
@@ -130,13 +132,13 @@ class Menu:
 
         if (
             self.percentage_music_text.x
-            > self.positions["percentage_music_text"][0] - ANIMATION_STARTING_OFFSET
+            > self.positions["percentage_music_text"][0] - self.animationStartingOffset
         ):
             self.percentage_music_text.x -= ANIMATION_SPEED
             self.percentage_music_text.change_text(self.percentage_music_text.text)
         if (
             self.percentage_sound_text.x
-            > self.positions["percentage_sound_text"][0] - ANIMATION_STARTING_OFFSET
+            > self.positions["percentage_sound_text"][0] - self.animationStartingOffset
         ):
             self.percentage_sound_text.x -= ANIMATION_SPEED
             self.percentage_sound_text.change_text(self.percentage_sound_text.text)
@@ -177,16 +179,16 @@ class Menu:
             # menu apparition animations
             self.menu_elements_animation()
 
-            if music_rod.left > self.positions["music_rod"][0] - ANIMATION_STARTING_OFFSET:
+            if music_rod.left > self.positions["music_rod"][0] - self.animationStartingOffset:
                 music_rod.x -= ANIMATION_SPEED
 
-            if music_rod_border.left > self.positions["music_rod_border"][0] - ANIMATION_STARTING_OFFSET:
+            if music_rod_border.left > self.positions["music_rod_border"][0] - self.animationStartingOffset:
                 music_rod_border.x -= ANIMATION_SPEED
 
-            if sound_rod.left > self.positions["sound_rod"][0] - ANIMATION_STARTING_OFFSET:
+            if sound_rod.left > self.positions["sound_rod"][0] - self.animationStartingOffset:
                 sound_rod.x -= ANIMATION_SPEED
 
-            if sound_rod_border.left > self.positions["sound_rod_border"][0] - ANIMATION_STARTING_OFFSET:
+            if sound_rod_border.left > self.positions["sound_rod_border"][0] - self.animationStartingOffset:
                 sound_rod_border.x -= ANIMATION_SPEED
 
             for event in pygame.event.get():
@@ -284,32 +286,36 @@ class Menu:
 
         self.menu_image = pygame.transform.scale(self.menu_image, self.window.get_size())
 
-        ANIMATION_STARTING_OFFSET = 200
+        if inOptions:
+            self.animationStartingOffset = 0
+        else:
+            self.animationStartingOffset = 1000
+
 
         self.positions = {
             "title": (self.window.get_width() // 2, 100),
             "jouer": (self.window.get_width() // 2, 300),
             "cartes_text": (self.window.get_width() // 2, 400),
             "option_text": (self.window.get_width() // 2, 450),
-            "music_text": (self.window.get_width() // 2 - 200 + ANIMATION_STARTING_OFFSET, 200),
-            "sound_text": (self.window.get_width() // 2 - 200 + ANIMATION_STARTING_OFFSET, 400),
-            "reset_high_score_text": (self.window.get_width() // 2 + ANIMATION_STARTING_OFFSET, 550),
+            "music_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 200),
+            "sound_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 400),
+            "reset_high_score_text": (self.window.get_width() // 2 + self.animationStartingOffset, 550),
             "percentage_music_text": (
-                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
                 200 - 25,
             ),
             "percentage_sound_text": (
-                self.window.get_width() // 2 + 200 + 70 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
                 400 - 25,
             ),
-            "music_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 200 - 25 // 2),
+            "music_rod": (self.window.get_width() // 2 - 50 + self.animationStartingOffset, 200 - 25 // 2),
             "music_rod_border": (
-                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 - 50 + self.animationStartingOffset,
                 200 - 25 // 2,
             ),
-            "sound_rod": (self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET, 400 - 25 // 2),
+            "sound_rod": (self.window.get_width() // 2 - 50 + self.animationStartingOffset, 400 - 25 // 2),
             "sound_rod_border": (
-                self.window.get_width() // 2 - 50 + ANIMATION_STARTING_OFFSET,
+                self.window.get_width() // 2 - 50 + self.animationStartingOffset,
                 400 - 25 // 2,
             ),
         }
@@ -318,11 +324,12 @@ class Menu:
         self.jouer.rect.center = self.positions["jouer"]
         self.option_text.rect.center = self.positions["option_text"]
         self.music_text.rect.center = self.positions["music_text"]
+        self.sound_text.rect.center = self.positions["sound_text"]
 
         if inOptions:
-            ANIMATION_STARTING_OFFSET = 200
+            self.animationStartingOffset = 0
         else:
-            ANIMATION_STARTING_OFFSET = 1000
+            self.animationStartingOffset = 1000
 
 
         ### Resize of Game assets
@@ -343,7 +350,7 @@ class Menu:
                         pressed = True
 
                 if event.type == pygame.WINDOWRESIZED:
-                    self.resizeAssets(False)
+                    self.resizeAssets(True)
                     self.game.player.width = self.window.get_width()
                     self.game.player.height = self.window.get_height()
 
