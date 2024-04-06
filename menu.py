@@ -127,7 +127,7 @@ class Menu:
         if self.sound_text.rect.center[0] > self.positions["sound_text"][0] - self.animationStartingOffset:
             self.sound_text.rect.x -= ANIMATION_SPEED
 
-        if self.reset_high_score_text.rect.center[0] > SIZE[0] // 2:
+        if self.reset_high_score_text.rect.center[0] > self.positions["reset_high_score_text"][0]:
             self.reset_high_score_text.rect.x -= ANIMATION_SPEED
 
         if (
@@ -293,20 +293,20 @@ class Menu:
 
 
         self.positions = {
-            "title": (self.window.get_width() // 2, 100),
-            "jouer": (self.window.get_width() // 2, 300),
-            "cartes_text": (self.window.get_width() // 2, 400),
-            "option_text": (self.window.get_width() // 2, 450),
-            "music_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 200),
-            "sound_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, 400),
-            "reset_high_score_text": (self.window.get_width() // 2 + self.animationStartingOffset, 550),
+            "title": (self.window.get_width() // 2, self.window.get_height()//7),
+            "jouer": (self.window.get_width() // 2, int(self.window.get_height()/2.4)),
+            "cartes_text": (self.window.get_width()//2,int(self.window.get_height()/1.8)),
+            "option_text": (self.window.get_width()//2, int(self.window.get_height()/1.6)),
+            "music_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, int(self.window.get_height()/3.6)),
+            "sound_text": (self.window.get_width() // 2 - 200 + self.animationStartingOffset, int(self.window.get_height()/1.8)),
+            "reset_high_score_text": (self.window.get_width() // 2 + self.animationStartingOffset, int(self.window.get_height()/1.3)),
             "percentage_music_text": (
                 self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
-                200 - 25,
+                int(self.window.get_height()/3.6) - 25,
             ),
             "percentage_sound_text": (
                 self.window.get_width() // 2 + 200 + 70 + self.animationStartingOffset,
-                400 - 25,
+                int(self.window.get_height()/1.8) - 25,
             ),
             "music_rod": (self.window.get_width() // 2 - 50 + self.animationStartingOffset, 200 - 25 // 2),
             "music_rod_border": (
@@ -325,6 +325,7 @@ class Menu:
         self.option_text.rect.center = self.positions["option_text"]
         self.music_text.rect.center = self.positions["music_text"]
         self.sound_text.rect.center = self.positions["sound_text"]
+        self.reset_high_score_text.rect.center = self.positions["reset_high_score_text"]
 
         if inOptions:
             self.animationStartingOffset = 0
