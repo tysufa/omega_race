@@ -42,6 +42,8 @@ class Player(pygame.sprite.Sprite):
         self.max_velocity = MAX_PLAYER_SPEED
         self.angle = 0
 
+        self.fire_rate = FIRE_RATE
+
         self.rect = self.image.get_rect(center=(self.x, self.y))  # pour l'affichage et la position de l'img
 
         self.hitbox = pygame.rect.Rect((self.x, self.y), HITBOX_SIZE)  # pour une taille de hitbox constante
@@ -150,7 +152,7 @@ class Player(pygame.sprite.Sprite):
     def update(self, window):
 
         if self.reloading:  # si on est en train de "recharger" :
-            if pygame.time.get_ticks() - self.time > FIRE_RATE:  # si on à dépassé le temps de recharge
+            if pygame.time.get_ticks() - self.time > self.fire_rate:  # si on à dépassé le temps de recharge
                 self.reloading = False  # on peut à nouveau tirer
 
         keys = pygame.key.get_pressed()  # on récupère la liste des touches appuyées
