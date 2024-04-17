@@ -423,6 +423,11 @@ class Game:
         print("upgrade 1 : vitesse vaisseau")
         print("upgrade 2 : vie supp")
         print("upgrade 3 : netoyage automatique")
+        print("upgrade 4 : tirs plus rapides")
+        print("upgrade 5 : freinage possible") # TODO: d'abord un booleen en mode freinage possible puis l'ugrade se transforme en freinage de plus en plus efficace
+        print("upgrade 6 : taille des balles") # NOTE: decider si on sépare la taille des balles entre joueur et ennemis ou pas
+        print("upgrade 7 : vitesse des balles")
+        print("shield ?")
         choix = int(input("choix upgrade : "))
         if choix == 1:
             self.player.max_velocity += 5
@@ -430,6 +435,8 @@ class Game:
             self.player.nb_life += 1
         elif choix == 3:
             VARIABLES["MINE_AUTO_CLEAN"] = True
+        elif choix == 4:
+            self.player.fire_rate = round(0.85 * self.player.fire_rate)
 
     def respawn(self):
         if len(self.ennemis.tab) == 0 or self.ennemis.only_bullet:
