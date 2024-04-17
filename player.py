@@ -13,6 +13,8 @@ pygame.init()
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, rect_centre, ennemis):
         super().__init__()
+        self.height = SIZE[1]
+        self.width = SIZE[0]
         self.base_image = pygame.image.load(PLAYER_IMAGE).convert_alpha()
         # on tourne l'image vers la droite
         self.base_image = pygame.transform.rotozoom(self.base_image, -90, 1)
@@ -71,7 +73,7 @@ class Player(pygame.sprite.Sprite):
         self.reloading = False  # sert à tester si on peut tirer à nouveau ou non
 
         self.rect_ecran = pygame.rect.Rect(
-            (WALL_DISTANCE, WALL_DISTANCE), (SIZE[0] - WALL_DISTANCE * 2, SIZE[1] - WALL_DISTANCE * 2)
+            (WALL_DISTANCE, WALL_DISTANCE), (self.width - WALL_DISTANCE * 2, self.height - WALL_DISTANCE * 2)
         )  # on créer un rectangle qui prend toute la fenetre
 
         self.particles = []
@@ -110,13 +112,13 @@ class Player(pygame.sprite.Sprite):
 
     def respawn_function(self):
         self.x = random.randint(
-            WALL_DISTANCE, SIZE[0] - WALL_DISTANCE
+            WALL_DISTANCE, self.width - WALL_DISTANCE
         )  # même si l'on touche le mur on sera téléporté à l'intérieur de la fenetre de jeu
-        self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
+        self.y = random.randint(WALL_DISTANCE, self.height - WALL_DISTANCE)
         self.hitbox.center = self.x, self.y
         while self.hitbox.colliderect(self.rect_centre):  # on ne veut pas respawn dans le rectangle au centre
-            self.x = random.randint(WALL_DISTANCE, SIZE[0] - WALL_DISTANCE)
-            self.y = random.randint(WALL_DISTANCE, SIZE[1] - WALL_DISTANCE)
+            self.x = random.randint(WALL_DISTANCE, self.width - WALL_DISTANCE)
+            self.y = random.randint(WALL_DISTANCE, self.height - WALL_DISTANCE)
             self.hitbox.center = self.x, self.y
 
         self.velocity.x = 0
@@ -209,10 +211,10 @@ class Player(pygame.sprite.Sprite):
             if projectile.rect.top < WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
 
-            elif projectile.rect.bottom > SIZE[1] - WALL_DISTANCE:
+            elif projectile.rect.bottom > self.height - WALL_DISTANCE:
                 self.dispawn_projectile(projectile)
 
-            if projectile.rect.right > SIZE[0]:
+            if projectile.rect.right > self.width:
                 self.dispawn_projectile(projectile)
 
             elif projectile.rect.left < WALL_DISTANCE:
@@ -231,8 +233,8 @@ class Player(pygame.sprite.Sprite):
             )  # on inverse la direction pour rebondir et on perd de la vitesse
             bounced = True
 
-        if self.hitbox.bottom > SIZE[1] - WALL_DISTANCE:
-            self.hitbox.bottom = SIZE[1] - WALL_DISTANCE - 1
+        if self.hitbox.bottom > self.height - WALL_DISTANCE:
+            self.hitbox.bottom = self.height - WALL_DISTANCE - 1
             self.y = self.hitbox.center[1]
             self.velocity.y *= -self.velocity_lost
             bounced = True
@@ -243,8 +245,8 @@ class Player(pygame.sprite.Sprite):
             self.velocity.x *= -self.velocity_lost
             bounced = True
 
-        if self.hitbox.right > SIZE[0] - WALL_DISTANCE:
-            self.hitbox.right = SIZE[0] - WALL_DISTANCE - 1
+        if self.hitbox.right > self.width - WALL_DISTANCE:
+            self.hitbox.right = self.width - WALL_DISTANCE - 1
             self.x = self.hitbox.center[0]
             self.velocity.x *= -self.velocity_lost
             bounced = True

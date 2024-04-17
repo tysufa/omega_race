@@ -23,7 +23,7 @@ PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 2
 
-FIRE_RATE = 550  # temps en millisecodes was 550
+FIRE_RATE = 0  # temps en millisecodes was 550
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.7 * PLAYER_SPEED
 BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 
@@ -41,12 +41,29 @@ ROCKETSHIP_SCORE = 500
 
 LISTE_UPGRADES = [
     "tourelle_cadence+",
-    "tourelle_grace-",
+    "tourelle_preigniter",
     "tir_vitesse+",
     "chargeur_rotation+",
     "tourelle_rocket",
     "mine_shrapnel",
+    "shield_rage",
+    "extra_shields",
+    "rocket_preigniter"
 ]
+"""#code en cours pour faire des upgrades une classe
+class Upgrades:
+    def __init__(self,name,dispalyed_name="",max_stacks=1,level_requirement):
+        self.name=name
+        if(displayed_name==""):
+            self.displayed_name=name
+        else:
+            self.displayed_name=displayed_name
+        self.max_stacks=max_stacks
+        self.level_requirement=level_requirement
+        LISTE_UPGRADES.append(self)
+
+    #def apply (self):#fonction appelée a chaque fois que l'uprgade est prise.
+"""
 
 ###Asteroid###
 # constantes :
@@ -58,9 +75,9 @@ TIR_VITESSE_UPGRADE_MULTIPLIER = 1.5
 TIR_VITESSE = 4.0
 
 ###Rocket###
-ROCKET_VITESSE = 5
-ROCKET_ROTATION = 4
-ROCKET_ROTATION_DECAY = 0.99
+ROCKET_VITESSE = 4
+ROCKET_ROTATION = 1.5
+ROCKET_ROTATION_DECAY = 1
 
 ###Chargeur###
 CHARGEUR_SCORE = 300
@@ -72,11 +89,10 @@ CHARGEUR_MAX_SPEED = 3
 CHARGEUR_ACCELERATION = 0.1
 CHARGEUR_DECELERATION = 0.1
 CHARGEUR_ANGLE_ACCELERATION = 20.0  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
-
+CHARGEUR_SHIELD_RAGE_MAX__SPEED = 5#la vitesse de l'ennemi quand il a un bouclier et que l'uprgade correspondante est prise
 
 ###Tourelle###
 TOURELLE_SCORE = 400
-TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER = 0.60
 TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER = 0.75
 TOURELLE_INITIAL_CLOCK = [
     200.0,
@@ -128,4 +144,10 @@ def reset():
     VARIABLES["CHARGEUR_ANGLE_ACCELERATION"] = CHARGEUR_ANGLE_ACCELERATION
     VARIABLES["TOURELLE_TIR"] = "tir"
     VARIABLES["MINE_TIRS"] = 0
+    VARIABLES["EXTRA_SHIELDS"]=0
+    VARIABLES["SHIELD_RAGE"]=0
     VARIABLES["MINE_AUTO_CLEAN"]=False
+    VARIABLES["ROCKETSHIP_INITIAL_CLOCK"] = [
+    400,
+    500,
+    ]

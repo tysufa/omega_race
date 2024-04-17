@@ -93,9 +93,10 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
-                if type(self.tab[i])==Mine:
+                if type(self.tab[i])==Mine and self.tab[i].aled:
                     for j in range(VARIABLES["MINE_TIRS"]):
-                            tmp.append(Tir(self.tab[i].x,self.tab[i].y, self.tab[i].window, self.tab[i].centre,(360/VARIABLES["MINE_TIRS"])*j))
+                        tmp.append(Tir(self.tab[i].x,self.tab[i].y, self.tab[i].window, self.tab[i].centre,(360/VARIABLES["MINE_TIRS"])*j))
+                    self.tab[i].aled=False
                 if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
@@ -112,10 +113,9 @@ class Ennemy_list:  # liste des ennemis en jeu
             VARIABLES["TOURELLE_NEW_CLOCK"][0]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
             VARIABLES["TOURELLE_NEW_CLOCK"][1]*=TOURELLE_NEW_CLOCK_UPGRADE_MULTIPLIER
             self.upgrades["tourelle_cadence+"]=False
-        if self.upgrades["tourelle_grace-"]:
-            VARIABLES["TOURELLE_INITIAL_CLOCK"][0]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
-            VARIABLES["TOURELLE_INITIAL_CLOCK"][1]*=TOURELLE_INITIAL_CLOCK_UPGRADE_MULTIPLIER
-            self.upgrades["tourelle_grace-"]=False
+        if self.upgrades["tourelle_preigniter"]:
+            VARIABLES["TOURELLE_INITIAL_CLOCK"][0]=0
+            VARIABLES["TOURELLE_INITIAL_CLOCK"][1]=0
         if self.upgrades["tir_vitesse+"]:
             VARIABLES["TIR_VITESSE"]*=TIR_VITESSE_UPGRADE_MULTIPLIER
             self.upgrades["tir_vitesse+"]=False
@@ -127,6 +127,16 @@ class Ennemy_list:  # liste des ennemis en jeu
             VARIABLES["TOURELLE_TIR"] = "rocket"
         if (self.upgrades["mine_shrapnel"]):
             VARIABLES["MINE_TIRS"] = 5
+        if (self.upgrades["shield_rage"]):
+            VARIABLES["SHIELD_RAGE"] += 1
+            self.upgrades["shield_rage"]=False
+        if (self.upgrades["extra_shields"]):
+            VARIABLES["EXTRA_SHIELDS"] += 2
+            self.upgrades["extra_shields"]=False
+        if (self.upgrades["rocket_preigniter"]):
+            VARIABLES["ROCKETSHIP_INITIAL_CLOCK"] = [0,0]
+
+
 
     def draw(self):
         for i in range(len(self.tab)):  # pour chaque ennemi dans la liste
@@ -154,7 +164,8 @@ class Ennemi:
         self.image_rect = self.image.get_rect(center=(self.x,self.y))
         self.hitbox = pygame.rect.Rect((x,y),(hitbox_size[0]+10,hitbox_size[1]+10))
         self.killbox =  pygame.rect.Rect((x,y),(max(hitbox_size[0]-10,1),max(hitbox_size[1]-10,1)))#hitbox qui tue le joueur
-
+        self.can_own_shield=False
+        self.owns_shield=False
         self.shield=False
         self.is_bullet = False
         self.score_value = 0
@@ -195,6 +206,7 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
                                    "image/mine/mines2.png", True)
 
         self.is_bullet = VARIABLES["MINE_AUTO_CLEAN"]
+        self.aled=True #je veut pas avoir a expliquer cette merde
 
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
@@ -352,6 +364,8 @@ class Chargeur(Ennemi):
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
 
         #sheild:
+        self.can_own_shield=True
+        self.owns_shield=shield
         self.shield=shield
         self.shield_anim=Anim(self.x,self.y,35,(63,63),50,"image/Nautolan/Shields/Nautolan Ship - Frigate - Shield.png",False)
 
@@ -446,8 +460,12 @@ class Chargeur(Ennemi):
         else:
             self.vitesse +=-CHARGEUR_DECELERATION
         #on limite la vitesse
-        if self.vitesse >CHARGEUR_MAX_SPEED:
-            self.vitesse=CHARGEUR_MAX_SPEED
+        if(self.shield):
+            if self.vitesse >CHARGEUR_MAX_SPEED+VARIABLES["SHIELD_RAGE"]:
+                self.vitesse=CHARGEUR_MAX_SPEED+VARIABLES["SHIELD_RAGE"]
+        else:
+            if self.vitesse >CHARGEUR_MAX_SPEED:
+                self.vitesse=CHARGEUR_MAX_SPEED
         if self.vitesse<CHARGEUR_MIN_SPEED:
             self.vitesse=CHARGEUR_MIN_SPEED
         #on effectue enfin le mouvement
@@ -471,6 +489,8 @@ class Tourelle(Ennemi):
         self.base_image = pygame.transform.scale(self.base_image, (80, 80))
 
         #sheild:
+        self.can_own_shield=True
+        self.owns_shield=shield
         self.shield=shield
         self.shield_anim=Anim(self.x,self.y,9,(80,80),50,"image/Nautolan/Shields/Nautolan Ship - Bomber - Shield - Copie.png",False)
 
@@ -498,10 +518,18 @@ class Tourelle(Ennemi):
     def move(self,x,y,liste):
         self.rotation=rotate(self.x,self.y,x,y)
         if self.clock<1 and not passe_par_milieu(self.x,self.y,x,y,20) :
-            if (VARIABLES["TOURELLE_TIR"]=="rocket"):
-                liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation))
+            if(self.shield):
+                n=2*VARIABLES["SHIELD_RAGE"]
+                for i in range(1,n+2):
+                    if (VARIABLES["TOURELLE_TIR"]=="rocket"):
+                        liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation-30+(i)*60/(n+2)))
+                    else:
+                        liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation+-15+(i)*30/(n+2)))
             else:
-                liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
+                if (VARIABLES["TOURELLE_TIR"]=="rocket"):
+                    liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation))
+                else:
+                    liste.append(Tir(self.x,self.y, self.window, self.centre,self.rotation))
             self.clock=randint(round(VARIABLES["TOURELLE_NEW_CLOCK"][0]),round(VARIABLES["TOURELLE_NEW_CLOCK"][1]))
         self.clock+=-1
         return liste
@@ -592,7 +620,7 @@ class Rocketship(Ennemi):
         self.rotation = 0
         self.vitesse=0
         self.objectif=(x,y)
-        self.clock=randint(ROCKETSHIP_INITIAL_CLOCK[0],ROCKETSHIP_INITIAL_CLOCK[1])
+        self.clock=randint(VARIABLES["ROCKETSHIP_INITIAL_CLOCK"][0],VARIABLES["ROCKETSHIP_INITIAL_CLOCK"][1])
         self.score_value = ROCKETSHIP_SCORE
 
         #pour l'animation de mort:
