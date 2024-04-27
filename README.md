@@ -129,6 +129,7 @@ This is an example of how to list things you need to use the software and how to
    python main.py
    ```
    or go in the directory omega_race in your file manager and double click on main.py
+   If you want you can also go to https://tysufa.itch.io/omega-race and download it there
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
