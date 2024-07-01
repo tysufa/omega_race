@@ -412,30 +412,78 @@ class Game:
 
     def choose_upgrades(self):
         ###Gestion upgrade ennemis
-        for i in range(len(LISTE_UPGRADES)):
-            print("upgrade " + str(i) + " : " + LISTE_UPGRADES[i])
-        choix = int(input("choix upgrade : "))
-        while self.ennemis.upgrades[LISTE_UPGRADES[choix]]:
-            choix = int(input("Upgrade non cumulable. \nchoix upgrade : "))
+
+        choix = 0
+        continuer=True
+        phrase="upgrade "+str(choix)+" : "
+        up_text = Text(phrase, 30, 0, 0, "orange")
+        up_text_2 = Text(LISTE_UPGRADES[choix], 30, 0, 0, "orange")
+        up_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
+        up_text_2.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 30
+        while(continuer==True):
+            self.draw()
+            phrase="upgrade "+str(choix)+" : "
+            up_text.change_text(phrase,False)
+            up_text_2.change_text(LISTE_UPGRADES[choix],False)
+            self.screen_surface.blit(up_text.image, up_text.rect)
+            self.screen_surface.blit(up_text_2.image, up_text_2.rect)
+            self.window.blit(
+                self.screen_surface, self.screen_shake_offset
+            )  # on affiche la surface sur la fenetre
+            pygame.display.flip()
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        continuer = False
+                    if event.key == pygame.K_RIGHT:
+                        choix+=1
+                        if (choix==len(LISTE_UPGRADES)):
+                            choix=0
+                    if event.key == pygame.K_LEFT:
+                        choix+=-1
+                        if (choix==-1):
+                            choix=len(LISTE_UPGRADES)-1
+
+
         self.ennemis.upgrades[LISTE_UPGRADES[choix]] = True
         self.ennemis.gestion_upgrades()
 
-        print("upgrade 1 : vitesse vaisseau")
-        print("upgrade 2 : vie supp")
-        print("upgrade 3 : netoyage automatique")
-        print("upgrade 4 : tirs plus rapides")
-        print("upgrade 5 : freinage possible") # TODO: d'abord un booleen en mode freinage possible puis l'ugrade se transforme en freinage de plus en plus efficace
-        print("upgrade 6 : taille des balles") # NOTE: decider si on sépare la taille des balles entre joueur et ennemis ou pas
-        print("upgrade 7 : vitesse des balles")
-        print("shield ?")
-        choix = int(input("choix upgrade : "))
-        if choix == 1:
+        UPRGADES_JOUEUR=["vitesse vaisseau","vie supp","netoyage automatique", "tirs plus rapides"]
+        choix = 0
+        continuer=True
+        phrase="upgrade "+str(choix)+" : "
+        while(continuer==True):
+            self.draw()
+            phrase="upgrade "+str(choix)+" : "
+            up_text.change_text(phrase,False)
+            up_text_2.change_text(UPRGADES_JOUEUR[choix],False)
+            self.screen_surface.blit(up_text.image, up_text.rect)
+            self.screen_surface.blit(up_text_2.image, up_text_2.rect)
+            self.window.blit(
+                self.screen_surface, self.screen_shake_offset
+            )  # on affiche la surface sur la fenetre
+            pygame.display.flip()
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        continuer = False
+                    if event.key == pygame.K_RIGHT:
+                        choix+=1
+                        if (choix==len(UPRGADES_JOUEUR)):
+                            choix=0
+                    if event.key == pygame.K_LEFT:
+                        choix+=-1
+                        if (choix==-1):
+                            choix=len(UPRGADES_JOUEUR)-1
+        if choix == 0:
             self.player.max_velocity += 5
-        elif choix == 2:
+        elif choix == 1:
             self.player.nb_life += 1
-        elif choix == 3:
+        elif choix == 2:
             VARIABLES["MINE_AUTO_CLEAN"] = True
-        elif choix == 4:
+        elif choix == 3:
             self.player.fire_rate = round(0.85 * self.player.fire_rate)
 
     def respawn(self):
