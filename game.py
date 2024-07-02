@@ -212,6 +212,7 @@ class Game:
         self.player.nb_life = LIFE_NB
 
         self.player.respawn_function()
+        self.player.reset_stats() # reset des upgrades du joueur
         self.player.player_alive = True
         self.player.explosion_anim.show = False
 
