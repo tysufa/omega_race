@@ -203,7 +203,7 @@ class Game:
         self.high_score_text.change_text(str(self.high_score))
 
         reset()
-        self.ennemis = Ennemy_list()
+        self.ennemis = Ennemy_list({})
 
         self.level = 1
 
@@ -421,6 +421,8 @@ class Game:
         up_text_2 = Text(LISTE_UPGRADES[choix], 30, 0, 0, "orange")
         up_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
         up_text_2.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 30
+        up_text_3 = Text("", 30, 0, 0, "orange")
+        up_text_3.rect.center = self.window.get_size()[0] // 2-150, self.window.get_size()[1] // 2 +60
         while(continuer==True):
             self.draw()
             phrase="upgrade "+str(choix)+" : "
@@ -428,15 +430,18 @@ class Game:
             up_text_2.change_text(LISTE_UPGRADES[choix],False)
             self.screen_surface.blit(up_text.image, up_text.rect)
             self.screen_surface.blit(up_text_2.image, up_text_2.rect)
-            self.window.blit(
-                self.screen_surface, self.screen_shake_offset
-            )  # on affiche la surface sur la fenetre
-            pygame.display.flip()
             keys = pygame.key.get_pressed()
+            if (self.ennemis.upgrades[LISTE_UPGRADES[choix]]==True):
+                up_text_3.change_text("Upgrade non cumulable",False)
+                self.screen_surface.blit(up_text_3.image, up_text_3.rect)
+                validable=False
+            else:
+                validable=True
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        continuer = False
+                        if validable:
+                            continuer=False
                     if event.key == pygame.K_RIGHT:
                         choix+=1
                         if (choix==len(LISTE_UPGRADES)):
@@ -445,6 +450,10 @@ class Game:
                         choix+=-1
                         if (choix==-1):
                             choix=len(LISTE_UPGRADES)-1
+            self.window.blit(
+                self.screen_surface, self.screen_shake_offset
+            )  # on affiche la surface sur la fenetre
+            pygame.display.flip()
 
 
         self.ennemis.upgrades[LISTE_UPGRADES[choix]] = True
