@@ -80,6 +80,10 @@ class Player(pygame.sprite.Sprite):
 
         self.particles = []
 
+    def reset_stats(self):
+        self.max_velocity = MAX_PLAYER_SPEED
+        self.fire_rate = FIRE_RATE
+
     def set_sound(self, sound_volume):
         self.shooting_sound.set_volume(0.15 * sound_volume)
         self.explosion_sound.set_volume(0.3 * sound_volume)
