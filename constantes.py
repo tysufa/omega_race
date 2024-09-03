@@ -23,7 +23,7 @@ PLAYER_INITIAL_POSITION = (130, 160)
 RESPAWN_TIME = 50 * 9  # durée de l'animation de mort x nombre de frame sur l'animation de la mort
 LIFE_NB = 2
 
-FIRE_RATE = 1  # temps en millisecodes was 550
+FIRE_RATE = 550  # temps en millisecodes was 550
 BULLET_SPEED = MAX_PLAYER_SPEED * 1.7 * PLAYER_SPEED
 BULLET_SPRITESHEET = "image/Kla'ed/Projectiles/Kla'ed - Big Bullet.png"
 
@@ -52,7 +52,7 @@ LISTE_UPGRADES = [
 ]
 """#code en cours pour faire des upgrades une classe
 class Upgrades:
-    def __init__(self,name,dispalyed_name="",max_stacks=1,level_requirement):
+    def __init__(self,name,dispalyed_name="",max_stacks=1,level_requirement=0):
         self.name=name
         if(displayed_name==""):
             self.displayed_name=name

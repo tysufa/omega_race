@@ -326,7 +326,7 @@ class Game:
                     )
                 elif i == 7:
                     self.ennemis.tab.append(
-                        Rocketship(
+                        Plasmaship(
                             randint(40, self.window.get_size()[0] - 40),
                             randint(40, self.window.get_size()[1] - 40),
                             self.screen_surface,
@@ -390,24 +390,25 @@ class Game:
     def decompter(self):
         ret = [0 for _ in range(8)]
         for en in self.ennemis.tab:
-            if type(en) == Mine:
-                ret[0] += 1
-            if type(en) == Asteroid:
-                ret[1] += 1
-            if type(en) == Chargeur:
-                if en.owns_shield:
-                    ret[6] += 1
-                else:
-                    ret[2] += 1
-            if type(en) == Tourelle:
-                if en.owns_shield:
-                    ret[5] += 1
-                else:
-                    ret[3] += 1
-            if type(en) == Miner:
-                ret[4] += 1
-            if type(en) == Rocketship:
-                ret[7] += 1
+            if en.should_respawn:
+                if type(en) == Mine:
+                    ret[0] += 1
+                if type(en) == Asteroid:
+                    ret[1] += 1
+                if type(en) == Chargeur:
+                    if en.owns_shield:
+                        ret[6] += 1
+                    else:
+                        ret[2] += 1
+                if type(en) == Tourelle:
+                    if en.owns_shield:
+                        ret[5] += 1
+                    else:
+                        ret[3] += 1
+                if type(en) == Miner:
+                    ret[4] += 1
+                if type(en) == Plasmaship:
+                    ret[7] += 1
         return ret
 
     def choose_upgrades(self):

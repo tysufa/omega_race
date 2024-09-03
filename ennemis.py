@@ -144,7 +144,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
 
 class Ennemi:
-    def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35)):
+    def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35),should_respawn=True):
         #Etat
         self.alive=True
         self.dying=False
@@ -153,6 +153,7 @@ class Ennemi:
         self.y=y
         self.needcord=needcord
         self.needlist=needlist
+        self.should_respawn=should_respawn
 
         # Données globales
         self.window = WINDOW  # mettre la fenettre en imput pour pouvoir s'afficher
@@ -349,11 +350,11 @@ class Rocket(Ennemi):
         pass
 
 class Chargeur(Ennemi):
-    def __init__(self, x, y, WINDOW, rect,shield=False):
-        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False)
+    def __init__(self, x, y, WINDOW, rect,shield=False,rotation=randint(0,360),should_respawn=True):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Frigate - Base.png",True,False,(35,35),should_respawn)
         self.engine_anim=Anim(self.x,self.y,6,(64,64),50,"image/Nautolan/Engine Effects/Nautolan Ship - Frigate - Engine Effect.png",False)
         self.engine_anim.show=False
-        self.rotation = randint(0,360)
+        self.rotation = rotation
         self.vitesse = 1
         self.objectif=(x,y)
         self.score_value = CHARGEUR_SCORE
@@ -703,6 +704,133 @@ class Rocketship(Ennemi):
                 self.clock=randint(ROCKETSHIP_NEW_CLOCK[0],ROCKETSHIP_NEW_CLOCK[1])
                 for i in range(ROCKETSHIP_NB_TIRS):
                     liste.append(Rocket(self.x,self.y, self.window, self.centre,self.rotation+(360/ROCKETSHIP_NB_TIRS)*i))
+        else :
+            self.choix_objectif(x,y)
+            self.rotation = modulo_rot(self.rotation)
+            objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
+            calcul_dirrection = modulo_rot(objectif - self.rotation)
+            #pour tourner dans le bon sens:
+            if calcul_dirrection > 0 and calcul_dirrection < 180:
+                self.rotation += +ROCKETSHIP_ROTATION_SPEED
+            else:
+                self.rotation += -ROCKETSHIP_ROTATION_SPEED
+            #pour accelerer si l'objectif est en vue et ralentir sinon:
+            if calcul_dirrection < ROCKETSHIP_ANGLE_ACCELERATION or calcul_dirrection > 360-ROCKETSHIP_ANGLE_ACCELERATION:
+                self.vitesse +=ROCKETSHIP_ACCELERATION
+            else:
+                self.vitesse +=-ROCKETSHIP_DECELERATION
+            #on limite la vitesse
+            if self.vitesse >ROCKETSHIP_MAX_SPEED:
+                self.vitesse=ROCKETSHIP_MAX_SPEED
+            if self.vitesse<ROCKETSHIP_MIN_SPEED:
+                self.vitesse=ROCKETSHIP_MIN_SPEED
+            #on effectue enfin le mouvement
+            self.x += self.vitesse * (cos(radians(self.rotation)))
+            self.y += self.vitesse * (sin(radians(self.rotation)))
+            self.colisions()
+        return liste
+
+    def death_anim(self):
+        self.explosion_anim.update()
+        self.explosion_anim.angle = self.rotation
+        self.explosion_anim.show = True
+        self.image = self.explosion_anim.image
+
+class Plasmaship(Ennemi):
+    def __init__(self, x, y, WINDOW,rect):
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Designs - Base/Nautolan Ship - Dreadnought - Base.png",True,True)
+        self.rotation = 0
+        self.vitesse=0
+        self.objectif=(x,y)
+        self.clock=randint(VARIABLES["ROCKETSHIP_INITIAL_CLOCK"][0],VARIABLES["ROCKETSHIP_INITIAL_CLOCK"][1])
+        self.score_value = ROCKETSHIP_SCORE
+        self.engine_anim=Anim(self.x,self.y,6,(128,128),50,"image/Nautolan/Engine Effects/Nautolan Ship - Dreadnought - Engine Effect.png",False)
+
+
+        #pour l'animation de mort:
+        self.explosion_anim = Anim(self.x, self.y, 8, (128, 128), 50,
+                                   "image/Nautolan/Destruction/Nautolan Ship - Dreadnought.png", True)
+        self.anim_group = pygame.sprite.Group(self.explosion_anim)
+    def draw(self):
+        self.window.blit(self.image, self.image_rect)
+        self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
+        self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
+        self.hitbox.center = self.image_rect.center
+        self.killbox.center = self.image_rect.center
+        self.engine_anim.angle= 270 - self.rotation
+        self.engine_anim.update()
+        self.window.blit(self.engine_anim.image, self.image_rect)
+        self.engine_anim.show=True
+
+    def colisions(self):
+        if super().colmurhor() and super().colmurver():
+            self.rotation = -self.rotation-90
+            if self.y<SIZE[1]//2:
+                self.y+=-5
+            else:
+                self.y+=+5
+            if self.x<SIZE[0]//2:
+                self.x+=-5
+            else:
+                self.x+=+5
+        if super().colver():
+            self.rotation = -self.rotation
+        if super().colmurver():
+            self.rotation = -self.rotation
+            if self.y<SIZE[1]//2:
+                self.y+=-5
+            else:
+                self.y+=+5
+        if super().colhor():
+            self.rotation = self.rotation + 90
+        if super().colmurhor():
+            self.rotation = self.rotation + 90
+            if self.x<SIZE[0]//2:
+                self.x+=-5
+            else:
+                self.x+=+5
+
+    def choix_objectif(self,x,y):
+        if not passe_par_milieu(self.x,self.y,x,y,40):#si on a une ligne de vue directe sur le joueur:
+            self.objectif=(self.x,self.y)#on bouge pas
+        else :#si on ne peut pas acceder au joueur:
+            if self.x<SIZE[0]//2+SIZE[0]//6 and self.x>SIZE[0]//2-SIZE[0]//6 and x<SIZE[0]//2+SIZE[0]//6 and x>SIZE[0]//2+-SIZE[0]//6: # le joueur et l'ennemi sont a l'opposé du rect:
+                if self.x<SIZE[0]//2:#on sort de ce coté du rect, en passant par le plus proche
+                    self.objectif=(self.x-10, self.y)
+                else:
+                    self.objectif=(self.x+10, self.y)
+            elif self.y<SIZE[1]//2+SIZE[1]//6 and self.y>SIZE[1]//2-SIZE[1]//6 and y<SIZE[1]//2+SIZE[1]//6 and y>SIZE[1]//2-SIZE[1]//6: # le joueur et l'ennemi sont a l'opposé du rect:
+                if self.y<SIZE[1]//2:#on sort de ce coté du rect, en passant par le plus proche
+                    self.objectif=(self.x, self.y-10)
+                else:
+                    self.objectif=(self.x, self.y+10)
+            elif not passe_par_milieu(self.x,self.y,self.x,y) and not passe_par_milieu(self.x,self.y,x,self.y):#si on à accés aux deux points :
+                if not passe_par_milieu(x,y,self.x,y):#on prends celui des deux qui donne accés au joueur
+                    self.objectif=(self.x,y)
+                else:
+                    self.objectif=(x,self.y)
+            elif not passe_par_milieu(self.x,self.y,self.x,y):#sinon, si on peut, on se mets de façon a partager le x ou le y du joueur
+                self.objectif=(self.x,y)
+            elif not passe_par_milieu(self.x,self.y,x,self.y):
+                self.objectif=(x,self.y)
+
+    def move(self, x, y,liste,particules=[]):
+        self.clock+=-1
+        if self.clock<1 :
+            self.clock=randint(200,250)
+            for i in range(1,5):
+                liste.insert(0,(Chargeur(self.x,self.y, self.window, self.centre,False,self.rotation+(360/5)*i,False)))
+        if not passe_par_milieu(self.x,self.y,x,y,40):#si on a une ligne de vue directe sur le joueur:
+            self.objectif=(x,y)
+            self.rotation = modulo_rot(self.rotation)
+            objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
+            calcul_dirrection = modulo_rot(objectif - self.rotation)
+            #pour tourner dans le bon sens:
+            if calcul_dirrection > 0 and calcul_dirrection < 180:
+                self.rotation += +ROCKETSHIP_ROTATION_SPEED
+            else:
+                self.rotation += -ROCKETSHIP_ROTATION_SPEED
+            #puis on tire
         else :
             self.choix_objectif(x,y)
             self.rotation = modulo_rot(self.rotation)
