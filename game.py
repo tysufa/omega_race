@@ -205,7 +205,7 @@ class Game:
         reset()
         self.ennemis = Ennemy_list({})
 
-        self.level = 1
+        self.level = 1 #set to 10 to test boss
 
         self.level_text.change_text("Niveau " + str(self.level))
 
@@ -327,6 +327,24 @@ class Game:
                     )
                 elif i == 7:
                     self.ennemis.tab.append(
+                        Rocketship(
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
+                elif i == 8:
+                    self.ennemis.tab.append(
+                        Beacon(
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
+                elif i == 9:
+                    self.ennemis.tab.append(
                         Plasmaship(
                             randint(40, self.window.get_size()[0] - 40),
                             randint(40, self.window.get_size()[1] - 40),
@@ -389,7 +407,7 @@ class Game:
         self.score_text.change_text(str(self.score))
 
     def decompter(self):
-        ret = [0 for _ in range(8)]
+        ret = [0 for _ in range(10)]
         for en in self.ennemis.tab:
             if en.should_respawn:
                 if type(en) == Mine:
@@ -408,8 +426,12 @@ class Game:
                         ret[3] += 1
                 if type(en) == Miner:
                     ret[4] += 1
-                if type(en) == Plasmaship:
+                if type(en) == Rocketship:
                     ret[7] += 1
+                if type(en) == Beacon:
+                    ret[8] += 1
+                if type(en) == Plasmaship:
+                    ret[9] += 1
         return ret
 
     def choose_upgrades(self):

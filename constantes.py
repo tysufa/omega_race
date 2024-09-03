@@ -129,6 +129,25 @@ ROCKETSHIP_DECELERATION = 0.1
 ROCKETSHIP_ANGLE_ACCELERATION = 20  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
 ROCKETSHIP_NB_TIRS = 1
 
+###Plasmaship###
+PLASMASHIP_SUMMON_CLOCK = [
+    400,
+    500,
+]
+PLASMASHIP_SPIKE_CLOCK = [
+    700,
+    800,
+]
+PLASMASHIP_SCORE = 5000
+PLASMASHIP_ROTATION_SPEED = 1
+PLASMASHIP_MIN_SPEED = 0
+PLASMASHIP_MAX_SPEED = 1
+PLASMASHIP_ACCELERATION = 0.01
+PLASMASHIP_DECELERATION = 0.1
+PLASMASHIP_ANGLE_ACCELERATION = 40  # determine la moitié de l'angle devant le chargeur dans lequel le joueur doit être pour qu'il accélère.
+PLASMASHIP_NB_TIRS = 1
+PLASMASHIP_NB_SUMMON = 1
+
 
 ###Variables###
 
@@ -151,3 +170,13 @@ def reset():
     400,
     500,
     ]
+    VARIABLES["PLASMASHIP_SUMMON_CLOCK"] = [
+    400,
+    500,
+    ]
+    VARIABLES["PLASMASHIP_SPIKE_CLOCK"] = [
+    700,
+    800,
+    ]
+    VARIABLES["PLASMASHIP_NB_SUMMON"] = 1
+    VARIABLES["PLASMASHIP_NB_SPIKE"] = 40
