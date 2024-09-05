@@ -78,9 +78,11 @@ class Ennemy_list:  # liste des ennemis en jeu
                     self.tempo = pygame.time.get_ticks()
 
             if self.tab[i].alive:  # si l'ennemi est vivant :
-                if self.tab[i].killbox.colliderect(player.hitbox) and player.alive:  # si ils touchent le joueur, on tue ce dernier.
-                    player.die()
+                if self.tab[i].deals_damage:
+                    if self.tab[i].killbox.colliderect(player.hitbox) and player.alive:  # si ils touchent le joueur, on tue ce dernier.
+                        player.die()
                 if type(self.tab[i])==Miner:
+                    self.tab[i].move(tmp)
                     if self.tab[i].mines<1:
                         self.tab[i].alive=False
                         tmp.append(Chargeur(self.tab[i].x,self.tab[i].y,self.tab[i].window,self.tab[i].centre))
@@ -113,10 +115,10 @@ class Ennemy_list:  # liste des ennemis en jeu
                         self.tab[i].move()
 
             else:  # si l'ennemi n'est pas vivant :
-                if type(self.tab[i])==Mine and self.tab[i].aled:
+                if type(self.tab[i])==Mine and self.tab[i].shrapnel_was_shot:
                     for j in range(VARIABLES["MINE_TIRS"]):
                         tmp.append(Tir(self.tab[i].x,self.tab[i].y, self.tab[i].window, self.tab[i].centre,(360/VARIABLES["MINE_TIRS"])*j))
-                    self.tab[i].aled=False
+                    self.tab[i].shrapnel_was_shot=False
                 if pygame.time.get_ticks() - self.tempo > self.tab[i].explosion_anim.frame_number * self.tab[i].explosion_anim.frames_delay:
                     tmp.pop(i - a)  # on le retire de la copie de la liste d'ennemi
                     a += 1  # comme on retire des éléments, il faut se décaler pour suprimer l'élément qui correspond a self.ennemy_list[i]
@@ -164,7 +166,7 @@ class Ennemy_list:  # liste des ennemis en jeu
 
 
 class Ennemi:
-    def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35),should_respawn=True):
+    def __init__ (self,x,y,WINDOW,rect,imagepath,needcord=False,needlist=False,hitbox_size=(35,35),should_respawn=True,deals_damage=True):
         #Etat
         self.alive=True
         self.dying=False
@@ -174,6 +176,7 @@ class Ennemi:
         self.needcord=needcord
         self.needlist=needlist
         self.should_respawn=should_respawn
+        self.deals_damage=deals_damage
 
         # Données globales
         self.window = WINDOW  # mettre la fenettre en imput pour pouvoir s'afficher
@@ -228,7 +231,7 @@ class Mine(Ennemi):  # La mine est un cercle blanc immobile.
                                    "image/mine/mines2.png", True)
 
         self.is_bullet = VARIABLES["MINE_AUTO_CLEAN"]
-        self.aled=True #je veut pas avoir a expliquer cette merde
+        self.shrapnel_was_shot=True #je veut pas avoir a expliquer cette merde
 
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (64, 64), 50,
@@ -259,8 +262,8 @@ class Beacon(Ennemi):  # La mine est un cercle blanc immobile.
         super().__init__(x, y, WINDOW, rect, "image/Kla'ed/Base/Kla'ed - Scout - Base.png",False,False,(30,30))
         self.score_value=50
 
-        self.is_bullet = VARIABLES["MINE_AUTO_CLEAN"]
-        self.aled=True #je veut pas avoir a expliquer cette merde
+        self.is_bullet = False
+        self.shrapnel_was_shot=True #je veut pas avoir a expliquer cette merde
         self.rotation=0
         self.clock=randint(100,200)
 
@@ -337,7 +340,7 @@ class Tir(Ennemi):
         self.anim=Anim(self.x,self.y,7,(9,12),100,"image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False)
         self.is_bullet = True
 
-        #pour pas que le jeu implose:
+        #Bien que ce ne soit pas fondamentalement nécéssaire, j'ai mis une deathanim pour les projectiles affin de ne pas avoir à creer d'exceptions dans la gestion de la mort.
         self.explosion_anim = Anim(self.x, self.y, 0, (64, 64), 0,
                                    "image/Nautolan/Destruction/Nautolan Ship - Frigate.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
@@ -364,12 +367,12 @@ class Tir(Ennemi):
 
 class Particule_Shield(Ennemi):
     def __init__(self, x, y, WINDOW, rect,rotation):
-        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False,False,(0,0))
+        super().__init__(x, y, WINDOW, rect, "image/Nautolan/Weapon Effects - Projectiles/Nautolan - Bullet.png",False,False,(0,0),False,False)
         self.rotation = modulo_rot(rotation)  # rotation de l'ennemi, en degrés, 0 étant a droite
         self.anim=Anim(self.x,self.y,6,(32,32),100,"image/Nautolan/Shields/Nautolan Ship - Particles - Shield.png",False)
         self.is_bullet = True
 
-        #pour pas que le jeu implose:
+        #Bien que ce ne soit pas fondamentalement nécéssaire, j'ai mis une deathanim pour les projectiles affin de ne pas avoir à creer d'exceptions dans la gestion de la mort.
         self.explosion_anim = Anim(self.x, self.y, 0, (64, 64), 0,
                                    "image/Nautolan/Destruction/Nautolan Ship - Frigate.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
@@ -385,8 +388,8 @@ class Particule_Shield(Ennemi):
         self.killbox.center = self.image_rect.center
 
     def move(self):
-        self.x+=50*(cos(radians(self.rotation)))
-        self.y+=50*(sin(radians(self.rotation)))
+        self.x+=20*(cos(radians(self.rotation)))
+        self.y+=20*(sin(radians(self.rotation)))
         self.image_rect.center=(self.x,self.y)
 
     def death_anim(self):
@@ -399,7 +402,7 @@ class Rocket(Ennemi):
         self.anim=Anim(self.x,self.y,4,(16,32),100,"image/Nautolan/Weapon Effects - Projectiles/Nautolan - Rocket.png",False)
         self.is_bullet = True
 
-        #pour pas que le jeu implose:
+        #Bien que ce ne soit pas fondamentalement nécéssaire, j'ai mis une deathanim pour les projectiles affin de ne pas avoir à creer d'exceptions dans la gestion de la mort.
         self.explosion_anim = Anim(self.x, self.y, 0, (64, 64), 0,
                                    "image/Nautolan/Destruction/Nautolan Ship - Frigate.png", True)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
@@ -831,6 +834,7 @@ class Plasmaship(Ennemi):
         self.shield=True
         self.summon_clock=randint(VARIABLES["PLASMASHIP_SUMMON_CLOCK"][0],VARIABLES["PLASMASHIP_SUMMON_CLOCK"][1])
         self.spike_clock=randint(VARIABLES["PLASMASHIP_SPIKE_CLOCK"][0],VARIABLES["PLASMASHIP_SPIKE_CLOCK"][1])
+        self.dash_clock=randint(VARIABLES["PLASMASHIP_DASH_CLOCK"][0],VARIABLES["PLASMASHIP_DASH_CLOCK"][1])
         self.score_value = PLASMASHIP_SCORE
         self.engine_anim=Anim(self.x,self.y,6,(128,128),50,"image/Nautolan/Engine Effects/Nautolan Ship - Dreadnought - Engine Effect.png",False)
 
@@ -838,24 +842,25 @@ class Plasmaship(Ennemi):
 
         #pour l'animation de mort:
         self.explosion_anim = Anim(self.x, self.y, 8, (128, 128), 50,
-                                   "image/Nautolan/Destruction/Nautolan Ship - Dreadnought.png", True)
+                                   "image/Nautolan/Destruction/Nautolan Ship - Dreadnought.png", False)
         self.anim_group = pygame.sprite.Group(self.explosion_anim)
     def draw(self):
         if self.shield:
             self.shield_anim.show=True
         else:
             self.shield_anim.show=False
-        self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
+        if self.alive:
+            self.image = pygame.transform.rotozoom(self.base_image, 270 - self.rotation, 1)
         self.image_rect = self.image.get_rect(center=(self.x, self.y))  # on replace le rectangle
         self.hitbox.center = self.image_rect.center
         self.killbox.center = self.image_rect.center
         self.engine_anim.angle= 270 - self.rotation
         self.engine_anim.update()
-        self.window.blit(self.engine_anim.image, self.image_rect)
         self.shield_anim.angle= 270 - self.rotation
         self.shield_anim.update()
         self.window.blit(self.shield_anim.image, self.image_rect)
-        if self.vitesse>0.5:
+        self.window.blit(self.engine_anim.image, self.image_rect)
+        if self.vitesse>1:
             self.engine_anim.show=True
         self.window.blit(self.image, self.image_rect)
 
@@ -914,8 +919,13 @@ class Plasmaship(Ennemi):
     def move(self, x, y,liste,particules=[]):
         self.summon_clock+=-1
         self.spike_clock+=-1
+        self.dash_clock+=-1
+        if self.dash_clock<1 :
+            if abs(self.x-x)>60 and abs(self.y-y)>60 :
+                self.dash_clock=randint(VARIABLES["PLASMASHIP_DASH_CLOCK"][0],VARIABLES["PLASMASHIP_DASH_CLOCK"][1])
+                self.vitesse=10
         if self.summon_clock<1 :
-            if len(liste)<10:
+            if len(liste)<15:
                 self.summon_clock=randint(VARIABLES["PLASMASHIP_SUMMON_CLOCK"][0],VARIABLES["PLASMASHIP_SUMMON_CLOCK"][1])
                 for i in range(1,VARIABLES["PLASMASHIP_NB_SUMMON"]+1):
                     liste.insert(0,(Chargeur(self.x,self.y, self.window, self.centre,False,self.rotation+(360/VARIABLES["PLASMASHIP_NB_SUMMON"]+1)*i,False)))
@@ -925,15 +935,15 @@ class Plasmaship(Ennemi):
                 liste.insert(0,(Tir(self.x,self.y, self.window, self.centre,self.rotation+(360/VARIABLES["PLASMASHIP_NB_SPIKE"])*i)))
         if not passe_par_milieu(self.x,self.y,x,y,40):#si on a une ligne de vue directe sur le joueur:
             self.objectif=(x,y)
+            self.vitesse +=-PLASMASHIP_DECELERATION
             self.rotation = modulo_rot(self.rotation)
             objectif = modulo_rot(rotate(self.x, self.y, self.objectif[0],self.objectif[1]))
             calcul_dirrection = modulo_rot(objectif - self.rotation)
             #pour tourner dans le bon sens:
             if calcul_dirrection > 0 and calcul_dirrection < 180:
-                self.rotation += +PLASMASHIP_ROTATION_SPEED
+                self.rotation += +PLASMASHIP_ROTATION_SPEED*(0.5*self.vitesse+1)
             else:
-                self.rotation += -PLASMASHIP_ROTATION_SPEED
-            #puis on tire
+                self.rotation += -PLASMASHIP_ROTATION_SPEED*(0.5*self.vitesse+1)
         else :
             self.choix_objectif(x,y)
             self.rotation = modulo_rot(self.rotation)
@@ -941,23 +951,23 @@ class Plasmaship(Ennemi):
             calcul_dirrection = modulo_rot(objectif - self.rotation)
             #pour tourner dans le bon sens:
             if calcul_dirrection > 0 and calcul_dirrection < 180:
-                self.rotation += +PLASMASHIP_ROTATION_SPEED
+                self.rotation += +PLASMASHIP_ROTATION_SPEED*(0.5*self.vitesse+1)
             else:
-                self.rotation += -PLASMASHIP_ROTATION_SPEED
+                self.rotation += -PLASMASHIP_ROTATION_SPEED*(0.5*self.vitesse+1)
             #pour accelerer si l'objectif est en vue et ralentir sinon:
             if calcul_dirrection < PLASMASHIP_ANGLE_ACCELERATION or calcul_dirrection > 360-PLASMASHIP_ANGLE_ACCELERATION:
                 self.vitesse +=PLASMASHIP_ACCELERATION
             else:
                 self.vitesse +=-PLASMASHIP_DECELERATION
             #on limite la vitesse
-            if self.vitesse >PLASMASHIP_MAX_SPEED:
-                self.vitesse=PLASMASHIP_MAX_SPEED
-            if self.vitesse<PLASMASHIP_MIN_SPEED:
-                self.vitesse=PLASMASHIP_MIN_SPEED
+        if self.vitesse >PLASMASHIP_MAX_SPEED:
+            self.vitesse+=-PLASMASHIP_DECELERATION
+        if self.vitesse<PLASMASHIP_MIN_SPEED:
+            self.vitesse=PLASMASHIP_MIN_SPEED
             #on effectue enfin le mouvement
-            self.x += self.vitesse * (cos(radians(self.rotation)))
-            self.y += self.vitesse * (sin(radians(self.rotation)))
-            self.colisions()
+        self.x += self.vitesse * (cos(radians(self.rotation)))
+        self.y += self.vitesse * (sin(radians(self.rotation)))
+        self.colisions()
         return liste
 
     def death_anim(self):

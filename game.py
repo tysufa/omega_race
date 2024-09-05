@@ -554,7 +554,10 @@ class Game:
                 else:
                     tempo_level = self.decompter()
                     self.ennemis = Ennemy_list(self.ennemis.upgrades)
+                    tmp=VARIABLES["EXTRA_SHIELDS"]
+                    VARIABLES["EXTRA_SHIELDS"]=0
                     self.spawn(tempo_level)
+                    VARIABLES["EXTRA_SHIELDS"]=tmp
 
                 self.player.respawn = False
                 # si le joueur était mort après son respawn il est à nouveau vivant
