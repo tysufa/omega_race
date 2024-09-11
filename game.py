@@ -205,7 +205,7 @@ class Game:
         reset()
         self.ennemis = Ennemy_list({})
 
-        self.level = 1
+        self.level = 1 #set to 10 to test boss
 
         self.level_text.change_text("Niveau " + str(self.level))
 
@@ -334,6 +334,24 @@ class Game:
                             self.center_square,
                         )
                     )
+                elif i == 8:
+                    self.ennemis.tab.append(
+                        Beacon(
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
+                elif i == 9:
+                    self.ennemis.tab.append(
+                        Plasmaship(
+                            randint(40, self.window.get_size()[0] - 40),
+                            randint(40, self.window.get_size()[1] - 40),
+                            self.screen_surface,
+                            self.center_square,
+                        )
+                    )
                 spawncenter = pygame.rect.Rect(
                     (self.center_square.x, self.center_square.y),
                     (
@@ -389,26 +407,31 @@ class Game:
         self.score_text.change_text(str(self.score))
 
     def decompter(self):
-        ret = [0 for _ in range(8)]
+        ret = [0 for _ in range(10)]
         for en in self.ennemis.tab:
-            if type(en) == Mine:
-                ret[0] += 1
-            if type(en) == Asteroid:
-                ret[1] += 1
-            if type(en) == Chargeur:
-                if en.owns_shield:
-                    ret[6] += 1
-                else:
-                    ret[2] += 1
-            if type(en) == Tourelle:
-                if en.owns_shield:
-                    ret[5] += 1
-                else:
-                    ret[3] += 1
-            if type(en) == Miner:
-                ret[4] += 1
-            if type(en) == Rocketship:
-                ret[7] += 1
+            if en.should_respawn:
+                if type(en) == Mine:
+                    ret[0] += 1
+                if type(en) == Asteroid:
+                    ret[1] += 1
+                if type(en) == Chargeur:
+                    if en.owns_shield:
+                        ret[6] += 1
+                    else:
+                        ret[2] += 1
+                if type(en) == Tourelle:
+                    if en.owns_shield:
+                        ret[5] += 1
+                    else:
+                        ret[3] += 1
+                if type(en) == Miner:
+                    ret[4] += 1
+                if type(en) == Rocketship:
+                    ret[7] += 1
+                if type(en) == Beacon:
+                    ret[8] += 1
+                if type(en) == Plasmaship:
+                    ret[9] += 1
         return ret
 
     def choose_upgrades(self):
@@ -538,7 +561,10 @@ class Game:
                 else:
                     tempo_level = self.decompter()
                     self.ennemis = Ennemy_list(self.ennemis.upgrades)
+                    tmp=VARIABLES["EXTRA_SHIELDS"]
+                    VARIABLES["EXTRA_SHIELDS"]=0
                     self.spawn(tempo_level)
+                    VARIABLES["EXTRA_SHIELDS"]=tmp
 
                 self.player.respawn = False
                 # si le joueur était mort après son respawn il est à nouveau vivant
