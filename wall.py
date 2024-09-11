@@ -8,7 +8,7 @@ class Wall(pygame.sprite.Sprite):
         self.y = y
         self.length = length
         self.height = height
-        self.width = width
+        self.width = width # TODO: cette variable n'est visiblement plus utilisé nulle part, à vérifier
         self.color = color
 
         self.image = pygame.surface.Surface((length, height))

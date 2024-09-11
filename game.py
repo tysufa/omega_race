@@ -416,32 +416,34 @@ class Game:
 
         choix = 0
         continuer=True
-        phrase="upgrade "+str(choix)+" : "
-        up_text = Text(phrase, 30, 0, 0, "orange")
-        up_text_2 = Text(LISTE_UPGRADES[choix], 30, 0, 0, "orange")
-        up_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
-        up_text_2.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 30
-        up_text_3 = Text("", 30, 0, 0, "orange")
-        up_text_3.rect.center = self.window.get_size()[0] // 2-150, self.window.get_size()[1] // 2 +60
-        while(continuer==True):
+        num_upgrade_text = Text("upgrade "+str(choix)+" : ", 30, 0, 0, "orange")
+        upgrade_text = Text(LISTE_UPGRADES[choix], 30, 0, 0, "orange")
+        num_upgrade_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2
+        upgrade_text.rect.center = self.window.get_size()[0] // 2, self.window.get_size()[1] // 2 + 30
+        upgrade_non_cumulable_text = Text("", 30, 0, 0, "orange")
+        upgrade_non_cumulable_text.rect.center = self.window.get_size()[0] // 2-150, self.window.get_size()[1] // 2 +60
+        while continuer:
             self.draw()
-            phrase="upgrade "+str(choix)+" : "
-            up_text.change_text(phrase,False)
-            up_text_2.change_text(LISTE_UPGRADES[choix],False)
-            self.screen_surface.blit(up_text.image, up_text.rect)
-            self.screen_surface.blit(up_text_2.image, up_text_2.rect)
+            num_upgrade_text.change_text("upgrade "+str(choix)+" : ",False)
+            upgrade_text.change_text(LISTE_UPGRADES[choix],False)
+            self.screen_surface.blit(num_upgrade_text.image, num_upgrade_text.rect)
+            self.screen_surface.blit(upgrade_text.image, upgrade_text.rect)
             keys = pygame.key.get_pressed()
             if (self.ennemis.upgrades[LISTE_UPGRADES[choix]]==True):
-                up_text_3.change_text("Upgrade non cumulable",False)
-                self.screen_surface.blit(up_text_3.image, up_text_3.rect)
+                upgrade_non_cumulable_text.change_text("Upgrade non cumulable",False)
+                self.screen_surface.blit(upgrade_non_cumulable_text.image, upgrade_non_cumulable_text .rect)
                 validable=False
             else:
                 validable=True
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    continuer = False
+                    pygame.quit()
+                    exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if validable:
-                            continuer=False
+                            continuer = False
                     if event.key == pygame.K_RIGHT:
                         choix+=1
                         if (choix==len(LISTE_UPGRADES)):
@@ -466,16 +468,21 @@ class Game:
         while(continuer==True):
             self.draw()
             phrase="upgrade "+str(choix)+" : "
-            up_text.change_text(phrase,False)
-            up_text_2.change_text(UPRGADES_JOUEUR[choix],False)
-            self.screen_surface.blit(up_text.image, up_text.rect)
-            self.screen_surface.blit(up_text_2.image, up_text_2.rect)
+            num_upgrade_text.change_text(phrase,False)
+            upgrade_text.change_text(UPRGADES_JOUEUR[choix],False)
+            self.screen_surface.blit(num_upgrade_text.image, num_upgrade_text.rect)
+            self.screen_surface.blit(upgrade_text.image, upgrade_text.rect)
             self.window.blit(
                 self.screen_surface, self.screen_shake_offset
             )  # on affiche la surface sur la fenetre
             pygame.display.flip()
             keys = pygame.key.get_pressed()
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    continuer = False
+                    pygame.quit()
+                    exit()
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         continuer = False
